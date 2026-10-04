@@ -1,0 +1,25 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+token*.json
+secrets/
+
+# Personal runtime data: store outside the repository
+local/
+private/
+personal/
+memory/
+runs/
+*.log
+
+# Development artifacts
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.pytest_cache/
