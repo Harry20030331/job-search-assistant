@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "fictional": true,
+  "identity": {
+    "fullName": "Alex Morgan",
+    "firstName": "Alex",
+    "lastName": "Morgan"
+  },
+  "contact": {
+    "email": "alex.morgan@example.com",
+    "phone": "+1 202 555 0142",
+    "currentLocation": "Example City, CA"
+  },
+  "education": [
+    {
+      "institution": "Example Institute of Technology",
+      "degree": "Master of Science",
+      "field": "Computer Science",
+      "startDate": "2025-09",
+      "endDate": "2027-06"
+    }
+  ],
+  "experiences": [
+    {
+      "id": "example-labs",
+      "employer": "Example Labs (fictional)",
+      "title": "Software Engineering Intern",
+      "startDate": "2026-06",
+      "endDate": "2026-08",
+      "description": "Built a document search prototype and tested retrieval quality on a synthetic support dataset."
+    }
+  ],
+  "skills": [
+    "Python",
+    "TypeScript",
+    "SQL",
+    "Information retrieval"
+  ],
+  "projects": [
+    {
+      "name": "Study Search",
+      "description": "Built a retrieval assistant with source citations and deterministic regression checks."
+    }
+  ],
+  "workAuthorization": {
+    "authorizedUs": true,
+    "sponsorshipNow": false,
+    "sponsorshipFuture": false
+  },
+  "availability": {
+    "startDate": "2027-07-01",
+    "relocation": null
+  },
+  "_meta": {
+    "provenance": "Entirely fictional course fixture, created 2026-10-15. Never submit to an employer.",
+    "unknowns": [
+      "availability.relocation"
+    ]
+  }
+}

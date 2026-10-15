@@ -1,42 +1,37 @@
 # Job Search Assistant
 
-A personal job-search assistant built on the Codex harness. It handles research, repetitive form filling, and interview coordination so users can focus on choosing opportunities, preparing, and interviewing.
+A local job-search assistant built on the Codex harness. Matching and Submission share one opportunity record; Codex operates the browser, while the local application validates records and presents Status and Review.
 
-**Status:** Initial project scaffold. Module implementations and evaluation runners are under development.
+This is a one-time, independently maintained extraction of an existing application workflow. The course distribution uses fictional inputs. Live employer workflows still require the user's own candidate facts, resume, browser access and authorization.
 
-## Modules and ownership
+## Quick start
 
-Each owner builds the complete module pipeline and its evaluation: cases, metrics, graders, baseline comparisons, and failure analysis.
+Requires Node.js 22 or later and npm. Open this repository in Codex for agent-driven browser work.
 
-| Module | Owner | Scope |
-| --- | --- | --- |
-| [Job Matching](modules/job-matching/) | Hannah Guan | Find and analyze suitable jobs; refine recommendations with user feedback. |
-| [Application Support](modules/application/) | Yuming Feng | Fill and check applications; resolve missing information with the user; submit when authorized. |
-| [Interview Coordination](modules/interview/) | Erica Zhao | Turn recruiting emails into preparation briefs and scheduling options; save and reuse reflections. |
+```sh
+npm ci
+npm run verify
+npm run demo -- --dir /tmp/job-search-demo
+```
 
-Yuming also coordinates the shared repository and module integration. Users provide truthful profiles and preferences, select opportunities, resolve unknowns, and confirm consequential actions.
-
-## Contribution and evaluation
-
-Our contribution is domain skills, workflow logic, supporting tools, and structured state/memory on top of Codex. We evaluate the benefit over basic task instructions using the same Codex model, tools, resources, and cases.
-
-| Module | Test data | Success criteria |
-| --- | --- | --- |
-| Job Matching | Historical jobs, profiles, preferences | Relevant matches and evidence-based analysis. |
-| Application Support | Different forms; complete and incomplete profiles | Correct, complete filling; unknown facts are not guessed. |
-| Interview Coordination | Recruiting emails, application context, research, calendars, reflections | Accurate briefs, valid scheduling, and reliable record reuse. |
-
-Use documented data sources, normal and edge cases, separate development and held-out tests, and resettable test environments. Report module quality, failures, user effort, time, and cost. Reflection effectiveness and proactive outreach are secondary to the three core workflows.
-
-## Delivery
-
-Users clone this repository and open it in Codex, then configure their own tools, connections, and permissions. Module owners will document supported setup and execution steps as implementations land.
-
-Keep real profiles, resumes, emails, calendars, credentials, and personal memory **outside this repository**, including its Git history. Only fictional examples belong here.
+The demo directory must not already exist. The command creates private runtime storage and prints the local Review and fictional employer-form URLs. Follow [the demo walkthrough](docs/demo.md). Stop with Ctrl+C; use a new directory for a clean reset. No model API key is needed to run the local UI or deterministic tests. Agent execution uses the user's configured Codex session and browser capabilities.
 
 ## Layout
 
-- `modules/`: independently developed workflows and evaluations.
-- `shared/`: agreed interfaces and reusable utilities.
-- `examples/`: fictional fixtures and configuration examples.
-- [AGENTS.md](AGENTS.md): concise contributor and agent instructions.
+- `skills/matching/`: job discovery and screening; Hannah Guan owns further development.
+- `skills/submission/`: application preparation, review and ATS techniques; Yuming Feng owns this workflow and integration.
+- `src/`: record management, validation, local UI, CLI adapters and tests.
+- `docs/`: operating contracts, setup, ownership and extraction notes.
+- `examples/`: a fictional candidate, preferences and resume.
+- `scripts/`: distribution and interface checks.
+- Runtime `data/`: created locally, ignored by Git; facts, preferences, resume mappings, opportunities, drafts and discovery state.
+
+Erica Zhao owns Interview Coordination. That workflow is not implemented in this extraction. See [team interfaces](docs/team-interfaces.md) before extending the common data model.
+
+## Personal use and privacy
+
+Candidate and resume inputs can live outside the repository. Start with [candidate inputs](docs/candidate-inputs.md), [commands](docs/commands.md), the [workflow contract](docs/workflow-contract.md) and [AGENTS.md](AGENTS.md). Keep personal inputs, runtime records and credentials outside version control. The example identity is fictional and must never be sent to real employers.
+
+## Evidence and evaluation
+
+The inherited tests validate deterministic storage, approval, synchronization and recovery behavior. The demo validates a synthetic local workflow. Neither establishes real-world agent accuracy or improvement over a baseline. Evaluation datasets, baselines and measured results remain future work. [Extraction notes](docs/extraction.md) describe scope and limitations.

@@ -1,5 +1,3 @@
-# Examples
+# Fictional inputs
 
-Add clearly labeled fictional profiles, jobs, forms, emails, and calendars for development and demonstrations.
-
-Record fixture provenance and expected outcomes. Keep held-out evaluation cases separate from development examples. Do not copy real applicant information, correspondence, credentials, or personal memory.
+Alex Morgan, all institutions/employers and all achievements are synthetic. candidate.json is the factual source, preferences.md records goals, resumes.json maps the llm category to the synthetic PDF. Relocation is intentionally unknown. The full set is for the local demo only.

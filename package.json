@@ -1,0 +1,32 @@
+{
+  "name": "job-search-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preflight": "tsx src/cli/preflightCli.ts",
+    "jobs": "tsx src/cli/jobLibraryCli.ts",
+    "lifecycle": "tsx src/cli/applicationLifecycleCli.ts",
+    "review": "tsx src/cli/reviewServerCli.ts",
+    "review:resume": "tsx src/cli/reviewServerCli.ts",
+    "runtime:init": "tsx src/cli/runtimeInitCli.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm test && npm run ui:check && node scripts/verify-boundaries.mjs && node scripts/check-distribution.mjs",
+    "profile": "tsx src/cli/profileCli.ts",
+    "data": "tsx src/cli/applicationDataCli.ts",
+    "ui:check": "node scripts/check-ui-contract.mjs",
+    "drafts": "tsx src/cli/draftsCli.ts",
+    "discovery": "tsx src/cli/discoveryCli.ts",
+    "demo": "tsx src/demo/cli.ts"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.4",
+    "vitest": "^4.1.11"
+  }
+}
