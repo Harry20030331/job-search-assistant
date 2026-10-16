@@ -1,10 +1,10 @@
 # Candidate inputs
 
-Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping categories to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer.
+Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping categories to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Initialize it once with `npm run setup:example`, then use the working copy:
 
 ```sh
-npm run profile -- --profile examples/candidate.json --check
-npm run preflight -- --url https://careers.example.com/jobs/demo --category llm --profile examples/candidate.json --manifest examples/resumes.json
+npm run profile -- --profile data/candidate.json --check
+npm run preflight -- --url https://careers.example.com/jobs/demo --category llm --profile data/candidate.json --manifest data/resumes.json
 ```
 
 The profile loader accepts a flat schemaVersion 2 record, as in `examples/candidate.json`. It also supports schemaVersion 3 descriptors referencing separate profile/experience files for users who already maintain those sources. This is optional; there is no default personal directory dependency. Relative references resolve from the descriptor's directory. Preflight validates identity and resume integrity, not completeness for every employer form. Missing form facts must remain questions.

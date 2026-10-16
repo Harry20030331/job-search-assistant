@@ -1,40 +1,70 @@
 # Job Search Assistant
 
-A local job-search assistant built on the Codex harness. Matching and Submission share one opportunity record; Codex operates the browser, while the local application validates records and presents Status and Review.
+A local job-search workbench built on Codex. Develop around one candidate: load the saved example into local data once, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents Status and Review.
 
-This is a one-time, independently maintained extraction of an existing application workflow. The course distribution uses fictional inputs. Live employer workflows still require the user's own candidate facts, resume, browser access and authorization.
+```text
+examples/  -- setup:example (once) -->  data/  <-- everyday work -->  Codex + skills
+saved candidate baseline              current candidate           Status / Review
+committed to Git                       local, persistent
+```
 
-## Quick start
+## Start developing
 
-Requires Node.js 22 or later and npm. Open this repository in Codex for agent-driven browser work.
+Requires Node.js 22 or later and npm. Open the repository in Codex.
 
 ```sh
 npm ci
 npm run verify
-npm run setup:example
-npm run review
+npm run setup:example   # First use only; refuses an existing data directory.
+npm run review          # Run again whenever you resume work.
 ```
 
-`setup:example` copies the fictional inputs into a new local `data/` with empty records. Run it once. `review` starts the existing Status/Review workbench and preserves local edits across restarts; it never recopies examples. Keep `data/` out of Git. Candidate facts are currently edited in `data/candidate.json`; there is no candidate editor in the web UI yet.
+Open the printed local URL. The workbench starts with an empty job list and review queue. The default port is 64441. No separate model API key is needed for the UI or deterministic tests; agent execution uses your configured Codex session.
 
-For an optional end-to-end submission test, run `npm run demo -- --dir /tmp/job-search-demo` with a new directory and follow [the walkthrough](docs/demo.md). This separate fixture adds one fictional job and a loopback employer form. It is not required for normal startup. No model API key is needed for the local UI or deterministic tests; agent execution uses the user's configured Codex session.
+The saved example is Alex Morgan, a fictional MS student seeking an entry-level applied AI/software role. Setup copies the complete candidate input bundle: facts, preferences, resume mapping and PDF. It also creates empty progress stores. It does not create a fake job or application.
 
-## Layout
+## Repository and working data
 
-- `skills/matching/`: job discovery and screening; Hannah Guan owns further development.
-- `skills/submission/`: application preparation, review and ATS techniques; Yuming Feng owns this workflow and integration.
-- `src/`: record management, validation, local UI, CLI adapters and tests.
-- `docs/`: operating contracts, setup, ownership and extraction notes.
-- `examples/`: a fictional candidate, preferences and resume.
-- `scripts/`: distribution and interface checks.
-- Runtime `data/`: created locally, ignored by Git; facts, preferences, resume mappings, opportunities, drafts and discovery state.
+```text
+skills/                         Workflow instructions
+  matching/                     Discovery and screening
+  submission/                   Application workflow and ATS-specific skills
+src/                            Application logic, CLI, UI and tests
+  demo/                         Optional fictional employer-form test
+scripts/                        Development verification checks
+docs/                           Contracts, interfaces and operating instructions
+examples/                       Saved fictional candidate input bundle
+  candidate.json                Facts, experience and scoped answers
+  preferences.md                Goals and screening/writing preferences
+  resumes.json                  Resume paths and integrity hashes
+  alex-morgan-resume.pdf         Resume consistent with the candidate
 
-Erica Zhao owns Interview Coordination. That workflow is not implemented in this extraction. See [team interfaces](docs/team-interfaces.md) before extending the common data model.
+data/                           Generated locally; ignored by Git
+  candidate.json                Current working candidate
+  preferences.md                Current working preferences
+  resumes.json                  Current resume mapping
+  alex-morgan-resume.pdf         Initial working resume copy
+  opportunities.json            Shared job and application progress
+  drafts/                       Working answers, questions and approvals
+  discovery-state.json          Completed discovery checkpoints
+```
 
-## Personal use and privacy
+Edit candidate facts and preferences in `data/`; use the domain commands for job/application updates. If a resume changes, update its mapping and hash. Restarting Review reuses the same data and never reloads the example. Local changes do not modify `examples/`. The current web interface has Status and Review; candidate editing uses the files. See [candidate inputs](docs/candidate-inputs.md) and [commands](docs/commands.md).
 
-Candidate and resume inputs can live outside the repository. Start with [candidate inputs](docs/candidate-inputs.md), [commands](docs/commands.md), the [workflow contract](docs/workflow-contract.md) and [AGENTS.md](AGENTS.md). Keep personal inputs, runtime records and credentials outside version control. The example identity is fictional and must never be sent to real employers.
+Commit reusable code, skills and deliberate improvements to the fictional baseline. Keep working data local. An example update reaches a new workspace on initialization, not an existing workspace automatically. For an independent run, use an explicitly selected external directory; see [structure](docs/structure.md).
 
-## Evidence and evaluation
+## Team development
 
-The inherited tests validate deterministic storage, approval, synchronization and recovery behavior. The demo validates a synthetic local workflow. Neither establishes real-world agent accuracy or improvement over a baseline. Evaluation datasets, baselines and measured results remain future work. [Extraction notes](docs/extraction.md) describe scope and limitations.
+| Owner | Starting point | Handoff |
+| --- | --- | --- |
+| Hannah Guan | `skills/matching/` and jobs/discovery interfaces | Create and maintain shared opportunities with screening evidence. |
+| Yuming Feng | `skills/submission/`, review and lifecycle interfaces | Advance the same opportunity through preparation, approval and verified submission. |
+| Erica Zhao | Design Interview Coordination; implementation is pending | Link recruiting activity to an opportunity and agree on new interview fields before extending storage. |
+
+Each developer can use a local copy of the same fictional candidate while keeping runtime changes independent. Work on feature branches and use PRs. Coordinate shared schema changes; do not create another authoritative job list. Read [team interfaces](docs/team-interfaces.md), the [workflow contract](docs/workflow-contract.md) and [AGENTS.md](AGENTS.md).
+
+## Optional submission exercise
+
+`npm run demo -- --dir /tmp/job-search-demo` creates a separate, fresh runtime with one fictional job and a loopback employer form. Follow [the walkthrough](docs/demo.md). This tests review and submission control flow; normal workbench startup does not depend on it.
+
+The candidate is synthetic and must never be submitted to a real employer. Tests and the local exercise do not establish real-world agent accuracy; evaluation datasets, baselines and measured results remain future work. This course repository is maintained independently from the original personal system. See [extraction notes](docs/extraction.md) for scope and validation.

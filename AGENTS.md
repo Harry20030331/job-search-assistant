@@ -15,7 +15,7 @@ Work on a feature branch and use a pull request for team review. Keep documentat
 ## Execution boundaries
 
 - Codex's in-app Browser is the only page executor. No Chrome profile dependency, extension, Simplify, alternate browser engine, hidden ATS API or retired executor.
-- Candidate scope is configured in the selected preferences file. Example data is fictional and must only be used with the local demo. Never submit it to an employer. Legacy China code is inert compatibility code, not an active workflow.
+- Candidate scope is configured in the selected preferences file. Example data is fictional and is for local development, fixtures and offline evaluation. Never submit it to an employer. Legacy China code is inert compatibility code, not an active workflow.
 - Every new application needs an explicit configured category. Never infer or silently switch the category or mapped approved PDF.
 - For discovery, read `skills/matching/SKILL.md` and `docs/job-discovery.md`. Use the job-library interfaces; discovery does not authorize applying or submitting.
 - For filling, use `skills/submission/SKILL.md` and the applicable ATS module. Deterministic approved facts are automatic; genuinely unknown facts become review questions. Do not invent personal history.
@@ -31,4 +31,4 @@ Keep shared operational policy in the workflow contract and platform-specific te
 
 Hannah Guan owns Matching; Yuming Feng owns Submission and integration; Erica Zhao owns Interview Coordination. The shared opportunity record is the handoff. Coordinate shared schema changes with affected owners. Interview implementation is pending; do not claim it exists. Candidate facts and resume paths belong to selected inputs, never skills.
 
-Read `docs/demo.md` before using synthetic fixtures. The demo uses a separate loopback form and temporary runtime, with no employer actions.
+Start local development with `npm run setup:example` once, then resume with `npm run review`. Treat `data/` as one persistent candidate workspace; never reseed it on startup or copy it back to examples automatically. Read `docs/demo.md` only when running the optional fictional submission exercise.
