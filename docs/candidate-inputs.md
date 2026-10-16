@@ -1,6 +1,6 @@
 # Candidate inputs
 
-Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping categories to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Initialize it once with `npm run setup:example`, then use the working copy:
+Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping categories to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Open the default case with `npm run review`, or select a saved case with `npm run example:load -- --from <example-directory>`, then use the working copy:
 
 ```sh
 npm run profile -- --profile data/candidate.json --check
@@ -15,7 +15,7 @@ The example preferences apply only to the fictional candidate. Known answers ret
 
 ## Runtime
 
-For the bundled fictional candidate, run `npm run setup:example` once, then `npm run review`. The copied `data/candidate.json` is the editable working profile. Changes remain local and do not alter `examples/`; setup refuses an existing `data/`.
+Run `npm run review` to use the current working state, automatically supplying the default fictional candidate when data is absent. `data/candidate.json` is the editable working profile. Use `npm run example:load` to replace current state from a saved case; changes remain local and do not alter `examples/`. Stop active writers before loading; the previous state is backed up locally.
 
 ```sh
 npm run runtime:init -- --dir /tmp/my-new-runtime

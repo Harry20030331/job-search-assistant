@@ -10,7 +10,7 @@ Use a feature branch and PR. Keep changes independent where possible, agree on s
 
 ## First development session
 
-1. Install dependencies and run `npm run verify`. Initialize your own working candidate with `npm run setup:example`; use `npm run review` for later sessions.
+1. Install dependencies and run `npm run verify`. Use `npm run review` to open your current working candidate. Load/reset a saved case with `npm run example:load` or select another using `--from <directory>`; stop active writers before switching.
 2. Read `data/candidate.json` and `data/preferences.md`, then the relevant skill and workflow contract. Runtime updates stay in `data/`; share code and deliberately maintained fictional inputs through Git.
 3. Hannah can exercise discovery/screening against supplied job descriptions and persist accepted opportunities. Yuming can prepare and review an application for those same records. Erica can begin with fictional recruiting invitations and define the interview handoff before extending the shared schema.
 4. Use isolated fixtures for repeatable tests; everyday development data may evolve. Keep evaluation inputs/model/tools/budgets comparable when measuring module improvements.

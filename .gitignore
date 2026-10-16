@@ -12,3 +12,5 @@ runs/
 *.key
 credentials*.json
 secrets/
+.example-load-*
+.example-load.lock/

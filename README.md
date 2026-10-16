@@ -1,11 +1,11 @@
 # Job Search Assistant
 
-A local job-search workbench built on Codex. Develop around one candidate: load the saved example into local data once, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents Status and Review.
+A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents Status and Review.
 
 ```text
-examples/  -- setup:example (once) -->  data/  <-- everyday work -->  Codex + skills
-saved candidate baseline              current candidate           Status / Review
-committed to Git                       local, persistent
+examples/  -- example:load -->  data/  <-- everyday work -->  Codex + skills
+saved candidate states        current candidate           Status / Review
+committed to Git               local, persistent
 ```
 
 ## Start developing
@@ -15,13 +15,22 @@ Requires Node.js 22 or later and npm. Open the repository in Codex.
 ```sh
 npm ci
 npm run verify
-npm run setup:example   # First use only; refuses an existing data directory.
-npm run review          # Run again whenever you resume work.
+npm run review          # Open the current working state.
 ```
 
 Open the printed local URL. The workbench starts with an empty job list and review queue. The default port is 64441. No separate model API key is needed for the UI or deterministic tests; agent execution uses your configured Codex session.
 
-The saved example is Alex Morgan, a fictional MS student seeking an entry-level applied AI/software role. Setup copies the complete candidate input bundle: facts, preferences, resume mapping and PDF. It also creates empty progress stores. It does not create a fake job or application.
+The default working case is Alex Morgan, a fictional MS student seeking an entry-level applied AI/software role. A checkout without local data loads this default automatically. Existing data is preserved on ordinary startup.
+
+To reset to the saved Alex state or switch cases, stop Review and other writers, then load an example:
+
+```sh
+npm run example:load                              # Load the saved Alex state.
+npm run example:load -- --from /path/to/example    # Load another saved case.
+npm run review
+```
+
+Loading replaces the whole working state rather than merging candidates. The previous data is retained under ignored `local/example-backups/`; the command prints its path. Invalid examples leave current data unchanged. A bundle contains candidate facts, preferences, a relative resume mapping and its PDFs, plus optional opportunities, drafts and discovery checkpoints. Omitted progress starts empty. The repository currently ships one example; the loader accepts other bundles without code changes.
 
 ## Repository and working data
 
@@ -49,9 +58,9 @@ data/                           Generated locally; ignored by Git
   discovery-state.json          Completed discovery checkpoints
 ```
 
-Edit candidate facts and preferences in `data/`; use the domain commands for job/application updates. If a resume changes, update its mapping and hash. Restarting Review reuses the same data and never reloads the example. Local changes do not modify `examples/`. The current web interface has Status and Review; candidate editing uses the files. See [candidate inputs](docs/candidate-inputs.md) and [commands](docs/commands.md).
+Edit candidate facts and preferences in `data/`; use the domain commands for job/application updates. If a resume changes, update its mapping and hash. Restarting Review reuses existing data. Explicit example loading replaces it. Local changes do not modify `examples/`. The current web interface has Status and Review; candidate editing uses the files. See [candidate inputs](docs/candidate-inputs.md) and [commands](docs/commands.md).
 
-Commit reusable code, skills and deliberate improvements to the fictional baseline. Keep working data local. An example update reaches a new workspace on initialization, not an existing workspace automatically. For an independent run, use an explicitly selected external directory; see [structure](docs/structure.md).
+Commit reusable code, skills and deliberate improvements to the fictional baseline. Keep working data local. An example update reaches the working data when explicitly loaded; it does not synchronize automatically. For an independent run, use an explicitly selected external directory; see [structure](docs/structure.md).
 
 ## Team development
 

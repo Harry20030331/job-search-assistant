@@ -30,8 +30,10 @@ See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contra
 
 ## Example and local workspace
 
-`examples/` is the committed baseline. `npm run setup:example` copies its inputs once to ignored local `data/` and creates empty opportunity, draft and discovery stores. `npm run review` resumes that data without reseeding. Existing data is never overwritten by setup. To try a clean copy, explicitly use a different workspace directory. There is no automatic reset or reverse synchronization to examples.
+`examples/` contains saved fictional state. `data/` is the current working state. `npm run review` opens existing data; when data is absent, it supplies the default Alex case. `npm run example:load` replaces current data with the default example; `--from <directory>` selects another bundle, and `--dir <workspace>` selects the destination workspace. Stop Review and other writers before loading.
+
+The loader validates a staged copy before switching. It preserves previous data under ignored `local/example-backups/` and reports that path. It copies candidate facts, preferences and all manifest-referenced PDFs, plus optional opportunity, draft and discovery records. If progress files are omitted, those stores start empty. It never merges two candidates. Examples remain unchanged as working data evolves.
 
 `src/` contains application behavior, including initialization. `scripts/` contains development checks; it does not store candidate state. `src/demo/` is an optional fixed submission test with a simulated employer, separate from normal workbench startup. The current web UI contains Status and Review, not a candidate editor or workspace switcher.
 
-The full directory tree and first-run commands are maintained in the repository README. The candidate bundle is copied as a unit; its README is documentation, not runtime input. Progress is created empty and accumulates around that one candidate. Working data is not a log of the examples directory. Deliberately improving the shareable fictional baseline is a separate reviewed change.
+The full directory tree and startup/loading commands are maintained in the repository README. The candidate bundle is copied as a unit; its README is documentation, not runtime input. Progress is loaded from the selected example when provided, otherwise starts empty, and then accumulates around that candidate. Working data is not a log of the examples directory. Deliberately improving the shareable fictional baseline is a separate reviewed change.

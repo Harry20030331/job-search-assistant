@@ -2,7 +2,7 @@
 
 Run these commands from the repository root. For directory ownership see [structure](structure.md); for authorization see [workflow-contract](workflow-contract.md). These commands manage local records unless the description explicitly says otherwise. Browser filling is performed separately by Codex.
 
-- `npm run setup:example`: initialize local `data/` once from fictional inputs, with no jobs or approvals. Use `-- --dir <existing-workspace>` for an external workspace. Refuses existing data.
+- `npm run example:load`: replace the working state from the default fictional example. Add `-- --from <example-directory> --dir <existing-workspace>` to select source and destination. Stop Review and other writers first. The prior data is backed up locally; the command prints its path.
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
 - `npm run ui:check`: verify the frozen UI v1 baseline.
 

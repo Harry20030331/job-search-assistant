@@ -2,6 +2,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { startReviewServer } from "../review/reviewServer.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
+import { ensureExampleData } from "../example.js";
 import { readReviewBatch } from "../review/reviewStore.js";
 
 export interface ReviewServerCliArgs {
@@ -56,6 +57,7 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
     projectRoot = resolve(argv[1]);
     argv = [];
   }
+  if (argv.length === 0) await ensureExampleData(projectRoot, resolve(defaultProjectRoot, "examples"));
   const recovered = argv.length === 0 ? await resolveRecoveryInputs(projectRoot) : undefined;
   const parsed = recovered ?? parseReviewServerArgs(argv);
   const reviewPath = resolve(parsed.reviewPath);

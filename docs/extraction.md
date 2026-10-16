@@ -20,8 +20,14 @@ For real use, supply your own facts and approved resume and use the documented w
 
 ## Example workbench refinement - 2026-10-15
 
-Added a one-time example initializer for an existing workspace. The default development flow is a single ignored `data/`, seeded from examples and reused on every Review restart. The fixed fake-employer scenario remains optional. Alex Morgan now has a coherent education/work timeline, detailed ownership, skill limits, preferences and intentionally unanswered fields; the resume is derived from those fictional facts. The broader workbench architecture remains deliberately small, with no profile editor or multi-workspace selector.
+The default development flow is a single ignored `data/`, loaded from a saved example and reused on ordinary Review restarts. The original initialize-only entrypoint has been superseded by the reloadable state loader described below. The fixed fake-employer scenario remains optional. Alex Morgan now has a coherent education/work timeline, detailed ownership, skill limits, preferences and intentionally unanswered fields; the resume is derived from those fictional facts. The broader workbench architecture remains deliberately small, with no profile editor or multi-workspace selector.
 
 Legacy report output and example text were translated to English. Compatibility patterns retain external-language recognition via Unicode escapes, and negative language tests retain their original meaning. English aliases are recognized by the inert regional classifier.
 
-Validation after refinement: 375 deterministic tests in 28 files, type checks, UI baseline, boundary checks and the distribution language/privacy scan passed. The revised one-page PDF was rendered and inspected. A fresh local workspace contains copied inputs and zero opportunities; reseeding cannot overwrite local edits. The normal course workspace uses port 64441 to avoid the original system's default port.
+Validation after refinement: 375 deterministic tests in 28 files, type checks, UI baseline, boundary checks and the distribution language/privacy scan passed. The revised one-page PDF was rendered and inspected. A fresh local workspace contains copied inputs and zero opportunities; ordinary restarts preserve local edits. The normal course workspace uses port 64441 to avoid the original system's default port.
+
+## Reloadable example states - 2026-10-15
+
+The user clarified that loading is a repeatable state switch, not a first-use setup. `example:load` now replaces working data from a selected bundle, including optional saved progress; it validates the staged copy and preserves previous data locally. Resume filenames come from the manifest. Ordinary Review startup supplies the default Alex case only if data is absent. The repository does not track private working data or backups.
+
+Validation: 378 tests passed, including repeated loading, switching candidate/resume names, loading saved progress, retaining backups, rejecting invalid snapshots and preserving current state on failure. Type checks, UI baseline and distribution/boundary checks passed.
