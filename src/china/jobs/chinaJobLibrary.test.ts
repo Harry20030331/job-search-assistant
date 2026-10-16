@@ -16,17 +16,17 @@ async function temporaryPath() {
 function job(overrides: Partial<ChinaJobRecord> = {}): ChinaJobRecord {
   return {
     jobId: "boss-123",
-    company: "示例科技",
-    title: "大模型应用工程师",
-    location: "上海",
+    company: "Example Technology",
+    title: "Applied LLM Engineer",
+    location: "Shanghai",
     category: "agent",
     bossUrl: "https://www.zhipin.com/job_detail/example.html",
-    recruiterName: "王女士",
-    recruiterTitle: "招聘经理",
+    recruiterName: "Jordan Lee",
+    recruiterTitle: "Recruiting Manager",
     firstSeen: "2026-08-08",
     lastVerified: "2026-08-08",
     status: "discovered",
-    note: "Agent 平台方向",
+    note: "Agent platform work",
     ...overrides
   };
 }
@@ -39,7 +39,7 @@ describe("China job library", () => {
       job({
         jobId: "boss-456",
         bossUrl: "https://www.zhipin.com/job_detail/robotics.html",
-        title: "机器人学习工程师",
+        title: "Robot Learning Engineer",
         category: "robotics",
         status: "awaiting_review",
         recruiterName: "",
@@ -68,7 +68,7 @@ describe("China job library", () => {
 
   test("rejects duplicate job identities and Boss URLs", async () => {
     const path = await temporaryPath();
-    await expect(writeChinaJobLibrary(path, [job(), job({ title: "另一个岗位" })])).rejects.toThrow("duplicate_china_job");
+    await expect(writeChinaJobLibrary(path, [job(), job({ title: "Another role" })])).rejects.toThrow("duplicate_china_job");
     await expect(writeChinaJobLibrary(path, [job(), job({ jobId: "boss-other" })])).rejects.toThrow("duplicate_china_job");
   });
 

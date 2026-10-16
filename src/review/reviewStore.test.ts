@@ -1346,7 +1346,7 @@ describe("fixed review publication interface", () => {
 
   test("rejects non-English display content without mutating the review", async () => {
     const path = await reviewPath(); const batch = validBatch(); await createReviewBatch(path, batch);
-    await expect(publishReviewItem(path, { ...batch.applications[0]!, snapshotId: "new", questions: [{ id: "q", prompt: "请补充", required: true }] }, { snapshotId: batch.applications[0]!.snapshotId, revision: null, decision: "pending" })).rejects.toThrow("english_review_content_required");
+    await expect(publishReviewItem(path, { ...batch.applications[0]!, snapshotId: "new", questions: [{ id: "q", prompt: "\u8bf7\u8865\u5145", required: true }] }, { snapshotId: batch.applications[0]!.snapshotId, revision: null, decision: "pending" })).rejects.toThrow("english_review_content_required");
     expect(await readReviewBatch(path)).toEqual(batch);
   });
 });

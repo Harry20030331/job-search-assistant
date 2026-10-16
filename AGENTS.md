@@ -2,7 +2,7 @@
 
 These instructions apply throughout this repository.
 
-Work on a feature branch and use a pull request for team review. Keep repository content in English. Use fictional fixtures only. Never copy personal histories or credentials.
+Work on a feature branch and use a pull request for team review. Keep documentation, UI text, examples, comments and test descriptions in English. External-language recognition patterns and intentional non-English rejection probes may use Unicode escapes; do not translate away their behavior. Use fictional fixtures only. Never copy personal histories or credentials.
 
 ## Active authorities
 

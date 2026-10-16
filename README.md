@@ -11,10 +11,13 @@ Requires Node.js 22 or later and npm. Open this repository in Codex for agent-dr
 ```sh
 npm ci
 npm run verify
-npm run demo -- --dir /tmp/job-search-demo
+npm run setup:example
+npm run review
 ```
 
-The demo directory must not already exist. The command creates private runtime storage and prints the local Review and fictional employer-form URLs. Follow [the demo walkthrough](docs/demo.md). Stop with Ctrl+C; use a new directory for a clean reset. No model API key is needed to run the local UI or deterministic tests. Agent execution uses the user's configured Codex session and browser capabilities.
+`setup:example` copies the fictional inputs into a new local `data/` with empty records. Run it once. `review` starts the existing Status/Review workbench and preserves local edits across restarts; it never recopies examples. Keep `data/` out of Git. Candidate facts are currently edited in `data/candidate.json`; there is no candidate editor in the web UI yet.
+
+For an optional end-to-end submission test, run `npm run demo -- --dir /tmp/job-search-demo` with a new directory and follow [the walkthrough](docs/demo.md). This separate fixture adds one fictional job and a loopback employer form. It is not required for normal startup. No model API key is needed for the local UI or deterministic tests; agent execution uses the user's configured Codex session.
 
 ## Layout
 

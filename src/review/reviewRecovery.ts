@@ -39,7 +39,7 @@ export async function resolveRecoveryInputs(projectRoot: string): Promise<Recove
     for (const name of await readdir(reviewPath)) if (name.endsWith(".json")) await requirePrivateFile(join(reviewPath, name));
     const [review, tracker, jobs] = await Promise.all([readReviewBatch(reviewPath), readApplicationTracker(canonical), readJobLibrary(canonical)]);
     validateRecoveryCandidate(review, tracker, jobs);
-    return { reviewPath, trackerPath: canonical, jobsPath: canonical, chinaJobsPath: "", chinaOutreachPath: "", port: 64440,
+    return { reviewPath, trackerPath: canonical, jobsPath: canonical, chinaJobsPath: "", chinaOutreachPath: "", port: 64441,
       applicationCount: review.applications.length, applicationIds: review.applications.map(item => item.applicationId), liveAtsState: "unverified" };
   }
   const reviewsPath = join(projectRoot, "reviews");

@@ -7,6 +7,12 @@ export async function initializeRuntime(directory: string, _now = new Date()): P
   const root = resolve(directory);
   // Exclusive mkdir rejects existing directories, files and symlinks.
   await mkdir(root, { mode: 0o700 });
+  return initializeRuntimeData(root);
+}
+
+/** Initialize data inside an existing workspace; never replace existing data. */
+export async function initializeRuntimeData(directory: string): Promise<RecoveryInputs> {
+  const root = resolve(directory);
   await mkdir(join(root, "data"), { mode: 0o700 });
   await mkdir(join(root, "data/drafts"), { mode: 0o700 });
   const files = [

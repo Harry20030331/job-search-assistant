@@ -16,10 +16,10 @@ function outreach(overrides: Partial<ChinaOutreachRecord> = {}): ChinaOutreachRe
   return {
     outreachId: "outreach-boss-123",
     jobId: "boss-123",
-    recruiterName: "王女士",
+    recruiterName: "Jordan Lee",
     category: "agent",
     cvFilename: "agent.pdf",
-    message: "您好，我对这个岗位很感兴趣。",
+    message: "Hello, I am interested in this role.",
     status: "draft",
     createdAt: "2026-08-08T20:00:00.000Z",
     updatedAt: "2026-08-08T20:00:00.000Z",
@@ -61,7 +61,7 @@ describe("China initial-outreach tracker", () => {
     const path = await temporaryPath();
     await expect(writeChinaOutreachTracker(path, {
       schemaVersion: 1,
-      outreach: [outreach(), outreach({ message: "另一条" })]
+      outreach: [outreach(), outreach({ message: "Another message" })]
     })).rejects.toThrow("duplicate_china_outreach");
     await expect(writeChinaOutreachTracker(path, {
       schemaVersion: 1,
@@ -73,7 +73,7 @@ describe("China initial-outreach tracker", () => {
     const path = await temporaryPath();
     await writeFile(path, JSON.stringify({
       schemaVersion: 1,
-      outreach: [{ ...outreach(), replies: ["您好"] }]
+      outreach: [{ ...outreach(), replies: ["Hello"] }]
     }), { mode: 0o600 });
     await expect(readChinaOutreachTracker(path)).rejects.toThrow("invalid_china_outreach_tracker");
     await writeFile(path, JSON.stringify({ schemaVersion: 2, outreach: [] }), { mode: 0o600 });

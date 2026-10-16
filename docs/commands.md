@@ -2,6 +2,7 @@
 
 Run these commands from the repository root. For directory ownership see [structure](structure.md); for authorization see [workflow-contract](workflow-contract.md). These commands manage local records unless the description explicitly says otherwise. Browser filling is performed separately by Codex.
 
+- `npm run setup:example`: initialize local `data/` once from fictional inputs, with no jobs or approvals. Use `-- --dir <existing-workspace>` for an external workspace. Refuses existing data.
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
 - `npm run ui:check`: verify the frozen UI v1 baseline.
 
@@ -17,7 +18,7 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run lifecycle -- transition --tracker <path> --application-id <id> --status <closed|interviewing|offer> --at <ISO>`: record one unambiguous protected recruiting update.
 - `npm run review` / `npm run review:resume`: restore the existing local review/status surface.
 - `npm run runtime:init -- --dir <new-directory>`: create private empty US records; the target must not exist.
-- `npm run review -- --runtime-dir <directory>`: serve an independent runtime; no China records required. The server defaults to loopback port 64440.
+- `npm run review -- --runtime-dir <directory>`: serve an independent runtime; no China records required. The course workspace defaults to loopback port 64441.
 - `npm run verify`: run type checks, synthetic tests, fixed UI and structural boundary verification.
 
 The `confirm-batch` input file is strict JSON with this exact shape (no additional fields):

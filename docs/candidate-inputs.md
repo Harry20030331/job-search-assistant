@@ -15,6 +15,8 @@ The example preferences apply only to the fictional candidate. Known answers ret
 
 ## Runtime
 
+For the bundled fictional candidate, run `npm run setup:example` once, then `npm run review`. The copied `data/candidate.json` is the editable working profile. Changes remain local and do not alter `examples/`; setup refuses an existing `data/`.
+
 ```sh
 npm run runtime:init -- --dir /tmp/my-new-runtime
 npm run review -- --runtime-dir /tmp/my-new-runtime

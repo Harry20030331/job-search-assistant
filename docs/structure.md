@@ -27,3 +27,9 @@ Opportunity availability and application stage are distinct. Closing a posting d
 The source workflow's private archive and runtime are excluded. Inert regional and credential helper code remains for compatibility and test coverage, with no configured accounts, private data or active commands. It is not needed to start the course demo. Tests may use synthetic legacy storage to validate recovery; normal startup uses opportunities and per-job drafts.
 
 See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contract](ui-contract.md), and [workflow contract](workflow-contract.md).
+
+## Example and local workspace
+
+`examples/` is the committed baseline. `npm run setup:example` copies its inputs once to ignored local `data/` and creates empty opportunity, draft and discovery stores. `npm run review` resumes that data without reseeding. Existing data is never overwritten by setup. To try a clean copy, explicitly use a different workspace directory. There is no automatic reset or reverse synchronization to examples.
+
+`src/` contains application behavior, including initialization. `scripts/` contains development checks; it does not store candidate state. `src/demo/` is an optional fixed submission test with a simulated employer, separate from normal workbench startup. The current web UI contains Status and Review, not a candidate editor or workspace switcher.

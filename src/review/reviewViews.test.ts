@@ -215,7 +215,7 @@ describe("review console views", () => {
     expect(visible).toContain("Saved &lt;answer&gt;");
     expect(visible).not.toContain("<textarea");
     expect(visible).toContain('class="choice-input"');
-    expect(visible).not.toContain("待补充");
+    expect(visible).not.toContain("\u5f85\u8865\u5145");
     expect(html).toContain("/api/review/answer");
     expect(html).not.toContain("/api/review/text");
     expect(html).toContain("approval.expectedDesiredRevision=state.desiredRevision");
@@ -591,11 +591,11 @@ describe("review console views", () => {
   test("renders the separate China lifecycle and recruiter without US evidence", () => {
     const rows: ChinaStatusViewItem[] = [{
       jobId: "boss-123",
-      company: "示例科技",
-      title: "大模型应用工程师",
-      location: "上海",
+      company: "Example Technology",
+      title: "Applied LLM Engineer",
+      location: "Shanghai",
       category: "agent",
-      recruiter: "王女士 · 招聘经理",
+      recruiter: "Jordan Lee · Recruiting Manager",
       href: "https://www.zhipin.com/job_detail/example.html",
       status: "awaiting_review",
       dateLabel: "08-08",
@@ -604,9 +604,9 @@ describe("review console views", () => {
     const html = renderChinaStatusPage(rows);
 
     expect(html).toContain("Discovered → Ready to Contact → Awaiting Review → Contacted → Closed");
-    expect(html).toContain("示例科技 · 上海");
-    expect(html).toContain("大模型应用工程师");
-    expect(html).toContain("王女士 · 招聘经理");
+    expect(html).toContain("Example Technology · Shanghai");
+    expect(html).toContain("Applied LLM Engineer");
+    expect(html).toContain("Jordan Lee · Recruiting Manager");
     expect(html).toContain("Awaiting Review");
     expect(html).not.toContain("Gmail confirmation");
     expect(html).not.toContain("Submitted");

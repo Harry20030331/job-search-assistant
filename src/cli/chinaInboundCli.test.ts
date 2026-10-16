@@ -16,9 +16,9 @@ async function setup() {
   await writeInboundHrTracker(path, {
     schemaVersion: 1,
     contacts: [
-      { ...base, contactId: "moonshot-song", recruiterName: "宋女士", company: "月之暗面", messageSummary: "Agentic RL", direction: "agent", companyTier: "top_ai_startup", status: "interested", reason: "明确匹配", nextAction: "prepare_reply" },
-      { ...base, contactId: "deeproute-liu", recruiterName: "刘先生", company: "元戎启行", messageSummary: "算法岗位", direction: "unclassified", companyTier: "top_robotics", status: "needs_clarification", reason: "方向不明确", nextAction: "ask_clarifying_question" },
-      { ...base, contactId: "huawei-huang", recruiterName: "黄先生", company: "华为", messageSummary: "Agent Infra", direction: "agent", companyTier: "big_tech", status: "not_interested", reason: "排除华为", nextAction: "none" }
+      { ...base, contactId: "moonshot-song", recruiterName: "Taylor Reed", company: "Moonshot AI", messageSummary: "Agentic RL", direction: "agent", companyTier: "top_ai_startup", status: "interested", reason: "Clear match", nextAction: "prepare_reply" },
+      { ...base, contactId: "deeproute-liu", recruiterName: "Casey Park", company: "DeepRoute", messageSummary: "Algorithm role", direction: "unclassified", companyTier: "top_robotics", status: "needs_clarification", reason: "Role direction unclear", nextAction: "ask_clarifying_question" },
+      { ...base, contactId: "huawei-huang", recruiterName: "Sam Chen", company: "Huawei", messageSummary: "Agent Infra", direction: "agent", companyTier: "big_tech", status: "not_interested", reason: "Excluded employer", nextAction: "none" }
     ]
   });
   const stdout: string[] = [];
@@ -41,7 +41,7 @@ describe("China inbound HR CLI", () => {
     expect(output).toContain("interested");
     expect(output).toContain("not_interested");
     expect(output).toContain("needs_clarification");
-    expect(output).toContain("## 感兴趣");
+    expect(output).toContain("## Interested");
   });
 
   test("rejects missing path", async () => {

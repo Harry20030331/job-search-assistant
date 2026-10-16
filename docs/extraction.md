@@ -17,3 +17,11 @@ For real use, supply your own facts and approved resume and use the documented w
 - The Codex in-app Browser walkthrough filled the fictional candidate, uploaded the fixture PDF, requested review with an unknown answer, approved the selected answer, synchronized it to the form and recorded a local simulated submission. Status displayed Submitted; the working draft was pruned after recording approval and receipt references.
 - The fictional PDF was inspected as rendered and as extracted text. Candidate inputs, real application history and device files are absent from the distribution. Team ownership names are intentional. The pattern scan is a supplement to file review, not proof against every possible secret.
 - The development test dependency was updated to Vitest 4; npm audit reported zero vulnerabilities at verification time.
+
+## Example workbench refinement - 2026-10-15
+
+Added a one-time example initializer for an existing workspace. The default development flow is a single ignored `data/`, seeded from examples and reused on every Review restart. The fixed fake-employer scenario remains optional. Alex Morgan now has a coherent education/work timeline, detailed ownership, skill limits, preferences and intentionally unanswered fields; the resume is derived from those fictional facts. The broader workbench architecture remains deliberately small, with no profile editor or multi-workspace selector.
+
+Legacy report output and example text were translated to English. Compatibility patterns retain external-language recognition via Unicode escapes, and negative language tests retain their original meaning. English aliases are recognized by the inert regional classifier.
+
+Validation after refinement: 375 deterministic tests in 28 files, type checks, UI baseline, boundary checks and the distribution language/privacy scan passed. The revised one-page PDF was rendered and inspected. A fresh local workspace contains copied inputs and zero opportunities; reseeding cannot overwrite local edits. The normal course workspace uses port 64441 to avoid the original system's default port.

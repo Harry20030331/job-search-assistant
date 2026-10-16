@@ -18,7 +18,8 @@
     "ui:check": "node scripts/check-ui-contract.mjs",
     "drafts": "tsx src/cli/draftsCli.ts",
     "discovery": "tsx src/cli/discoveryCli.ts",
-    "demo": "tsx src/demo/cli.ts"
+    "demo": "tsx src/demo/cli.ts",
+    "setup:example": "tsx src/cli/exampleInitCli.ts"
   },
   "dependencies": {
     "zod": "^3.23.8"

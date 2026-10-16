@@ -6,17 +6,17 @@ import { buildChinaStatusView } from "./chinaStatusView.js";
 function job(overrides: Partial<ChinaJobRecord> = {}): ChinaJobRecord {
   return {
     jobId: "boss-123",
-    company: "示例科技",
-    title: "大模型应用工程师",
-    location: "上海",
+    company: "Example Technology",
+    title: "Applied LLM Engineer",
+    location: "Shanghai",
     category: "agent",
     bossUrl: "https://www.zhipin.com/job_detail/example.html",
-    recruiterName: "王女士",
-    recruiterTitle: "招聘经理",
+    recruiterName: "Jordan Lee",
+    recruiterTitle: "Recruiting Manager",
     firstSeen: "2026-08-08",
     lastVerified: "2026-08-08",
     status: "discovered",
-    note: "Agent 平台",
+    note: "Agent platform",
     ...overrides
   };
 }
@@ -25,10 +25,10 @@ function outreach(overrides: Partial<ChinaOutreachRecord> = {}): ChinaOutreachRe
   return {
     outreachId: "outreach-boss-123",
     jobId: "boss-123",
-    recruiterName: "王女士",
+    recruiterName: "Jordan Lee",
     category: "agent",
     cvFilename: "agent.pdf",
-    message: "您好，我对这个岗位很感兴趣。",
+    message: "Hello, I am interested in this role.",
     status: "awaiting_review",
     createdAt: "2026-08-08T20:00:00.000Z",
     updatedAt: "2026-08-08T20:01:00.000Z",
@@ -40,11 +40,11 @@ describe("China status projection", () => {
   test("shows a discovered Boss job without creating outreach state", () => {
     expect(buildChinaStatusView([job()], [])).toEqual([{
       jobId: "boss-123",
-      company: "示例科技",
-      title: "大模型应用工程师",
-      location: "上海",
+      company: "Example Technology",
+      title: "Applied LLM Engineer",
+      location: "Shanghai",
       category: "agent",
-      recruiter: "王女士 · 招聘经理",
+      recruiter: "Jordan Lee · Recruiting Manager",
       href: "https://www.zhipin.com/job_detail/example.html",
       status: "discovered",
       dateLabel: "08-08",
@@ -55,7 +55,7 @@ describe("China status projection", () => {
   test("merges only the exact job outreach and projects its China lifecycle", () => {
     const rows = buildChinaStatusView([
       job(),
-      job({ jobId: "boss-456", bossUrl: "https://www.zhipin.com/job_detail/robotics.html", title: "机器人学习工程师", category: "robotics", recruiterName: "", recruiterTitle: "" })
+      job({ jobId: "boss-456", bossUrl: "https://www.zhipin.com/job_detail/robotics.html", title: "Robot Learning Engineer", category: "robotics", recruiterName: "", recruiterTitle: "" })
     ], [outreach()]);
     expect(rows[0]?.status).toBe("awaiting_review");
     expect(rows[0]?.dateTime).toBe("2026-08-08T20:01:00.000Z");

@@ -6,14 +6,14 @@ import { readInboundHrTracker, writeInboundHrTracker } from "./inboundHrTracker.
 
 const interested = {
   contactId: "boss-moonshot-song",
-  recruiterName: "宋女士",
-  company: "月之暗面",
+  recruiterName: "Taylor Reed",
+  company: "Moonshot AI",
   recruiterTitle: "HR",
-  messageSummary: "大模型 Agentic RL 岗位",
+  messageSummary: "LLM Agentic RL role",
   direction: "agent" as const,
   companyTier: "top_ai_startup" as const,
   status: "interested" as const,
-  reason: "头部 AI 公司且岗位明确属于 Agent 后训练",
+  reason: "AI company with an explicit agent post-training role",
   nextAction: "prepare_reply" as const,
   firstSeenAt: "2026-08-12T04:49:00.000Z",
   lastActivityAt: "2026-08-12T04:49:00.000Z"

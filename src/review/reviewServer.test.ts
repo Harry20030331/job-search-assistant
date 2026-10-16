@@ -240,7 +240,7 @@ describe("local review server", () => {
     ];
     const { server } = await fixture(undefined, document);
     const html = await (await fetch(`${server.address}/review`)).text();
-    expect(html).not.toContain("待补充");
+    expect(html).not.toContain("\u5f85\u8865\u5145");
     expect(html).toContain("Share evidence");
     expect(html).not.toContain("<textarea");
     expect(html).toContain('data-action="approve" disabled');
@@ -313,8 +313,8 @@ describe("local review server", () => {
     expect(html).toContain('<span class="row-status">Shortlisted</span>');
     expect(html.indexOf("Shortlist Co")).toBeLessThan(html.indexOf("Legacy Co"));
     expect(html).toContain("New Co");
-    expect(html).not.toContain("待你审阅");
-    expect(html).not.toContain("核验说明");
+    expect(html).not.toContain("\u5f85\u4f60\u5ba1\u9605");
+    expect(html).not.toContain("\u6838\u9a8c\u8bf4\u660e");
   });
 
   test("suppresses a ready job when the tracker owns the same exact jobId", async () => {

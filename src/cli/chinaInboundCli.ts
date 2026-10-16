@@ -21,22 +21,22 @@ function parseArguments(args: readonly string[]): { command: "validate" | "repor
 }
 
 function line(contact: InboundHrContact): string {
-  return `- ${contact.company}｜${contact.recruiterName}｜${contact.direction}｜${contact.status}｜${contact.reason}｜下一步：${contact.nextAction}`;
+  return `- ${contact.company} | ${contact.recruiterName} | ${contact.direction} | ${contact.status} | ${contact.reason} | Next action: ${contact.nextAction}`;
 }
 
 function section(title: string, contacts: InboundHrContact[]): string {
-  const rows = contacts.length ? contacts.map(line) : ["- 无"];
+  const rows = contacts.length ? contacts.map(line) : ["- None"];
   return [`## ${title}`, "", ...rows, ""].join("\n");
 }
 
 export function renderInboundHrReport(contacts: InboundHrContact[]): string {
   return [
-    "# Boss 主动 HR 筛查",
+    "# Boss inbound recruiter screening",
     "",
-    section("感兴趣", contacts.filter((contact) => contact.status === "interested")),
-    section("待核实", contacts.filter((contact) => contact.status === "needs_clarification")),
-    section("不感兴趣", contacts.filter((contact) => contact.status === "not_interested")),
-    section("已回复或关闭", contacts.filter((contact) => contact.status === "replied" || contact.status === "closed"))
+    section("Interested", contacts.filter((contact) => contact.status === "interested")),
+    section("Needs clarification", contacts.filter((contact) => contact.status === "needs_clarification")),
+    section("Not interested", contacts.filter((contact) => contact.status === "not_interested")),
+    section("Replied or closed", contacts.filter((contact) => contact.status === "replied" || contact.status === "closed"))
   ].join("\n").trimEnd() + "\n";
 }
 
