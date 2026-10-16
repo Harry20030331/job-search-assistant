@@ -1,0 +1,23 @@
+# Project documentation
+
+Maintain shared project documentation in this repository's `docs/` directory. The local checkout may live in iCloud; GitHub is the team-facing copy after synchronization. Personal runtime data stays outside the shared documentation.
+
+## Planning and collaboration
+
+- [Evaluation framework](evaluation.md): concise Chinese test matrix, metrics and candidate-input decisions.
+- [Hannah handoff](hannah-handoff.md): concise Chinese candidate-onboarding and opportunity handoff requirements.
+- [Team interfaces](team-interfaces.md): module ownership and shared integration boundaries.
+
+## Development and operation
+
+- [Structure](structure.md): files, data ownership and workspace lifecycle.
+- [Commands](commands.md): runnable entrypoints and record updates.
+- [Candidate inputs](candidate-inputs.md): current input formats and factual ownership.
+- [Job discovery](job-discovery.md): sources, screening and opportunity updates.
+- [Workflow contract](workflow-contract.md): preparation, review, execution and recovery.
+- [UI contract](ui-contract.md): fixed interface and versioned renderer manifests (`ui-contract-v*.json`).
+- [Architecture](architecture.md): system components and design context.
+- [Demo](demo.md): local fictional application walkthrough.
+- [Extraction notes](extraction.md): course extraction scope and validation.
+
+The two Chinese planning documents reflect explicit user language preferences. Operational documentation, code and UI remain English. Planned requirements do not imply implemented behavior; refer to each document's status notes.

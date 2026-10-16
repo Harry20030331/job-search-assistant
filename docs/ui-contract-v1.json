@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "approvedAt": "2026-10-15",
+  "files": {
+    "src/review/reviewViews.ts": "839f7d6adbb339b9b092eec5f23ab806211f7df3da869f5a5c179910cb97e0b9",
+    "src/review/statusView.ts": "d608f168d91d302b3714a30448403d7fe4e875fb4ab76c8ed85b9c796c98b4bd"
+  }
+}
