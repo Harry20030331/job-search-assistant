@@ -2,6 +2,8 @@
 
 A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents Status and Review.
 
+See the [project documentation index](docs/README.md) for evaluation, team handoffs and operating contracts.
+
 ```text
 examples/  -- example:load -->  data/  <-- everyday work -->  Codex + skills
 saved candidate states        current candidate           Status / Review
@@ -72,8 +74,10 @@ Commit reusable code, skills and deliberate improvements to the fictional baseli
 
 Each developer can use a local copy of the same fictional candidate while keeping runtime changes independent. Work on feature branches and use PRs. Coordinate shared schema changes; do not create another authoritative job list. Read [team interfaces](docs/team-interfaces.md), the [workflow contract](docs/workflow-contract.md) and [AGENTS.md](AGENTS.md).
 
+For Hannah's candidate onboarding and Matching integration, see the [handoff specification](docs/hannah-handoff.md), including LinkedIn import, required/optional fields and the opportunity JSON contract.
+
 ## Optional submission exercise
 
 `npm run demo -- --dir /tmp/job-search-demo` creates a separate, fresh runtime with one fictional job and a loopback employer form. Follow [the walkthrough](docs/demo.md). This tests review and submission control flow; normal workbench startup does not depend on it.
 
-The candidate is synthetic and must never be submitted to a real employer. Tests and the local exercise do not establish real-world agent accuracy; evaluation datasets, baselines and measured results remain future work. This course repository is maintained independently from the original personal system. See [extraction notes](docs/extraction.md) for scope and validation.
+The candidate is synthetic and must never be submitted to a real employer. Tests and the local exercise do not establish real-world agent accuracy. The [evaluation framework](docs/evaluation.md) defines the planned candidate-by-form matrix, quality and cost metrics, and severe-error reporting; datasets and measured results remain future work. This course repository is maintained independently from the original personal system. See [extraction notes](docs/extraction.md) for scope and validation.
