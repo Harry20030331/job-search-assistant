@@ -51,8 +51,9 @@ export async function matchingContext(paths: MatchingPaths) {
   ]);
   const manifest = z.array(z.object({ category: z.string(), path: z.string(), sha256: z.string() })).parse(JSON.parse(manifestText));
   const policy = readPolicy(preferences);
-  if (policy && policy.rules.categories.some(c => !manifest.some(m => m.category === c))) throw new Error("matching_category_not_configured");
-  return { token: hash(JSON.stringify({ candidate, preferences, manifestText })), candidate, preferences, manifest, policy };
+  const categoriesWithoutResume = policy?.rules.categories.filter(c => !manifest.some(m => m.category === c)) ?? [];
+  return { token: hash(JSON.stringify({ candidate, preferences, manifestText })), candidate, preferences, manifest, policy,
+    categoriesWithoutResume, resumeMappingConfigured: policy !== null && categoriesWithoutResume.length === 0 };
 }
 
 const queues = new Map<string, Promise<unknown>>();
@@ -84,7 +85,6 @@ export async function saveMatchingPreferences(paths: MatchingPaths, input: unkno
       rules: { ...(previous?.rules ?? command.initialRules), ...command.feedback.patch },
       feedback: [...(previous?.feedback ?? []), command.feedback]
     });
-    if (policy.rules.categories.some(c => !context.manifest.some(m => m.category === c))) throw new Error("matching_category_not_configured");
     const block = `${begin}\n${JSON.stringify(policy, null, 2)}\n${end}`;
     const updated = previous
       ? context.preferences.slice(0, context.preferences.indexOf(begin)) + block + context.preferences.slice(context.preferences.indexOf(end) + end.length)
@@ -138,7 +138,7 @@ export async function publishMatchingRound(paths: MatchingPaths, input: unknown)
         if (a.workMode && !rules.workModes.includes(a.workMode)) reasons.push("Work mode excluded by preferences");
         if (rules.locations.length && a.eligibleLocations.length && !a.eligibleLocations.some(l => rules.locations.some(p => equal(l, p)))) reasons.push("Location excluded by preferences");
         const questions = [...a.questions];
-        if (!a.workMode) questions.push("Confirm permitted work mode");
+        if (!a.workMode && new Set(rules.workModes).size < 3) questions.push("Confirm permitted work mode");
         if (rules.locations.length && !a.eligibleLocations.length) questions.push("Confirm permitted work location");
         let decision = reasons.length || a.decision === "reject" ? "reject" : questions.length || a.decision === "needs_confirmation" ? "needs_confirmation" : "recommend";
         const company = a.company.trim().toLowerCase();
@@ -162,9 +162,11 @@ export async function publishMatchingRound(paths: MatchingPaths, input: unknown)
         if (existing) result.jobId = existing.jobId;
         if (existing?.application || existing?.availability === "closed") { protectedIds.push(result.jobId); continue; }
         if (existing && result.lastVerified < existing.lastVerified) throw new Error("matching_observation_outdated");
-        if (result.decision !== "recommend" && !existing) continue;
+        if (!["recommend", "needs_confirmation"].includes(result.decision) && !existing) continue;
         const explanation = `Match: ${result.match.join("; ")}. Gaps: ${result.gaps.join("; ") || "None recorded"}. Questions: ${result.questions.join("; ") || "None"}. ${result.reasons.join("; ")}. Evidence: ${result.candidateEvidence.join("; ")}; ${result.jobEvidence.join("; ")}`;
-        const note = `${result.decision === "recommend" ? "" : "user-excluded: "}matching: ${result.decision}. ${explanation}`;
+        const preferenceProofMissing = (new Set(rules.workModes).size < 3 && !result.workMode) || (rules.locations.length > 0 && !result.eligibleLocations.length);
+        const visible = result.decision === "recommend" || (result.decision === "needs_confirmation" && !preferenceProofMissing);
+        const note = `${visible ? "" : "user-excluded: "}matching: ${result.decision}. ${explanation}`;
         const { jobId, company, title, location, category, officialUrl, sources, firstSeen, lastVerified } = result;
         const record = upsertRecord(existingJobs, { jobId, company, title, location, category, officialUrl, sources, firstSeen, lastVerified, note, status: "ready" });
         record.status = result.decision === "recommend" ? "ready" : "new";

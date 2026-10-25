@@ -5,6 +5,16 @@ description: Use when discovering, screening, deduplicating, or refreshing Unite
 
 # Discovering United States Graduate Jobs
 
+## Chat entry and candidate intake
+
+When the user asks to find jobs or start Matching, execute the workflow in this Codex chat. The user supplies ordinary language or a resume; do not ask them to author JSON, run CLI commands, or translate their own feedback. The webpage displays the saved shortlist; this chat is the input and feedback surface. Follow `../../docs/matching-chat.md` for the runnable intake and interactive walkthrough.
+
+For a new candidate, collect a name or alias, education/experience summary, core skills, target roles and explicit categories, locations/work modes, seniority, start timing, and batch/company limits. Ask only for missing search-critical scope, in one concise question. Preserve unknowns such as relocation and sponsorship; conditional eligibility must remain explicit. Show a concise summary of extracted facts and constraints for confirmation, then call `matching intake` in a NEW workspace. Never merge a real candidate into the fictional example or overwrite another candidate. Resume mapping, contact details and full application-onboarding checks may wait until preparation.
+
+For existing inputs selected by the user, read them directly. Do not demand a new confirmation of facts already confirmed. Report which candidate/workspace is active before searching. If no candidate has been selected, ask whether to use the fictional example or new inputs; an explicit fictional exercise may use the example immediately.
+
+After publishing a real search, show each role's official link, match, gaps and pending conditions; distinguish recommended roles from research leads (`new`). Invite feedback in this chat. On the next feedback message, read the current workspace and context, interpret the actual instruction, save a narrow patch plus the original meaning and source reference, rescreen the current shortlist and search for replacement leads as needed. Preserve unrelated preferences. Ask only if feedback scope is ambiguous; otherwise execute it immediately. Report the before/after difference and any shortage. Never replace this interaction with a scripted demo or invent feedback to claim an interactive run succeeded.
+
 ## Inputs and boundary
 
 Discovery produces job records, not applications or submission permission. Read `../../docs/workflow-contract.md`, `../../docs/job-discovery.md`, the resolved candidate profile, `../../data/preferences.md` and the approved CV manifest before browsing. Screening preferences and personal qualifications belong in those data sources; do not infer them from this skill.

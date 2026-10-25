@@ -61,7 +61,7 @@ test("unknown requirements stay questions and duplicates or incomplete rounds ca
   const { paths, assessments } = await setup();
   const unknown = { ...assessments[0]!, workMode: null, eligibleLocations: [] };
   expect((await publish(paths, [unknown])).results[0]?.decision).toBe("needs_confirmation");
-  expect((await readOpportunities(paths.opportunities)).opportunities).toHaveLength(0);
+  expect((await readOpportunities(paths.opportunities)).opportunities[0]?.stage).toBe("new");
   await expect(publish(paths, [assessments[0]!, assessments[0]!])).rejects.toThrow("duplicate_matching_assessment");
   await publish(paths, assessments);
   const before = await readFile(paths.opportunities, "utf8");
@@ -88,7 +88,8 @@ test("CLI accepts explicit inputs and refuses malformed commands", async () => {
   const { paths } = await setup();
   expect(await runMatchingCli(["context", "--profile", paths.profile, "--preferences", paths.preferences, "--manifest", paths.manifest])).toHaveProperty("token");
   await expect(runMatchingCli(["feedback"])).rejects.toThrow("invalid_arguments");
-  await expect(feedback(paths, { categories: ["recommendation"] })).rejects.toThrow("matching_category_not_configured");
+  await feedback(paths, { categories: ["recommendation"] });
+  expect((await matchingContext(paths)).categoriesWithoutResume).toEqual(["recommendation"]);
 });
 
 test("an outdated observation rolls back the complete publication", async () => {
@@ -99,6 +100,20 @@ test("an outdated observation rolls back the complete publication", async () => 
   assessments[1] = { ...assessments[1]!, firstSeen: "2026-10-24", lastVerified: "2026-10-24" };
   await expect(publish(paths, assessments)).rejects.toThrow("matching_observation_outdated");
   expect(await readFile(paths.opportunities, "utf8")).toBe(before);
+});
+
+test("remote-only feedback turns an unknown work mode into a saved research question", async () => {
+  const { paths, assessments } = await setup();
+  const unknown = { ...assessments[0]!, workMode: null };
+  expect((await publish(paths, [unknown])).results[0]?.decision).toBe("recommend");
+  await feedback(paths, { workModes: ["remote"] });
+  const result = await publish(paths, [unknown]);
+  expect(result.results[0]?.decision).toBe("needs_confirmation");
+  expect(result.results[0]?.questions).toContain("Confirm permitted work mode");
+  const stored = (await readOpportunities(paths.opportunities)).opportunities[0]!;
+  expect(stored.stage).toBe("new");
+  expect(stored.note).toMatch(/^user-excluded:/);
+  expect(buildStatusView([], projectJobs(await readOpportunities(paths.opportunities)))).toEqual([]);
 });
 
 test("offline demo is isolated and refuses to replace existing state", async () => {

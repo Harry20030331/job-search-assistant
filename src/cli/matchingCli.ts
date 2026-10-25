@@ -2,17 +2,23 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { matchingContext, publishMatchingRound, saveMatchingPreferences, type MatchingPaths } from "../matching/matching.js";
+import { createMatchingWorkspace, readIntakeFile, workspaceMatchingPaths } from "../matching/intake.js";
 
 export async function runMatchingCli(args: string[]) {
   const [operation, ...rest] = args;
-  if (!["context", "feedback", "publish"].includes(operation ?? "") || rest.length % 2) throw new Error("invalid_arguments");
+  if (!["intake", "context", "feedback", "publish"].includes(operation ?? "") || rest.length % 2) throw new Error("invalid_arguments");
   const options = new Map<string, string>();
   for (let i = 0; i < rest.length; i += 2) {
     const key = rest[i]!, value = rest[i + 1]!;
-    if (!["--profile", "--preferences", "--manifest", "--opportunities", "--input"].includes(key) || options.has(key) || value.startsWith("--")) throw new Error("invalid_arguments");
+    if (!["--workspace", "--profile", "--preferences", "--manifest", "--opportunities", "--input"].includes(key) || options.has(key) || !value || value.startsWith("--")) throw new Error("invalid_arguments");
     options.set(key, value);
   }
-  const paths: MatchingPaths = {
+  if (operation === "intake") {
+    if (!options.has("--workspace") || !options.has("--input") || options.size !== 2) throw new Error("invalid_arguments");
+    return createMatchingWorkspace(options.get("--workspace")!, await readIntakeFile(options.get("--input")!));
+  }
+  if (options.has("--workspace") && ["--profile", "--preferences", "--manifest", "--opportunities"].some(k => options.has(k))) throw new Error("invalid_arguments");
+  const paths: MatchingPaths = options.has("--workspace") ? workspaceMatchingPaths(options.get("--workspace")!) : {
     profile: resolve(options.get("--profile") ?? "data/candidate.json"),
     preferences: resolve(options.get("--preferences") ?? "data/preferences.md"),
     manifest: resolve(options.get("--manifest") ?? "data/resumes.json"),

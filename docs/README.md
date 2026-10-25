@@ -15,6 +15,7 @@ Maintain shared project documentation in this repository's `docs/` directory. Th
 - [Candidate inputs](candidate-inputs.md): current input formats and factual ownership.
 - [Job discovery](job-discovery.md): sources, screening and opportunity updates.
 - [Matching loop](matching.md): executable recommendation publication, persistent feedback and isolated two-round demo.
+- [Interactive Matching](matching-chat.md): natural-language candidate intake, live search and actual feedback turns through Codex chat.
 - [Workflow contract](workflow-contract.md): preparation, review, execution and recovery.
 - [UI contract](ui-contract.md): fixed interface and versioned renderer manifests (`ui-contract-v*.json`).
 - [Architecture](architecture.md): system components and design context.
