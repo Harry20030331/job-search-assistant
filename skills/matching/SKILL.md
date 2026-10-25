@@ -22,6 +22,10 @@ Use Codex's in-app Browser for current listings and official employer pages. Do 
 
 ## Persist and report
 
+For an interactive recommendation/feedback loop, use the context, feedback and publish commands in `../../docs/matching.md`. Read fresh candidate facts, the complete preference prose and the structured policy before each round. Translate only actual user feedback into a narrow patch; retain its reference and confirm ambiguous scope. Do not infer lasting preferences from a single rejected role. Use stable job exclusions for individual choices. Code handles explicit filters and publication; you still own qualification analysis, evidence truth, natural-language preferences and ranking.
+
+After feedback, re-read and re-assess against the new context token; never merely substitute a fresh token on stale analysis. Cover every managed open shortlist role, explain changed decisions, and include new leads where necessary. Save only actual verification dates. Publish accepted roles through the Matching domain command, then show recommendations, gaps and unresolved questions in chat and refresh Status. A `needs_confirmation` result is a research/user question, not an accepted recommendation or application approval. Do not create a second canonical job list. The offline demo is scripted and does not establish real-world matching performance.
+
 Use `npm run jobs -- upsert` / `close` for narrow validated writes. Deduplicate by official requisition ID or canonical official URL after stripping only known tracking parameters. Merge source attribution and preserve earliest first-seen dates. Discovery writes only `new` or `ready`; tracker-owned state wins and must not be overwritten.
 
 Obey company limits and the candidate's recall policy. Keep screening notes internal. The fixed Status projection owns visibility, numbering and labels; a library record does not prove a form was opened or submitted. Validate after writes and report accepted additions, material changes and operational failures only. Advance a source checkpoint only after its scan and every inspected disposition are complete.
