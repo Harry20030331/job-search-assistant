@@ -15,6 +15,8 @@ The example preferences apply only to the fictional candidate. Known answers ret
 
 ## Runtime
 
+Interactive search intake uses Codex chat: provide a background/resume and search preferences, review the extracted summary, and let Codex run the validated [Matching intake](matching-chat.md). Users do not need to author JSON. Intake creates a fresh isolated candidate workspace with an empty resume manifest; it cannot replace existing cases. Initial search can proceed, while application preflight continues to require approved PDFs. This is search intake, not the complete application-onboarding validator.
+
 Run `npm run review` to use the current working state, automatically supplying the default fictional candidate when data is absent. `data/candidate.json` is the editable working profile. Use `npm run example:load` to replace current state from a saved case; changes remain local and do not alter `examples/`. Stop active writers before loading; the previous state is backed up locally.
 
 ```sh

@@ -184,7 +184,7 @@ export async function writeJobLibrary(path: string, records: JobRecord[]): Promi
   await chmod(path, 0o600);
 }
 
-function upsertRecord(records: JobRecord[], input: NewJobRecord): JobRecord {
+export function upsertRecord(records: JobRecord[], input: NewJobRecord): JobRecord {
   let normalized: JobRecord;
   try {
     normalized = validateRecord({

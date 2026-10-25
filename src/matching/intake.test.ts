@@ -1,0 +1,32 @@
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, expect, test } from "vitest";
+import { createMatchingWorkspace } from "./intake.js";
+import { runMatchingCli } from "../cli/matchingCli.js";
+import { runPreflight } from "../preflight.js";
+const roots: string[] = [];
+afterEach(async () => { await Promise.all(roots.splice(0).map(p => rm(p, { recursive: true, force: true }))); });
+const input = {
+  confirmed: true, reference: "Fictional user confirms the intake summary",
+  candidate: { schemaVersion: 2, identity: { fullName: "Casey Example" }, summary: "MS student with a retrieval course project", skills: ["Python", "Retrieval"], education: [{ degree: "MS", endDate: "2027-06" }], experiences: [], availability: { relocation: null } },
+  preferences: "Entry-level applied LLM roles. Seattle remote or hybrid. Start July 2027. Relocation unknown.",
+  rules: { categories: ["llm"], workModes: ["remote", "hybrid"], locations: ["Seattle, WA"], excludedCompanies: [], excludedJobIds: [], limit: 3, perCompany: 1 }
+};
+async function target() { const parent = await mkdtemp(join(tmpdir(), "intake-")); roots.push(parent); return join(parent, "case"); }
+test("confirmed search intake preserves unknowns, needs no resume and remains blocked from application preflight", async () => {
+  const result = await createMatchingWorkspace(await target(), input);
+  expect(result.context.candidate.availability).toEqual({ relocation: null });
+  expect(result.context.categoriesWithoutResume).toEqual(["llm"]);
+  expect(result.context.candidate).not.toHaveProperty("contact");
+  expect(await readFile(result.paths.manifest, "utf8")).toBe("[]\n");
+  const context = await runMatchingCli(["context", "--workspace", result.root]);
+  expect(context).toHaveProperty("token", result.context.token);
+  await expect(runPreflight({ category: "llm", jobUrl: "https://jobs.example.com/one", profilePath: result.paths.profile, manifestPath: result.paths.manifest })).rejects.toThrow("approved_cv_manifest_invalid");
+  await expect(createMatchingWorkspace(result.root, input)).rejects.toThrow();
+  expect((JSON.parse(await readFile(result.paths.profile, "utf8"))).identity.fullName).toBe("Casey Example");
+});
+test("unconfirmed or empty-background intake cannot initialize a candidate workspace", async () => {
+  await expect(createMatchingWorkspace(await target(), { ...input, confirmed: false })).rejects.toThrow();
+  await expect(createMatchingWorkspace(await target(), { ...input, candidate: { ...input.candidate, education: [] } })).rejects.toThrow("matching_background_required");
+});

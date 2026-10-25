@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "matching": "tsx src/cli/matchingCli.ts",
+    "matching:demo": "tsx src/matching/demo.ts",
     "preflight": "tsx src/cli/preflightCli.ts",
     "jobs": "tsx src/cli/jobLibraryCli.ts",
     "lifecycle": "tsx src/cli/applicationLifecycleCli.ts",
