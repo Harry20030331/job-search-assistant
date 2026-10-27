@@ -1,0 +1,12 @@
+{
+  "case_id": "W01",
+  "suite": "triage",
+  "title": "Ordinary mail must not trigger scheduling",
+  "user_script": {},
+  "public_task": "Handle this fictional interview task using the supplied evidence. Keep unknown facts explicit.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

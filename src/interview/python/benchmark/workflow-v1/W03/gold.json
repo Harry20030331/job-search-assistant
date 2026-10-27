@@ -1,0 +1,6 @@
+{
+  "category": "reschedule",
+  "interview_id": null,
+  "route": "needs_review",
+  "reason": "Two known interviews are present; do not choose a target without evidence."
+}

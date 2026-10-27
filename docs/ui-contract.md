@@ -1,10 +1,10 @@
-# Application UI contract — version 1
+# Application UI contract — version 4
 
-Extracted UI baseline, established 2026-10-15. This is the current fixed Status and Review interface. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
+The original baseline was established 2026-10-15. On 2026-10-26 the user requested shared navigation and complete practice cases (v2), then a concise question/answer presentation (v3). V4 implements the subsequent explicit request for direct interview questions, optional question banks and complete coding answers. Clarification and strong-answer guidance are inside Method; runnable code is inside Sample answer. Code signatures, examples, prose and tables receive escaped semantic formatting. Preserve all prior manifests as historical evidence. Routine recruiting work still changes data through the interfaces below, never the renderer or interactions.
 
 ## Fixed presentation
 
-- Preserve `/status/us`, `/status` and `/review`, existing layout and navigation.
+- Preserve `/status/us`, `/status` and `/review`, their content and approval behavior. Shared navigation now links Home (`/`), Status, Review, Interviews and Google account (`/settings/accounts`). Root now renders Home instead of Review.
 - English-only interface and new review display text. Chat language is independent.
 - No region selector, China entry, or replacement All applications selector.
 - Status stages: Shortlisted → In Review → Submitted → Interviewing → Offer.
@@ -53,8 +53,12 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v1.json` for the renderer (including CSS/client interactions) and Status projection. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the active SHA-256 baseline in `ui-contract-v4.json`, including shared navigation, application renderer, Status projection, Interview renderer and practice text formatter. It is included in `npm run verify`. View and interaction tests remain behavioral checks. Data content, counts and timestamps are intentionally not frozen. The manifest records implementation verification, not completed team review or a merge.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
 This is a repository guard, not an operating-system security boundary. It prevents accidental drift when checks are run; it does not claim files are technically uneditable. Keep credentials, candidate facts and private records out of the baseline.
+
+## Interview and account views, 2026-10-26
+
+The same server serves `/interviews`, described in [the workbench contract](interview-workbench.md), with Overview, Plan, Practice and Debrief. Practice asks questions directly with necessary inputs and follow-ups; Method and Sample answer are revealed on demand. More questions offers plan-bound alternatives. Rubric/reference notes and self-checks remain internal. New round state uses a revisioned registry linked to stable application IDs and existing lifecycle functions. The account page starts Google OAuth and offers local session sign-out; tokens are never rendered. Connecting does not approve a calendar write, start unattended inbox processing or merge candidate history. Plans and calendar actions remain separately confirmed in chat. Earlier observations remain in [v1](interview-workbench-verification.md) and [v2 verification](interview-workbench-v2-verification.md); the earlier compact presentation is [v3](interview-practice-compact-verification.md) and current verification is [v4](interview-practice-direct-verification.md).

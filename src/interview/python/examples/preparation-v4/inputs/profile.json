@@ -1,0 +1,10 @@
+{
+  "source_id":"profile",
+  "name":"Alex Example (fictional test candidate)",
+  "timezone":"America/Tijuana",
+  "preparation_budget_minutes":90,
+  "priorities":["ML evaluation and avoiding leakage","ML problem solving and coding","Explaining the supplied course project without inventing metrics"],
+  "projects":[{"name":"ReviewClassifier (fictional)","description":"Built a course-project binary text classifier using TF-IDF and logistic regression. Compared random and time-based splits. No numerical outcome or production deployment was supplied."}],
+  "availability_windows":[],
+  "provenance":"Synthetic development profile; not personal facts about the connected Google account owner."
+}

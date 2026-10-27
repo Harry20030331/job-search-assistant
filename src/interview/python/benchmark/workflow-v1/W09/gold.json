@@ -1,0 +1,15 @@
+{
+  "suite": "preparation",
+  "interview_id": "interview-p02",
+  "application_id": "app-cedar-p02",
+  "expected_event_count": 0,
+  "interview_fields": {
+    "round": null
+  },
+  "require_preparation": false,
+  "rubric_notes": [
+    "Only supplied fictional candidate facts are evidence.",
+    "Suggested exercises are not employer-confirmed questions.",
+    "A self-report does not establish objective ability or interviewer feedback."
+  ]
+}

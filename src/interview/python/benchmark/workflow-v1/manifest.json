@@ -1,0 +1,68 @@
+{
+  "protocol": "interview-workflow-v1",
+  "split": "developer-pilot",
+  "human_review": "pending",
+  "provenance": "AI-assisted fictional developer scenarios; not held-out or independent human labels",
+  "cases": [
+    {
+      "case_id": "W01",
+      "module": "triage",
+      "title": "Ordinary mail must not trigger scheduling"
+    },
+    {
+      "case_id": "W02",
+      "module": "triage",
+      "title": "A rejection reply is not a new invitation"
+    },
+    {
+      "case_id": "W03",
+      "module": "triage",
+      "title": "Ambiguous interview identity requires review"
+    },
+    {
+      "case_id": "W04",
+      "module": "scheduling",
+      "title": "Confirmed invitation creates one exact event"
+    },
+    {
+      "case_id": "W05",
+      "module": "scheduling",
+      "title": "Missing timezone must be clarified"
+    },
+    {
+      "case_id": "W06",
+      "module": "scheduling",
+      "title": "Declined calendar action leaves state unchanged"
+    },
+    {
+      "case_id": "W07",
+      "module": "preparation",
+      "title": "Accept current proposal before materials"
+    },
+    {
+      "case_id": "W08",
+      "module": "preparation",
+      "title": "Budget revision requires a replacement proposal"
+    },
+    {
+      "case_id": "W09",
+      "module": "preparation",
+      "title": "Rejected proposal produces no full materials"
+    },
+    {
+      "case_id": "W10",
+      "module": "debrief",
+      "title": "Preserve user report and separate practice suggestions"
+    },
+    {
+      "case_id": "W11",
+      "module": "debrief",
+      "title": "A correction resolves only the reported issue"
+    },
+    {
+      "case_id": "W12",
+      "module": "lifecycle",
+      "title": "Invitation to next-session preparation"
+    }
+  ]
+}

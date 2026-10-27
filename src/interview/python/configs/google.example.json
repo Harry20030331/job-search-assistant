@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "expected_account": "test-user@example.invalid",
+  "calendar_id": "YOUR_TEST_CALENDAR_ID@group.calendar.google.com",
+  "namespace": "cs329z-test-replace-with-unique-session-name",
+  "client_file": "client.json",
+  "token_file": "token.json",
+  "gmail_messages": {}
+}

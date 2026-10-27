@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
-import { chmod, readFile, unlink } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { chmod, open, readFile, unlink } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { promisify } from "node:util";
 const lockWaitMilliseconds = 5_000;
@@ -21,6 +22,7 @@ async function releaseShlock(lockPath: string): Promise<void> {
 }
 
 export async function acquireFileLock(path: string): Promise<() => Promise<void>> {
+  if (process.platform === "win32") return acquireWindowsFileLock(path);
   const lockPath = `${path}.lock`;
   const deadline = Date.now() + lockWaitMilliseconds;
   while (true) {
@@ -43,5 +45,44 @@ export async function acquireFileLock(path: string): Promise<() => Promise<void>
       if (Date.now() >= deadline) throw new Error("application_tracker_locked");
       await delay(10 + Math.floor(Math.random() * 16));
     }
+  }
+}
+
+/** Atomic exclusive creation on Windows; abandoned locks fail closed for manual recovery. */
+export async function acquireWindowsFileLock(path: string, waitMilliseconds = lockWaitMilliseconds): Promise<() => Promise<void>> {
+  const lockPath = `${path}.lock`;
+  const owner = JSON.stringify({ pid: process.pid, token: randomUUID(), createdAt: new Date().toISOString() }) + "\n";
+  const deadline = Date.now() + waitMilliseconds;
+  while (true) {
+    let handle;
+    try {
+      handle = await open(lockPath, "wx", 0o600);
+    } catch (error) {
+      if (errorCode(error) !== "EEXIST") throw new Error("application_tracker_lock_failed");
+      if (Date.now() >= deadline) throw new Error("application_tracker_locked");
+      await delay(10 + Math.floor(Math.random() * 16));
+      continue;
+    }
+    try {
+      await handle.writeFile(owner, "utf8");
+      await handle.sync();
+    } catch {
+      await handle.close();
+      await unlink(lockPath);
+      throw new Error("application_tracker_lock_failed");
+    }
+    await handle.close();
+    let released = false;
+    return async () => {
+      if (released) return;
+      try {
+        if (await readFile(lockPath, "utf8") !== owner) throw new Error("application_tracker_lock_owner_changed");
+        await unlink(lockPath);
+        released = true;
+      } catch (error) {
+        if (errorCode(error) !== "ENOENT") throw error;
+        released = true;
+      }
+    };
   }
 }

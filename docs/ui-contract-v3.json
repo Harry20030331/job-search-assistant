@@ -1,0 +1,14 @@
+{
+  "version": 3,
+  "establishedAt": "2026-10-26",
+  "authorization": "Explicit user request: concise Scenario, Task and Follow-ups; Method and Sample answer; readable paragraphs, bullets and code.",
+  "reviewStatus": "Implementation verified in the in-app Browser and targeted tests; user/team review pending.",
+  "supersedes": "ui-contract-v2.json",
+  "files": {
+    "src/review/reviewViews.ts": "51de1f8159a9a45ba6e849664f3419c2b70dec1de0a00ee67269cc6ba2e564b1",
+    "src/review/statusView.ts": "d608f168d91d302b3714a30448403d7fe4e875fb4ab76c8ed85b9c796c98b4bd",
+    "src/workbench/views.ts": "5ffac1abd1d1d5539fc655254c6163a3bfdc91cda66b40be6e3d4c9ab7511ac6",
+    "src/interview/interviewView.ts": "3c310a3e6f83cc36e5de5775384f992af317e5fc7cf0329e889d7fc03a08273e",
+    "src/interview/practiceText.ts": "95b01ee21bde458d3c0fd0d480a18af6cd9692e6d2ff5e628c3a8bfca66b6551"
+  }
+}

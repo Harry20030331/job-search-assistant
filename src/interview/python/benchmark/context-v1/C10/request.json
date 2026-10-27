@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c10",
+    "application_id": "application-c10",
+    "interview_id": "interview-c10",
+    "company": "Kestrel Mobility",
+    "role": "Senior Product Data Scientist"
+  },
+  "association": "verified",
+  "budget_minutes": 25,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Avery Stone designed an internal experiment review checklist and partnered with an operations analyst. Employer preference and motivation are not supplied.",
+      "content_sha256": "a1d46de9e5c0f4825bbfd17d3545d8d3e5fa3ddaf40e67f5bdd1a15cca79b8ed"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c10",
+      "company": "Kestrel Mobility",
+      "role": "Senior Product Data Scientist",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "KM-1010 Senior Product Data Scientist: recruiter screen, introduction and role/company motivation. The listing has closed but your application and interview remain active.",
+      "content_sha256": "44fa5356cfd391e1910775f1fa6c2ea2a0e8582b1db2cd108bfe3cfa26474889"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Kestrel Mobility",
+      "role": null,
+      "locator": "https://c10.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Kestrel Mobility builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "95c0f16928ff3fea3c457a734bae47b40c14e9d80801aa9d51bb48f40326ff13"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c10",
+      "company": "Kestrel Mobility",
+      "role": "Senior Product Data Scientist",
+      "locator": "https://c10.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "KM-1010 archived official listing, now closed: Senior Product Data Scientist. Own experimentation standards, define product metrics and advise operations teams.",
+      "content_sha256": "aed3ed40463fc366b1cc65ecf91aed9b6494bd9d160e1afce248d59fcf80587c"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

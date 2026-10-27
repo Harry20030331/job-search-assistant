@@ -12,10 +12,12 @@ export interface ReviewServerCliArgs {
   chinaJobsPath?: string;
   chinaOutreachPath?: string;
   port: number;
+  profilePath?: string;
+  googleRoot?: string;
 }
 
 export function parseReviewServerArgs(argv: readonly string[]): ReviewServerCliArgs {
-  const allowed = new Set(["--review", "--tracker", "--jobs", "--china-jobs", "--china-outreach", "--port"]);
+  const allowed = new Set(["--review", "--tracker", "--jobs", "--china-jobs", "--china-outreach", "--port", "--profile", "--google-root"]);
   if (argv.length % 2 !== 0) throw new Error("invalid_cli_arguments");
   const values = new Map<string, string>();
   for (let index = 0; index < argv.length; index += 2) {
@@ -33,7 +35,9 @@ export function parseReviewServerArgs(argv: readonly string[]): ReviewServerCliA
   if (!reviewPath || !trackerPath || !jobsPath || !Number.isInteger(port) || port < 1 || port > 65_535) {
     throw new Error("invalid_cli_arguments");
   }
-  return { reviewPath, trackerPath, jobsPath, chinaJobsPath, chinaOutreachPath, port };
+  return { reviewPath, trackerPath, jobsPath, chinaJobsPath, chinaOutreachPath, port,
+    ...(values.has("--profile") ? { profilePath: values.get("--profile")! } : {}),
+    ...(values.has("--google-root") ? { googleRoot: values.get("--google-root")! } : {}) };
 }
 
 export function formatReviewServerStartup(address: string, reviewPath: string, applicationIds: readonly string[]): string {
@@ -74,9 +78,12 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
     jobsPath,
     chinaJobsPath,
     chinaOutreachPath,
+    profilePath: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : undefined,
+    googleRoot: "googleRoot" in parsed && parsed.googleRoot ? resolve(parsed.googleRoot) : undefined,
     port: parsed.port
   });
   process.stdout.write(formatReviewServerStartup(running.address, reviewPath, applicationIds));
+  process.stdout.write(`interviews_url=${running.address}/interviews\n`);
 }
 
 if (process.argv[1] && modulePath === resolve(process.argv[1])) {

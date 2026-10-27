@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Application received",
+      "body": "Thanks for applying to Cedar Systems. We received your application and will contact you if selected for an interview."
+    }
+  ],
+  "known_interviews": []
+}

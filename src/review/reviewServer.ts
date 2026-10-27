@@ -12,6 +12,11 @@ import { readApplicationTracker } from "../tracker.js";
 import { readJobLibrary } from "../jobs/jobLibrary.js";
 import { renderReviewPage, renderUsStatusPage } from "./reviewViews.js";
 import { buildStatusView } from "./statusView.js";
+import { dirname, join } from "node:path";
+import { readInterviewBoard } from "../interview/workbench.js";
+import { renderInterviewPage } from "../interview/interviewView.js";
+import { renderHomePage, renderAccountPage } from "../workbench/views.js";
+import { GoogleBridge, googleRoutes } from "../interview/googleBridge.js";
 
 export interface ReviewServerOptions {
   reviewPath: string;
@@ -20,6 +25,8 @@ export interface ReviewServerOptions {
   chinaJobsPath?: string;
   chinaOutreachPath?: string;
   port: number;
+  profilePath?: string;
+  googleRoot?: string;
 }
 
 export interface RunningReviewServer {
@@ -194,10 +201,36 @@ function publicError(error: unknown): { status: number; code: string } {
 }
 
 export async function startReviewServer(options: ReviewServerOptions): Promise<RunningReviewServer> {
+  const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
     try {
-      if (request.method === "GET" && (url.pathname === "/" || url.pathname === "/review")) {
+      if (googleRoutes.has(url.pathname)) {
+        const address = server.address();
+        if (!address || typeof address === "string") throw new Error("request_failed");
+        await google.proxy(request, response, `http://127.0.0.1:${address.port}`);
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/settings/accounts") {
+        send(response, 200, renderAccountPage(), "text/html; charset=utf-8"); return;
+      }
+      if (request.method === "GET" && url.pathname === "/") {
+        const applications = (await readApplicationTracker(options.trackerPath)).applications;
+        let interviews: Awaited<ReturnType<typeof readInterviewBoard>> = [];
+        try { interviews = await readInterviewBoard({ trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") }); } catch { /* Candidate-free legacy runtimes still expose navigation and account setup. */ }
+        send(response, 200, renderHomePage({ applications: applications.length,
+          interviews: interviews.filter(i => ["invited", "scheduled"].includes(i.entry.state)).length,
+          pendingPlans: interviews.filter(i => i.snapshot?.proposal?.status === "awaiting_plan_approval").length,
+          practiceReady: interviews.filter(i => i.snapshot?.freshness === "current" && i.snapshot.materials).length }), "text/html; charset=utf-8"); return;
+      }
+      if (request.method === "GET" && url.pathname === "/interviews") {
+        const items = await readInterviewBoard({ trackerPath: options.trackerPath,
+          profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") });
+        send(response, 200, renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
+          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all"), "text/html; charset=utf-8");
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/review") {
         send(response, 200, renderReviewPage(await readReviewBatch(options.reviewPath), url.searchParams.get("application") ?? undefined, (await readApplicationTracker(options.trackerPath)).applications.filter((item) => ["submitted", "confirmed", "interviewing", "offer"].includes(item.status)).map((item) => item.applicationId)), "text/html; charset=utf-8");
         return;
       }
@@ -313,6 +346,6 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
   const address = server.address() as AddressInfo;
   return {
     address: `http://127.0.0.1:${address.port}`,
-    close: () => new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+    close: () => { google.close(); return new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
   };
 }

@@ -1,6 +1,7 @@
 import type { ReviewBatch, ReviewItem } from "./reviewStore.js";
 import type { StatusViewItem, StatusViewStatus } from "./statusView.js";
 import type { ChinaStatusViewItem, ChinaStatus } from "../china/status/chinaStatusView.js";
+import { workspaceHeader, workspaceStyles } from "../workbench/views.js";
 
 function escapeHtml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
@@ -57,11 +58,11 @@ button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:
 `;
 
 function shell(title: string, active: "review" | "status", body: string, extraStyles = "", script = ""): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>${shellStyles}${extraStyles}</style></head><body><header class="mast"><div><div class="kicker">Local application desk · no-submit surface</div><div class="brand">Application control room</div><p class="lede">Review evidence locally. Decisions are snapshot-bound. This site cannot operate an ATS.</p></div><nav aria-label="Primary"><a href="/review" ${active === "review" ? 'aria-current="page"' : ""}>Review queue</a><a href="/status" ${active === "status" ? 'aria-current="page"' : ""}>Status ledger</a></nav></header>${body}${script ? `<script>${script}</script>` : ""}</body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>${shellStyles}${extraStyles}${workspaceStyles}</style></head><body>${workspaceHeader(active)}${body}${script ? `<script>${script}</script>` : ""}</body></html>`;
 }
 
 function reviewShell(body: string, styles: string, script: string): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Application review</title><style>${shellStyles}${styles}</style></head><body><header class="review-top"><a href="/review" aria-current="page">Applications</a><nav aria-label="Primary"><a href="/review" aria-current="page">Review</a><a href="/status">Status</a></nav></header>${body}<script>${script}</script></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Application review</title><style>${shellStyles}${styles}${workspaceStyles}</style></head><body>${workspaceHeader("review")}${body}<script>${script}</script></body></html>`;
 }
 
 function questionChoices(item: ReviewItem, question: ReviewItem["questions"][number]): string {

@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c03",
+    "application_id": "application-c03",
+    "interview_id": "interview-c03",
+    "company": "Cobalt Transit",
+    "role": "Graduate Backend Engineer"
+  },
+  "association": "verified",
+  "budget_minutes": 20,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Jamie Reed built a course transit-status API with a teammate, implemented request validation and wrote integration tests. Production service ownership is not established.",
+      "content_sha256": "ee590805a9d1c85586d419d0797389753663df9db51a00f217681535108a24f1"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c03",
+      "company": "Cobalt Transit",
+      "role": "Graduate Backend Engineer",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "CT-303 Graduate Backend Engineer: a recruiter/HR conversation about your background, why this role, collaboration and practical availability. No live coding is planned.",
+      "content_sha256": "c79edd8bab875323b86d0dcba07189ce6f4cd15e48483df69b67bbde328aa4a4"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Cobalt Transit",
+      "role": null,
+      "locator": "https://c03.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Cobalt Transit builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "e186796f6fbf82996cf4de576fb62e57dccd3b63b52d67f573d2a3630779564a"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c03",
+      "company": "Cobalt Transit",
+      "role": "Graduate Backend Engineer",
+      "locator": "https://c03.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "CT-303: Graduate Backend Engineer. Early-career API development, testing and basic database knowledge. Learn service reliability with an experienced team.",
+      "content_sha256": "6bccf329dfdfbf6996d14b8cefbfbdbbf8142f2d49e51447441b56b3beac5cba"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

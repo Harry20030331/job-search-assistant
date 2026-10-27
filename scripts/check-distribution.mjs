@@ -7,8 +7,8 @@ let count=0;
 // Explicit user-requested Chinese planning documents; privacy checks still apply.
 const chinesePlanningDocs = new Set(['docs/evaluation.md', 'docs/hannah-handoff.md']);
 async function walk(dir){for(const entry of await readdir(dir,{withFileTypes:true})){
- if(['node_modules','.git','data','local','private','runs'].includes(entry.name))continue;
- const file=join(dir,entry.name), path=relative(root,file);
+ if(['node_modules','.git','data','local','private','runs','.venv','.google-local','__pycache__'].includes(entry.name))continue;
+ const file=join(dir,entry.name), path=relative(root,file).split('\\').join('/');
  if(entry.isSymbolicLink())throw new Error(`symlink_in_distribution:${path}`);
  if(entry.isDirectory()){if(entry.name==='archive')throw new Error('archive_in_distribution');await walk(file);continue;}
  if(path===relative(root,fileURLToPath(import.meta.url)))continue;

@@ -26,6 +26,32 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run review -- --runtime-dir <directory>`: serve an independent runtime; no China records required. The course workspace defaults to loopback port 64441.
 - `npm run verify`: run type checks, synthetic tests, fixed UI and structural boundary verification.
 
+## Interview commands
+
+`npm run interview:enrich -- start|next|record|finish` runs bounded evidence research in the current Codex chat. The active search tool and in-app Browser execute its reserved actions; Python stores receipts and exports a context request without fetching pages or calling another LLM. `npm run interview:enrichment-checks -- --output <new-private-directory>` runs eight offline protocol scenarios, not a model retrieval benchmark. See [enrichment protocol](interview-enrichment.md).
+
+`npm run interview:learning -- bind|attach|revoke` explicitly connects a selected canonical candidate source to an existing account learning store, retrieves scoped active practice evidence read-only before context capture, or revokes a binding. It makes no Google/model calls. See [candidate learning](interview-learning.md) for provenance, scope and required absolute-path flags.
+
+`npm run interview:track -- link|publish|inspect --runtime-dir <absolute-candidate-runtime>` connects verified rounds to existing applications and publishes an explicitly selected fresh preparation run to `/interviews` on the existing Review server. Link requires a strict `--input` payload with provenance/current revision. Publish requires `--interview-id`, `--workspace` and `--expected-revision`. Use optional `--profile` for external/v3 candidate sources. `npm run interview:demo -- --output <new-absolute-directory> --port 8767` creates and serves three authored fictional UI scenarios without model/Google calls. See [the workbench](interview-workbench.md); lifecycle publication must precede canonical preparation staging.
+
+`npm run interview:context -- schema|request|freeze|check` exposes the opt-in evidence-bound preparation context contract. `npm run interview:context-cases -- check` validates its 12 supplied-evidence development cases; `export --output <absolute-new-private-directory>` creates a case-label review pack without model calls. See [context contracts](interview-context-contract.md) for required flags and limits. These commands do not yet generate the analysis, retrieve live JDs or alter the existing preparation workflow.
+
+`npm run interview:context-analyze -- --request <absolute-request.json> --output <absolute-new-isolated-directory>` makes one real model call for context analysis; `--method simple-instruction-v1` selects the simple baseline instead of `context-guided-v1`. `npm run interview:context-pilot -- --output <absolute-new-isolated-directory> --case C05 --case C08` runs both methods on explicitly selected cases, retaining first attempts. These consume Codex quota, use captured evidence only and do not authorize or generate full preparation materials.
+
+`npm run interview:context-preparation -- capture|stage|attach|inspect` binds captured context to preparation state. `npm run interview:context-prepare -- proposal|materials --workspace <absolute-work> --output <absolute-new-isolated-output>` runs the new plan/material nodes; materials additionally require the exact approval ID. `npm run interview:context-preparation-pilot` compares planning methods with fresh states. See [context-aware preparation](interview-context-preparation.md) for full flags, coverage-policy configuration, canonical handoff reuse and explicit synthetic audit boundaries.
+
+`npm run interview:preparation-quality -- export|judge|compare` evaluates actual preparation semantics under a separate six-dimension stage-aware rubric. Export takes `--pilot` and a new `--output`; judge/compare take `--pack`, with host-only `--judge-env` or a completed `--ratings` CSV respectively. See [semantic evaluation](interview-preparation-quality.md). Human/judge scores remain uncalibrated until appropriate comparison; this does not replace historical four-dimension scores.
+
+`npm run interview:preparation-controls -- export|judge|report` diagnoses the unchanged semantic judge on 12 authored strong/partial/severe controls from four fictional stories. Export takes a new `--output`; judge/report take `--pack`, with optional host-only `--judge-env` for paid judge calls. Labels and packets freeze before judging. See [challenge controls](interview-preparation-controls.md); developer expectations are not independently validated labels or agent performance.
+
+`npm run interview:benchmark -- --run <absolute-new-output-outside-the-checkout>` runs the current-workflow simple-instruction developer batch and exports reports/review forms. Add `--judge --judge-env <absolute-local-dotenv>` for the independent OpenRouter audit. `npm run interview:review -- compare --batch <absolute-batch> --ratings <absolute-csv>` compares completed human scores. See [the protocol](interview-workflow-benchmark.md) for isolation, fixed sample selection, limits and resumption rules.
+
+See [Interview](interview.md) for Python setup, complete flags, the source-version token and an offline example. Run `npm run interview -- context --workspace <candidate-workspace> --job-id <stable-id> --settings <settings.json> --invitation <invitation.txt>` to inspect the read-only handoff. `stage` additionally requires `--expected-token <token> --output <new-absolute-directory>` and creates an isolated local workspace, without Google/model calls or shared-ledger writes.
+
+`npm run interview:tools -- call <operation> --workspace <absolute-work> --input <absolute-json>` invokes the business tool API. `npm run interview:local -- inspect --workspace <absolute-work>` reads local state. See [Interview storage](interview-storage.md) for business versus experiment output paths.
+
+`npm run interview:test` runs the Python contract suite separately from `npm run verify`. `npm run interview:eval -- --split dev --group A --case S01` invokes a real baseline model task; add `--judge` for the independent OpenRouter quality judge. This consumes quota. Other explicit entrypoints are `interview:triage`, `interview:analysis`, `interview:calibration`, `interview:prepare`, `interview:approve`, `interview:coordinator`, `interview:inbox`, `interview:connect` and `interview:google`. These Python commands run from `src/interview/python/`; supply absolute paths for cross-module inputs/outputs. No background mail monitor is installed by these changes.
+
 The `confirm-batch` input file is strict JSON with this exact shape (no additional fields):
 
 ```json
@@ -58,6 +84,8 @@ The batch command emits one JSON document with `ok`, `ready`, and `parked`. Inva
 Use explicit input and runtime paths for independent runs. See [candidate-inputs](candidate-inputs.md).
 
 ## Canonical storage paths
+
+The server's `/` is Home; `/interviews` contains Plan, Practice and Debrief; `/settings/accounts` starts Google authorization. `review` accepts developer-only `--google-root <private-config-directory>` and optional `--profile`. After exact context-plan acceptance, `npm run interview:practice -- --workspace <absolute-work> --approval-id <current-id> --output <new-absolute-output>` generates complete simulations. See [the workbench](interview-workbench.md) and [simulation contract](interview-practice.md).
 
 Use `data/opportunities.json` wherever a compatibility command takes `--tracker`, `--jobs`, `trackerPath` or `jobsPath`. Use `data/drafts` for `--review` or `reviewPath`. These are views of one durable job store, not additional files. Normal `review:resume` resolves them automatically.
 

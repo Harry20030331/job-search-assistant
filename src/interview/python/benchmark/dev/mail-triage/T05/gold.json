@@ -1,0 +1,6 @@
+{
+  "category": "invitation",
+  "interview_id": null,
+  "route": "scheduling_review",
+  "reason": "A new fixed-slot interview should enter scheduling review."
+}

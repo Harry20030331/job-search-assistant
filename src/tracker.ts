@@ -354,12 +354,16 @@ export async function transitionApplication(
   applicationId: string,
   next: Exclude<ApplicationStatus, "submitted" | "confirmed">,
   updates: z.input<typeof transitionUpdatesSchema> = {},
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
+  expectedIdentity?: Pick<ApplicationRecord, "jobId" | "company" | "title" | "jobUrl">
 ) {
   const parsedUpdates = transitionUpdatesSchema.safeParse(updates);
   if (!parsedUpdates.success) throw new Error("invalid_application_record");
   return transact(path, (document) => {
     const record = exactRecord(document, applicationId);
+    if (expectedIdentity && Object.entries(expectedIdentity).some(([key, value]) => record[key as keyof ApplicationRecord] !== value)) {
+      throw new Error("application_identity_changed");
+    }
     if (!allowed[record.status].includes(next)) throw new Error("invalid_status_transition");
     requireAtOrAfter(now, record.updatedAt);
     record.status = next;

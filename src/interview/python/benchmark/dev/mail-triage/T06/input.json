@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Invitation to meet the ML team",
+      "body": "We would like to invite you to a technical interview for the Machine Learning Engineer position at Pine Labs. Scheduling details will follow."
+    }
+  ],
+  "known_interviews": []
+}

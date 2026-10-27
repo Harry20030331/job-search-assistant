@@ -1,0 +1,61 @@
+{
+  "clock": "2026-10-19T16:00:00+00:00",
+  "events": [],
+  "history": [
+    {
+      "record_id": "old-project",
+      "created_at": "2026-10-01T16:00:00+00:00",
+      "text": "In a backend project-story interview, I could not clearly distinguish my contribution from the team's."
+    },
+    {
+      "record_id": "background-00",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 0: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-01",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 1: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-02",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 2: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-03",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 3: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-04",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 4: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-05",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 5: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-06",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 6: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-07",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 7: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-08",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 8: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    },
+    {
+      "record_id": "background-09",
+      "created_at": "2026-10-02T16:00:00+00:00",
+      "text": "Frontend practice note 9: I practiced CSS spacing and color choices. This is not an ML or backend weakness."
+    }
+  ]
+}

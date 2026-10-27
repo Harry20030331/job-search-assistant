@@ -1,0 +1,23 @@
+{
+  "human_review": "reviewed",
+  "jd_status": "exact",
+  "role_focus_expected": [
+    "ml_modeling",
+    "ml_evaluation"
+  ],
+  "round_focus_expected": [
+    "ml_modeling",
+    "ml_evaluation"
+  ],
+  "seniority_expected": "senior",
+  "round_expected": "technical",
+  "review_notes": [
+    "Use time-based validation rather than substituting a product A/B-testing case."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

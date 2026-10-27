@@ -1,0 +1,11 @@
+{
+  "case_id": "PREP-V4-DEMO",
+  "suite": "preparation_protocol_development",
+  "task": "Prepare for the sample ML technical interview using the fictional candidate profile. First propose a plan, then wait for exact plan approval before full materials.",
+  "provenance": {
+    "kind": "fully_synthetic_development_fixture",
+    "human_review": "pending",
+    "benchmark_case": false,
+    "candidate_is_not_the_user": true
+  }
+}

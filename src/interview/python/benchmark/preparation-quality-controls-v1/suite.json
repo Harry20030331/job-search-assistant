@@ -1,0 +1,147 @@
+{
+  "protocol": "preparation-quality-controls-v1",
+  "authorship": "AI-assisted developer-authored fictional diagnostic controls; not natural agent outputs, independently reviewed labels or held-out cases",
+  "design": "Four source stories, each with an intended strong, partial and severe variant. Only the named target dimension has a prespecified exact score; other dimensions may change collaterally. Freeze before the first judge call. No prompt tuning or replacement of failed responses in this run.",
+  "stories": [
+    {
+      "story_id": "QC01",
+      "target_dimension": "role_round_focus",
+      "stage": "proposal",
+      "company": "Harbor Signals",
+      "role": "Graduate Backend Engineer",
+      "budget_minutes": 20,
+      "candidate": "Morgan Chen implemented request validation and integration tests for a course delivery-status API with one teammate. Production ownership, professional impact and personal motivation are not supplied.",
+      "invitation": "HS-41: recruiter/HR conversation about background, motivation, collaboration and availability. No live coding or system-design exercise is planned.",
+      "jd": "HS-41 Graduate Backend Engineer: early-career API development, testing and basic database knowledge. Learn reliability with an experienced team.",
+      "company_text": "Harbor Signals builds delivery-status tools. Its stated values include explaining decisions and learning from users.",
+      "approved_sections": null,
+      "variants": [
+        {
+          "variant_id": "aligned",
+          "expected_target_score": 2,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; awaiting acceptance before full materials.\n\n## Introduction and motivation: 8 minutes\nFocus: self_introduction, why_company, why_role. Draft a 45-second introduction from the course API work. Note one company fact and reflect on whether it actually interests you; personal motivation is unknown. Deliverable: a short outline with honest why-company/why-role reflection points. Sources: candidate, company, invitation, jd.\n\n## Collaboration discussion: 8 minutes\nFocus: collaboration, project_discussion. Outline one teammate episode using only request-validation and integration-test contributions, then rehearse a 60-second account once. No production impact is established. Deliverable: one concise situation/action/learning outline for a conversational HR question. Sources: candidate, invitation.\n\n## Availability and candidate questions: 4 minutes\nFocus: availability, interviewer_questions. Supply actual availability, which is unknown, and choose two questions about graduate support and learning reliability. Deliverable: an availability note and two question themes. Sources: invitation, jd.\n\nCoding/SQL/system-design drills are deferred because this round explicitly excludes coding/design exercises. Background, motivations, collaboration and questions are covered within these blocks."
+        },
+        {
+          "variant_id": "mixed_tags",
+          "expected_target_score": 1,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; awaiting acceptance before full materials.\n\n## Introduction and motivation: 8 minutes\nFocus: self_introduction, why_company, why_role. Draft a 45-second introduction from the course API work. Use one supplied company fact as an honest reflection prompt; personal motivation is unknown. Deliverable: a concise introduction and motivation outline. Sources: candidate, company, invitation, jd.\n\n## Collaboration discussion: 8 minutes\nFocus: coding, sql, system_design. Outline one teammate episode about request validation and tests and rehearse a 60-second account once. This remains a conversational HR discussion, not a live coding or design drill. Production impact is unknown. Deliverable: one situation/action/learning outline. Sources: candidate, invitation, jd.\n\n## Availability and candidate questions: 4 minutes\nSupply actual availability and two questions about graduate support and reliability learning. Deliverable: an availability note and two question themes. Sources: invitation, jd.\n\nNo actual coding/design exercise is proposed. Common introduction, company/role motivation, collaboration and questions are included."
+        },
+        {
+          "variant_id": "wrong_round",
+          "expected_target_score": 0,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; awaiting acceptance before full materials.\n\n## Introduction and motivation: 3 minutes\nUse the documented course project for a short introduction, then identify an honest personal connection to the supplied company facts and role. Personal motivation remains unknown. Deliverable: a three-line outline. Sources: candidate, company, jd.\n\n## Live technical assessment preparation: 14 minutes\nPrioritize this recruiter conversation as an algorithm and architecture assessment despite the no-coding/no-design invitation. Work through one small coding prompt for 6 minutes, a basic database query for 3 minutes and a small service-design sketch for 5 minutes. Deliverable: code, a query and a design sketch for this round. Sources: jd, invitation.\n\n## Availability and candidate questions: 3 minutes\nRecord actual availability and one question about graduate support. Deliverable: a short note. Collaboration rehearsal is deferred to make room for technical drills. Sources: invitation, jd."
+        }
+      ]
+    },
+    {
+      "story_id": "QC02",
+      "target_dimension": "workload_feasibility",
+      "stage": "proposal",
+      "company": "Maple Relay",
+      "role": "Senior Backend Engineer",
+      "budget_minutes": 20,
+      "candidate": "Riley Park maintained an internal queue service for three years and coordinated one incident review with two teammates. No measured business impact or personal motivation is supplied.",
+      "invitation": "MR-72 hiring-manager round: discuss the candidate's queue-service experience, one reliability tradeoff, collaboration and role motivation. A brief project discussion is expected, not a coding test.",
+      "jd": "MR-72 Senior Backend Engineer: queue reliability, incident learning, clear tradeoff discussions and collaboration. No specific system-design problem is provided.",
+      "company_text": "Maple Relay develops internal logistics software. Its published fictional values emphasize clear technical decisions and shared incident learning.",
+      "approved_sections": null,
+      "variants": [
+        {
+          "variant_id": "bounded",
+          "expected_target_score": 2,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; full materials follow exact acceptance.\n\n## Introduction and motivations: 5 minutes\nDraft a 45-second introduction from the queue-service work and identify one truthful why-company/why-role reflection using the stated values. Unknown motivation stays a prompt. Deliverable: five outline bullets. Sources: candidate, company, jd.\n\n## Reliability tradeoff: 7 minutes\nChoose one actual queue-service decision, outline the constraint, two options and one tradeoff, then rehearse a two-minute explanation once. Do not invent impact measurements. Deliverable: one four-bullet decision account. Sources: candidate, invitation, jd.\n\n## Collaboration: 5 minutes\nOutline one supported incident-review episode and rehearse a 60-second account once, leaving missing details for truthful personalization. Deliverable: one short collaboration outline. Sources: candidate, invitation.\n\n## Candidate questions: 3 minutes\nChoose two question themes about incident learning and team expectations. Deliverable: two questions. Sources: company, jd.\n\nThe plan targets the explicit manager agenda. No extra reading or rehearsal is required outside the 20-minute budget."
+        },
+        {
+          "variant_id": "crowded",
+          "expected_target_score": 1,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; full materials follow exact acceptance.\n\n## Introduction and motivations: 5 minutes\nDraft a 45-second introduction and truthful why-company/why-role reflection using the supported queue-service work and supplied company values. Motivation is unknown. Deliverable: five outline bullets. Sources: candidate, company, jd.\n\n## Reliability tradeoff: 7 minutes\nCreate two separate tradeoff accounts, each with three alternatives and a failure-mode sketch, then give a two-minute rehearsal of each and compare them. Do not invent impact. Deliverable: two decision outlines, two sketches and a comparison note. Sources: candidate, invitation, jd.\n\n## Collaboration: 5 minutes\nOutline one incident-review episode, rehearse it once for 60 seconds and note one learning point without inventing missing details. Deliverable: one collaboration outline. Sources: candidate, invitation.\n\n## Candidate questions: 3 minutes\nChoose two question themes about incident learning and team expectations. Deliverable: two questions. Sources: company, jd.\n\nAll drafting, sketching and rehearsal must fit within these blocks; no outside work is allocated."
+        },
+        {
+          "variant_id": "impossible_repetitions",
+          "expected_target_score": 0,
+          "expected_serious_categories": [],
+          "output_text": "# Preparation proposal\n20 minutes; full materials follow exact acceptance.\n\n## Introduction and motivations: 5 minutes\nDraft a short introduction and truthful why-company/why-role reflection from supported evidence. Motivation is unknown. Deliverable: five outline bullets. Sources: candidate, company, jd.\n\n## Reliability tradeoff: 7 minutes\nConduct four complete 10-minute tradeoff mock discussions in real time, then write detailed feedback on each. All four must occur inside this seven-minute block, with no speed-up or homework. Deliverable: four completed timed mocks and four feedback notes. Sources: candidate, invitation, jd.\n\n## Collaboration: 5 minutes\nConduct three complete five-minute collaboration rehearsals and revise the story after each, all inside this five-minute block. Use only actual incident-review facts; do not invent outcomes. Deliverable: three completed rehearsals and revisions. Sources: candidate, invitation.\n\n## Candidate questions: 3 minutes\nChoose two questions about incident learning and team expectations. Sources: company, jd.\n\nTotal allocation is 5+7+5+3=20 minutes. No work may be moved outside these blocks."
+        }
+      ]
+    },
+    {
+      "story_id": "QC03",
+      "target_dimension": "evidence_fidelity",
+      "stage": "materials",
+      "company": "Cedar Analytics",
+      "role": "Junior Machine Learning Engineer",
+      "budget_minutes": 30,
+      "candidate": "Taylor Singh compared classifiers on a public synthetic dataset and wrote an error-analysis notebook. Taylor has no documented healthcare deployment, production ownership or measured business impact. Personal motivation is unknown.",
+      "invitation": "CA-19 technical discussion: explain a documented classifier project, evaluation choices and a brief introduction. No exact questions or product deployment details are provided.",
+      "jd": "CA-19 Junior Machine Learning Engineer: evaluate classifiers, communicate limitations and collaborate on prototypes. The role does not establish clinical deployment or leadership ownership.",
+      "company_text": "Cedar Analytics builds workflow analysis tools. Its published fictional values are explaining limitations and learning from users. Team size and social activities are not documented.",
+      "approved_sections": [
+        {"section_id": "intro", "topic": "Introduction and motivation", "minutes": 8},
+        {"section_id": "evaluation", "topic": "Documented classifier evaluation", "minutes": 18},
+        {"section_id": "questions", "topic": "Candidate questions", "minutes": 4}
+      ],
+      "variants": [
+        {
+          "variant_id": "grounded",
+          "expected_target_score": 2,
+          "expected_serious_categories": [],
+          "output_text": "# Approved preparation materials\n30 minutes, sections intro/evaluation/questions. All questions below are suggested practice, not employer-confirmed questions.\n\n## intro: 8 minutes\nPrompt: Give a 45-second introduction and explain what genuinely attracts you to this role/company. Spend three minutes outlining the documented classifier comparison, two reflecting on the company's stated value of explaining limitations, two rehearsing and one checking. Answer structure: documented project task, actual contribution, a limitation, then a personal connection only if true. Leave motivation as a reflection prompt. Self-check: no healthcare deployment, production impact or unsupported ownership claims. Sources: candidate, company, jd.\n\n## evaluation: 18 minutes\nPrompt: Explain how you compared classifiers and what would change if observations from one user appeared in both training and test data. Spend five minutes outlining the actual notebook, five sketching a user-disjoint split, five rehearsing an explanation and three checking it. Answer points: explain the actual data and comparison; shared-user observations can leak information across splits; group by user where appropriate to the intended generalization; select metrics for the task; state unknown class balance and costs rather than inventing them. Distinguish your documented notebook from a hypothetical improved design. Self-check: observations from the same user do not cross the proposed split; a notebook result is not evidence of clinical impact. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPrompt: Prepare two questions about prototype evaluation and communicating limitations. Spend two minutes choosing themes, one wording them and one checking that they do not presume an undocumented deployment. Answer structure: ask how the team selects evaluation criteria and communicates uncertainty. Self-check: ask rather than claim. Sources: company, jd."
+        },
+        {
+          "variant_id": "minor_unsupported_fact",
+          "expected_target_score": 1,
+          "expected_serious_categories": [],
+          "output_text": "# Approved preparation materials\n30 minutes, sections intro/evaluation/questions. These are suggested practice questions. Cedar Analytics is known for weekly learning lunches.\n\n## intro: 8 minutes\nPrompt: Give a 45-second introduction and truthful why-company/why-role reflection. Spend three minutes outlining the documented classifier comparison, two reflecting on explaining limitations, two rehearsing and one checking. Answer structure: actual project, contribution and limitation; add a personal motivation only if true. Self-check: do not invent production or healthcare experience. Sources: candidate, company, jd.\n\n## evaluation: 18 minutes\nPrompt: Explain your classifier comparison and how to avoid sharing observations from one user across training and test splits. Spend five minutes outlining the notebook, five sketching a user-disjoint split, five rehearsing and three checking. Answer points: actual data and comparison, possible leakage from shared users, grouping by user where appropriate to the generalization target, task-appropriate metrics and unknown class balance/costs. Label an improved design as hypothetical rather than claiming the notebook already used it. Self-check: no user crosses the proposed split; no clinical impact is claimed. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPrepare two questions about prototype evaluation and communicating limitations, without assuming deployment details. Spend two minutes selecting themes, one wording and one checking. Answer structure: ask about criteria and uncertainty. Self-check: questions do not presume undocumented facts. Sources: company, jd."
+        },
+        {
+          "variant_id": "fabricated_impact_and_guarantee",
+          "expected_target_score": 0,
+          "expected_serious_categories": ["fabrication", "unsupported_certainty"],
+          "output_text": "# Approved preparation materials\n30 minutes, sections intro/evaluation/questions. These are the exact questions Cedar Analytics will ask; the employer has confirmed them.\n\n## intro: 8 minutes\nPrompt: Give your introduction and motivations. Spend three minutes outlining, two refining, two rehearsing and one checking. Answer points: say you led a five-person clinical deployment team and your production classifier reduced hospital errors by 35%; say healthcare deployment has always been your personal passion. These are established candidate facts to memorize. Self-check: include the 35% result confidently. Sources: candidate, company, jd.\n\n## evaluation: 18 minutes\nPrompt: Explain the classifier comparison and a user-disjoint train/test split. Spend five minutes outlining, five sketching a split, five rehearsing and three checking. Answer points: shared users can leak information; group by user where appropriate; choose metrics for the task. Present the public synthetic notebook as proof of the 35% hospital result and professional leadership experience. Self-check: confidently state clinical impact. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPrepare two questions about prototype evaluation and communicating limitations. Spend two minutes choosing, one wording and one checking. Ask about criteria and uncertainty. Sources: company, jd."
+        }
+      ]
+    },
+    {
+      "story_id": "QC04",
+      "target_dimension": "actionability",
+      "stage": "materials",
+      "company": "Juniper Metrics",
+      "role": "Product Data Scientist",
+      "budget_minutes": 25,
+      "candidate": "Avery Lin wrote SQL analyses and an experiment proposal for a fictional course subscription product with a teammate. No launched experiment, measured lift or professional stakeholder ownership is documented. Personal motivation is unknown.",
+      "invitation": "JM-36 hiring-manager conversation: introduction, company/role motivation, collaboration and one bounded product experiment discussion. Exact questions are unspecified.",
+      "jd": "JM-36 Product Data Scientist: product metrics, experimentation and clear communication. This round does not call for model implementation or distributed architecture.",
+      "company_text": "Juniper Metrics builds subscription analytics tools. Its stated fictional values emphasize clear assumptions and learning from experiments.",
+      "approved_sections": [
+        {"section_id": "intro", "topic": "Introduction and motivations", "minutes": 7},
+        {"section_id": "story", "topic": "Collaboration and experiment discussion", "minutes": 14},
+        {"section_id": "questions", "topic": "Candidate questions", "minutes": 4}
+      ],
+      "variants": [
+        {
+          "variant_id": "usable",
+          "expected_target_score": 2,
+          "expected_serious_categories": [],
+          "output_text": "# Approved preparation materials\n25 minutes; intro/story/questions. All prompts are suggested practice.\n\n## intro: 7 minutes\nPrompt: Introduce your documented course SQL/experiment work and explain your actual interest in this role/company. Spend three minutes drafting five bullets, two reflecting on the supplied value of clear assumptions and two rehearsing a 45-second answer. Answer structure: actual task, contribution, learning, then a truthful personal connection if one exists. Self-check: motivation is not supplied; do not claim a launched experiment or measured lift. Sources: candidate, company, jd.\n\n## story: 14 minutes\nPrompt: Describe one teammate disagreement about your course experiment proposal, then explain how you would evaluate a hypothetical subscription change. Missing disagreement details must be supplied honestly; if no disagreement occurred, describe collaboration without inventing conflict. Spend four minutes outlining, four choosing one primary metric and a guardrail, four rehearsing a two-minute response and two checking. Answer structure: actual situation/contribution/learning, then clearly hypothetical hypothesis, randomization unit, metric, guardrail and one caveat. Self-check: distinguish proposed work from launched results; acknowledge unknown traffic and baseline rates. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPrompt: Draft two questions about how the team chooses metrics and documents assumptions. Spend two minutes drafting, one reading aloud and one removing assumptions about unprovided team processes. Answer structure: ask how rather than claim that. Self-check: each question links to supplied role/company context. Sources: company, jd."
+        },
+        {
+          "variant_id": "thin_middle",
+          "expected_target_score": 1,
+          "expected_serious_categories": [],
+          "output_text": "# Approved preparation materials\n25 minutes; intro/story/questions. Suggested practice only.\n\n## intro: 7 minutes\nPrompt: Introduce the documented course SQL/experiment work and reflect truthfully on why this role/company. Spend three minutes drafting five bullets, two reflecting on clear assumptions and two rehearsing. Answer structure: actual task, contribution, learning and a genuine personal connection if one exists. Self-check: do not invent motivation, a launched experiment or measured lift. Sources: candidate, company, jd.\n\n## story: 14 minutes\nPrepare collaboration and experiment design. Use STAR and be clear. Think about metrics and practice an answer. Answer points: mention collaboration and experimentation. Self-check: sound professional. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPrompt: Draft two questions about metric selection and documenting assumptions. Spend two minutes drafting, one reading aloud and one checking. Answer structure: ask how the team approaches each topic. Self-check: do not assume undocumented processes. Sources: company, jd."
+        },
+        {
+          "variant_id": "empty_advice",
+          "expected_target_score": 0,
+          "expected_serious_categories": [],
+          "output_text": "# Approved preparation materials\n25 minutes; intro/story/questions. Suggested practice only.\n\n## intro: 7 minutes\nPreparation topics: self introduction, why company, why role. Prepare well and be confident. Answer points: give a good answer. Self-check: do your best. Sources: candidate, company, jd.\n\n## story: 14 minutes\nPreparation topics: collaboration and product experiments. Think about these topics carefully and answer professionally. Answer points: be clear and relevant. Self-check: be prepared. Sources: candidate, invitation, jd.\n\n## questions: 4 minutes\nPreparation topic: interviewer questions. Think of good questions. Answer points: ask something useful. Self-check: sound interested. Sources: company, jd."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Interview request",
+      "body": "Would you be available for an interview about your experience with developer tools? I am collecting perspectives for a study."
+    }
+  ],
+  "known_interviews": []
+}

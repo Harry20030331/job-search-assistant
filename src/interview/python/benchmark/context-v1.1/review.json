@@ -1,0 +1,28 @@
+{
+  "origin": "human_current_chat",
+  "review_date": "2026-10-25",
+  "source_dataset_hash": "c60faf6eacb441503d52268f7767c9473e4fe438e8e9b8130b2102bb318ee4a3",
+  "decisions": {
+    "C01": "keep",
+    "C02": "keep",
+    "C03": "keep",
+    "C04": "keep",
+    "C05": "revise",
+    "C06": "keep",
+    "C07": "keep",
+    "C08": "keep",
+    "C09": "keep",
+    "C10": "keep",
+    "C11": "keep",
+    "C12": "keep"
+  },
+  "instruction_reference": "User marked C05 Revise: same-company different-role JD is correctly an analogue, but hiring-manager topics are not supplied and must be explicitly inferred. All other cases keep.",
+  "applied_revision": {
+    "case_id": "C05",
+    "round_label": "confirmed",
+    "round_focus": "inferred if supplied; optional hypotheses, not mandatory actual topics",
+    "role_focus": "inferred from analogue",
+    "actual_round_scope": "unknown"
+  },
+  "unchanged": "All request files, identities, source evidence, budgets and other cases' semantic expectations are preserved."
+}

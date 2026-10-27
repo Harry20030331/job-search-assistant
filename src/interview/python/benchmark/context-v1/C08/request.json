@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c08",
+    "application_id": "application-c08",
+    "interview_id": "interview-c08",
+    "company": "Indigo Health Tools",
+    "role": "Junior Modeling Data Scientist"
+  },
+  "association": "verified",
+  "budget_minutes": 50,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Jordan Ash compared two classifiers on a public synthetic dataset and wrote an error-analysis notebook. Clinical deployment and healthcare employment are not established.",
+      "content_sha256": "7f649765b35891158ab052447cc19d222edef091d4f57069d901422c72a2d223"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c08",
+      "company": "Indigo Health Tools",
+      "role": "Junior Modeling Data Scientist",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "IHT-808 Junior Modeling Data Scientist: this technical round focuses on experiment design and product metrics. We will not assess model implementation in this round; later rounds may differ.",
+      "content_sha256": "f88a58eeb7d3353d28f41d4c4610727d8a123130ad34f787afa4012d7d71a584"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Indigo Health Tools",
+      "role": null,
+      "locator": "https://c08.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Indigo Health Tools builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "5639cd83d64b862a0a34082f9df85847a54736acc71525ef4168ffdf9f5d079a"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c08",
+      "company": "Indigo Health Tools",
+      "role": "Junior Modeling Data Scientist",
+      "locator": "https://c08.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "IHT-808: Junior Modeling Data Scientist. Early-career model training, feature validation and calibration for internal workflow tooling. Product experimentation is an occasional collaboration.",
+      "content_sha256": "f3fe514c0066d456544ea0174318e92a375436d6841975218bb8c3123b7e8faf"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

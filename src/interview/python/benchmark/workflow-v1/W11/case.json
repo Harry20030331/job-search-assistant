@@ -1,0 +1,40 @@
+{
+  "case_id": "W11",
+  "suite": "debrief",
+  "title": "A correction resolves only the reported issue",
+  "user_script": {},
+  "public_task": "Record the supplied interview/practice debrief faithfully. Separate reported facts and self-assessment from suggested practice.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  },
+  "debriefs": [
+    {
+      "record_id": "W11-report",
+      "interview_id": "fictional-past-practice",
+      "occurred_at": "2026-10-17T16:00:00+00:00",
+      "mode": "practice",
+      "origin": "synthetic_test_script",
+      "subject": {
+        "company": null,
+        "role": "backend_swe",
+        "round": null
+      },
+      "text": "In practice I could not explain why retrying a task can duplicate its effects. I also lost the structure of my QueueLab project story. No interviewer feedback was provided."
+    },
+    {
+      "record_id": "W11-correction",
+      "interview_id": "fictional-past-practice",
+      "occurred_at": "2026-10-18T16:00:00+00:00",
+      "mode": "practice",
+      "origin": "synthetic_test_script",
+      "subject": {
+        "company": null,
+        "role": "backend_swe",
+        "round": null
+      },
+      "text": "In today's practice I explained duplicate task effects and idempotency correctly. I still lost the structure of my QueueLab project story. This is my own assessment, not interviewer feedback."
+    }
+  ]
+}

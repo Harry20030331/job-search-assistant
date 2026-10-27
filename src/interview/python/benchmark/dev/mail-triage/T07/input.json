@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Pine Labs interview availability",
+      "body": "Please send three available one-hour slots next week for your Machine Learning Engineer interview. We have not selected a time yet."
+    }
+  ],
+  "known_interviews": []
+}

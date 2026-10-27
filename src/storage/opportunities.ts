@@ -47,7 +47,7 @@ export function parseOpportunities(value: unknown): Opportunities {
   validateApplicationRecords(projectApplications(result));
   return result;
 }
-export function isOpportunityPath(path: string): boolean { return path.endsWith("/opportunities.json") || path === "opportunities.json"; }
+export function isOpportunityPath(path: string): boolean { return path.replaceAll("\\", "/").split("/").at(-1) === "opportunities.json"; }
 export async function readOpportunities(path: string): Promise<Opportunities> {
   return parseOpportunities(JSON.parse(await readFile(path, "utf8")));
 }

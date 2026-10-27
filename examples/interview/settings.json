@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "interviewId": "fictional-cedar-interview-1",
+  "round": "ML technical",
+  "timezone": "America/Los_Angeles",
+  "preparationBudgetMinutes": 90,
+  "priorities": ["Explain only supplied project facts", "Practice ML evaluation and coding"]
+}

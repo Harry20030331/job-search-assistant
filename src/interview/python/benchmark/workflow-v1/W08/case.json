@@ -1,0 +1,15 @@
+{
+  "case_id": "W08",
+  "suite": "preparation",
+  "title": "Budget revision requires a replacement proposal",
+  "user_script": {
+    "decision": "revise",
+    "new_budget": 20
+  },
+  "public_task": "Prepare for the supplied interview within the candidate's budget. First propose a sourced outline and wait for my decision before full practice materials.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

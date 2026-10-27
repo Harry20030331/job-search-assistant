@@ -1,0 +1,35 @@
+{
+  "human_review": "reviewed",
+  "jd_status": "analogue",
+  "role_focus_expected": [
+    "experimentation",
+    "product_metrics"
+  ],
+  "round_focus_expected": [
+    "project_ownership",
+    "motivation"
+  ],
+  "seniority_expected": null,
+  "round_expected": "hiring_manager",
+  "review_notes": [
+    "Product focus is a preparation hypothesis from a different role, not a confirmed EL-505 requirement.",
+    "Associate alone does not establish seniority; preserve the missing exact JD and ask if needed.",
+    "The hiring-manager round label is explicit in the invitation, but its topic scope is not confirmed.",
+    "Project ownership and motivation are optional plausible preparation themes, not required actual interview topics. Other well-supported hypotheses or an explicit unknown scope are acceptable.",
+    "If round themes are suggested, label them inferred, explain the basis and retain unknown employer expectations. Do not promote the analogue JD to confirmation of this round's questions."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task.",
+  "role_focus_assessment_expected": "inferred",
+  "round_label_assessment_expected": "confirmed",
+  "round_focus_assessment_expected": "inferred",
+  "round_focus_required": false,
+  "unknowns_expected": [
+    "The actual hiring-manager topics/questions are not provided.",
+    "The exact role JD and seniority remain unknown."
+  ]
+}

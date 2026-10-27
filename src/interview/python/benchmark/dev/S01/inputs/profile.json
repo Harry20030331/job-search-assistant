@@ -1,0 +1,21 @@
+{
+  "source_id": "profile",
+  "name": "Alex Example (fictional)",
+  "timezone": "America/Los_Angeles",
+  "preparation_budget_minutes": 90,
+  "projects": [
+    {
+      "name": "QueueLab",
+      "description": "Built a toy task queue with retry and deduplication; compared throughput under bursty load.",
+      "confirmed_metrics": [
+        "Measured throughput on synthetic load; no production scale claim."
+      ]
+    }
+  ],
+  "availability_windows": [
+    {
+      "start": "2026-10-27T13:00:00+00:00",
+      "end": "2026-10-27T23:00:00+00:00"
+    }
+  ]
+}

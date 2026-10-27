@@ -1,0 +1,20 @@
+{
+  "suite": "preparation",
+  "interview_id": "interview-p01",
+  "application_id": "app-cedar-p01",
+  "expected_event_count": 0,
+  "interview_fields": {
+    "duration_minutes": 45
+  },
+  "require_preparation": false,
+  "rubric_notes": [
+    "Only supplied fictional candidate facts are evidence.",
+    "Suggested exercises are not employer-confirmed questions.",
+    "A self-report does not establish objective ability or interviewer feedback."
+  ],
+  "expected_topics": [
+    "idempotency",
+    "project_story"
+  ],
+  "expect_resolution": true
+}

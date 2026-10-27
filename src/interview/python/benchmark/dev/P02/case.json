@@ -1,0 +1,30 @@
+{
+  "case_id": "P02",
+  "suite": "preparation",
+  "task": "Generate a source-grounded preparation plan only. Do not schedule or write calendar events. If the round is unknown, state the uncertainty and provide a provisional plan using confirmed information.",
+  "visits": [
+    {
+      "clock": "2026-10-19T16:00:00+00:00",
+      "message": "Generate a source-grounded preparation plan only. Do not schedule or write calendar events. If the round is unknown, state the uncertainty and provide a provisional plan using confirmed information.",
+      "user_script": {
+        "confirm": true,
+        "facts": {
+          "other": "The recruiter has not provided additional details. Please use confirmed information and clearly mark a provisional plan."
+        }
+      }
+    }
+  ],
+  "user_script": {
+    "confirm": true,
+    "facts": {
+      "other": "The recruiter has not provided additional details. Please use confirmed information and clearly mark a provisional plan."
+    }
+  },
+  "provenance": {
+    "kind": "synthetic_with_ai_assistance",
+    "human_review": "pending",
+    "development_only": true,
+    "fixture_revision": 2,
+    "revision_note": "Before the first P02 live run, removed the confirmed round from application and mail so missing-round evidence is consistent across sources."
+  }
+}

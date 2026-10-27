@@ -1,0 +1,19 @@
+{
+  "source_id": "profile",
+  "name": "Alex Example (fictional)",
+  "timezone": "America/Los_Angeles",
+  "preparation_budget_minutes": 90,
+  "projects": [
+    {
+      "name": "EvalLab",
+      "description": "Compared classifiers on a synthetic imbalanced dataset, using precision and recall.",
+      "confirmed_metrics": []
+    }
+  ],
+  "availability_windows": [
+    {
+      "start": "2026-10-27T13:00:00+00:00",
+      "end": "2026-10-27T23:00:00+00:00"
+    }
+  ]
+}

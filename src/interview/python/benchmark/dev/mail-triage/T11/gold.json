@@ -1,0 +1,6 @@
+{
+  "category": "cancellation",
+  "interview_id": "interview-northstar-backend",
+  "route": "cancellation_review",
+  "reason": "Explicit upcoming-event cancellation, not a new invite or automatic replacement."
+}

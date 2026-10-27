@@ -1,0 +1,24 @@
+{
+  "human_review": "pending",
+  "jd_status": "analogue",
+  "role_focus_expected": [
+    "experimentation",
+    "product_metrics"
+  ],
+  "round_focus_expected": [
+    "project_ownership",
+    "motivation"
+  ],
+  "seniority_expected": null,
+  "round_expected": "hiring_manager",
+  "review_notes": [
+    "Product focus is a preparation hypothesis from a different role, not a confirmed EL-505 requirement.",
+    "Associate alone does not establish seniority; preserve the missing exact JD and ask if needed."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

@@ -1,0 +1,8 @@
+{
+  "case_id": "C10",
+  "fictional": true,
+  "human_review": "reviewed",
+  "task": "Analyze this interview preparation context using only the supplied evidence. Distinguish confirmed facts, inferred expectations and unknowns. Return context analysis only, not a plan or full materials.",
+  "condition": "supplied-evidence; no live search",
+  "candidate": "Avery Stone"
+}

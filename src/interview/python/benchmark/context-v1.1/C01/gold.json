@@ -1,0 +1,25 @@
+{
+  "human_review": "reviewed",
+  "jd_status": "exact",
+  "role_focus_expected": [
+    "experimentation",
+    "product_metrics",
+    "sql"
+  ],
+  "round_focus_expected": [
+    "experimentation",
+    "product_metrics",
+    "sql"
+  ],
+  "seniority_expected": "early_career",
+  "round_expected": "technical",
+  "review_notes": [
+    "Do not turn this into an ML model-training interview."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

@@ -1,0 +1,28 @@
+{
+  "case_id": "M01",
+  "suite": "memory",
+  "task": "Across separate visits, preserve my raw debriefs and use relevant current experience to prepare for a later interview. Do not write any calendar event in this task.",
+  "visits": [
+    {
+      "clock": "2026-10-19T16:00:00+00:00",
+      "message": "Save this raw debrief verbatim with record_id=debrief-1 and created_at=2026-10-19T16:00:00+00:00: In the backend system-design interview I struggled with capacity estimation. I need to practice requests per second and storage estimates."
+    },
+    {
+      "clock": "2026-10-20T16:00:00+00:00",
+      "message": "Save this raw update verbatim with record_id=debrief-2 and created_at=2026-10-20T16:00:00+00:00: My backend project-story explanation has improved after practice. Do not treat unclear personal contribution as my current main weakness. Capacity estimation still needs work."
+    },
+    {
+      "clock": "2026-10-21T16:00:00+00:00",
+      "message": "Prepare for the upcoming interview using JD, round and profile. Use relevant current history, respect corrections, and do not schedule anything."
+    }
+  ],
+  "user_script": {
+    "confirm": true,
+    "facts": {}
+  },
+  "provenance": {
+    "kind": "synthetic_with_ai_assistance",
+    "human_review": "pending",
+    "development_only": true
+  }
+}

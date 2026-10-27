@@ -1,0 +1,14 @@
+{
+  "case_id": "W09",
+  "suite": "preparation",
+  "title": "Rejected proposal produces no full materials",
+  "user_script": {
+    "decision": "reject"
+  },
+  "public_task": "Prepare for the supplied interview within the candidate's budget. First propose a sourced outline and wait for my decision before full practice materials.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

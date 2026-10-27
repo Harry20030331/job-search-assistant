@@ -1,0 +1,24 @@
+{
+  "human_review": "pending",
+  "jd_status": "missing",
+  "role_focus_expected": [
+    "ml_modeling"
+  ],
+  "round_focus_expected": [
+    "self_introduction",
+    "why_role",
+    "motivation"
+  ],
+  "seniority_expected": null,
+  "round_expected": "hr",
+  "review_notes": [
+    "The title supports only tentative ML preparation, not an invented specialty or seniority.",
+    "Why-company motivation must be elicited, not invented from a mission statement."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}
