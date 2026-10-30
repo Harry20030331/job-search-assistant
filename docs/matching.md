@@ -6,7 +6,7 @@ Implemented 2026-10-25. This is a Codex-driven workflow with deterministic publi
 
 Codex starts at [the Matching workflow](../skills/matching/SKILL.md), then reads only the needed child: [candidate intake](../skills/matching/intake/SKILL.md), [job discovery](../skills/matching/discovery/SKILL.md), or [matching and feedback](../skills/matching/feedback/SKILL.md). Intake confirms inputs, discovery observes official roles, and assessment compares required versus preferred qualifications. It produces ranked assessments with candidate and job evidence, gaps and unresolved questions. No keyword score substitutes for this judgment.
 
-The Matching CLI binds those assessments to a hash of the resolved candidate, complete preferences and resume manifest. It enforces confirmed category, work-mode, location, company/job exclusions and shortlist limits. It publishes accepted roles atomically through the existing job/storage domain functions. It never creates an application, approves a draft or submits anything.
+The Matching CLI binds those assessments to a hash of the resolved candidate, complete preferences and resume manifest. It enforces confirmed job-direction, work-mode, location, company/job exclusions and shortlist limits. It publishes accepted roles atomically through the existing job/storage domain functions. It never creates an application, approves a draft or submits anything.
 
 ## Run against selected inputs
 
@@ -44,7 +44,7 @@ Context, feedback and publish commands accept `--profile`, `--preferences`, `--m
 
 V1 feedback is persistent for this selected candidate workspace until superseded. For a one-round exception, use an isolated workspace or explicitly restore the prior constraints afterward; do not silently turn temporary feedback into a lasting preference. Text-only feedback may use an empty patch: Codex must then re-assess the prose. A fresh token is a version guard, not proof of semantic understanding. New feedback takes precedence for the explicitly changed dimensions; unrelated original prose constraints still apply.
 
-Location strings are explicit allowed locations compared case-insensitively, not a geocoder. The agent must normalize observed eligibility to the same labels (for example, Washington eligibility to a confirmed Seattle location), with evidence. "Remote" alone does not establish geographic eligibility. Unknown work mode or required location yields `needs_confirmation`, not a fabricated fact. Categories must be explicitly selected in the policy. Discovery permits an empty resume manifest; context reports missing mappings. Approved resume mapping and PDF integrity remain preflight responsibilities before application execution.
+Location strings are explicit allowed locations compared case-insensitively, not a geocoder. The agent must normalize observed eligibility to the same labels (for example, Washington eligibility to a confirmed Seattle location), with evidence. "Remote" alone does not establish geographic eligibility. Unknown work mode or required location yields `needs_confirmation`, not a fabricated fact. Policy categories are open job directions selected in the preferences, not resume keys. Discovery permits an empty resume manifest; context reports available resume-profile keys without guessing a mapping. Approved resume mapping and PDF integrity remain preflight responsibilities before application execution.
 
 ### Assessment round
 

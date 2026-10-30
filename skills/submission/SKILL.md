@@ -9,7 +9,7 @@ Read `../../docs/workflow-contract.md` for the active preparation, review, submi
 
 ## Preparation
 
-Run bounded preflight using fresh canonical facts, application rules and CV manifest. Every application needs an explicit active category and official HTTPS URL. Upload only its mapped approved PDF and verify the visible filename. Candidate facts override ATS parsing; never infer a missing fact from a blank field or a resume parser.
+Run bounded preflight using fresh canonical facts, application rules and CV manifest. Every application needs an explicit approved resume-profile key from the selected manifest and an official HTTPS URL. The existing preflight/Review/lifecycle `category` means that resume key, while job `category` means direction; read [the shared adapter contract](../../docs/job-directions.md). Never infer the resume key from a PM/other direction or relabel a job to fit a CV. Upload only its mapped approved PDF and verify the visible filename. Candidate facts override ATS parsing; never infer a missing fact from a blank field or a resume parser.
 
 For generated answers, read the full prompt, the explicit category's approved narrative evidence and the resolved current experience. Choose relevant examples for the actual responsibilities. Preserve metric scopes, titles and provenance; do not use a permanent essay template or merge different category variants into new claims. Put the draft into Review.
 

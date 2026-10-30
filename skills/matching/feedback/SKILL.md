@@ -9,9 +9,13 @@ Read [the Matching entry point](../SKILL.md) for shared scope and website handli
 
 ## Assess current evidence
 
-Read fresh `matching context`, canonical jobs and the complete preference prose, including saved structured constraints and text feedback. Compare observed requirements with canonical candidate facts: experience scope, degree/equivalence, skill depth, locations, employment type, timing, authorization conditions and application limits. Preserve explicit exceptions and distinguish required from preferred qualifications. Select exactly one permitted category; do not silently broaden scope or switch its resume route.
+Read fresh `matching context`, canonical jobs and the complete preference prose, including saved structured constraints and text feedback. Compare observed requirements with canonical candidate facts: experience scope, degree/equivalence, skill depth, locations, employment type, timing, authorization conditions and application limits. Preserve explicit exceptions and distinguish required from preferred qualifications. Select a direction consistent with the current search scope. Job `category` is an open direction label, not an approved resume profile; do not infer an application resume from it.
 
 Rank the supplied leads with source-backed match reasons, gaps and questions. Separate `recommend`, `needs_confirmation` and `reject`; the code may defer eligible roles outside the configured shortlist/company limits. Do not manufacture qualifications or a score as evidence of fit. A supplied job description can support analysis but cannot prove current official-page availability. Return to [discovery](../discovery/SKILL.md) for missing, stale or contradictory employer evidence. Return personal-fact gaps to [intake](../intake/SKILL.md) without guessing answers.
+
+## Explicit shortlist requests
+
+When the user explicitly asks to save a particular known role, use the existing jobs CLI/domain API to save it as `new`, including its actual direction and outstanding conditions. This does not require a resume mapping, all eligibility questions answered, a full recommendation round, or code/schema approval. Preserve the canonical role identity and source evidence. A one-off saved role outside the ongoing search scope does not silently broaden that scope. Do not fabricate missing employer identity/URL facts or overwrite an existing application. Distinguish a user-saved conditional lead from an assessed ready recommendation.
 
 ## Apply actual feedback
 

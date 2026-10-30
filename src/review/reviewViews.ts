@@ -7,7 +7,8 @@ function escapeHtml(value: string): string {
 }
 
 function categoryLabel(category: ReviewItem["category"]): string {
-  return { llm: "LLM", recommendation: "REC", robotics: "LOB" }[category];
+  const legacy: Record<string, string> = { llm: "LLM", recommendation: "REC", robotics: "LOB" };
+  return Object.hasOwn(legacy, category) ? legacy[category]! : escapeHtml(category);
 }
 
 function safeHref(value: string): string {

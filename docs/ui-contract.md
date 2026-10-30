@@ -1,6 +1,6 @@
-# Application UI contract — version 1
+# Application UI contract — version 2
 
-Extracted UI baseline, established 2026-10-15. This is the current fixed Status and Review interface. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
+Version 2, requested 2026-10-29 to support open job directions independently of application resume routing. The original `ui-contract-v1.json` is preserved. Only direction-label fallback/escaping and the tracked-row direction projection changed; the existing layout and interactions remain fixed. This is the current Status and Review interface. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
 ## Fixed presentation
 
@@ -9,7 +9,7 @@ Extracted UI baseline, established 2026-10-15. This is the current fixed Status 
 - No region selector, China entry, or replacement All applications selector.
 - Status stages: Shortlisted → In Review → Submitted → Interviewing → Offer.
 - Internal `submitted` and `confirmed` both display as Submitted; website/email evidence stays independent internally.
-- Category labels: LLM, REC, LOB. Stored category values and approved CV routing do not change.
+- Legacy labels remain LLM, REC, LOB. Other job directions render as escaped text in the same Status field. Tracked Status rows use the job direction; application/Review categories remain the explicitly bound resume profile. See [direction/resume interface](job-directions.md).
 - Closed and `hiddenFromStatus` records stay in local storage and do not appear in the active view.
 - Each filtered list starts at 01. Display numbers are temporary, never record identity; all updates use jobId/applicationId.
 - Review contains current actionable drafts/questions only. Submitted/approved history does not reappear as pending review.
@@ -53,7 +53,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v1.json` for the renderer (including CSS/client interactions) and Status projection. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v2.json` for the renderer (including CSS/client interactions) and Status projection. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 

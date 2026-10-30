@@ -4,7 +4,7 @@ import { chmod, readFile, realpath, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { acquireFileLock } from "../recordLock.js";
-import { categories } from "../preflight.js";
+import { resumeCategorySchema } from "../classification.js";
 
 const timestamp = z.string().datetime();
 const liveSnapshotIdentity = z.string().regex(/^sha256:[0-9a-f]{64}$/i);
@@ -97,7 +97,7 @@ const reviewItemSchema = z.object({
   officialUrl: z.string().url().startsWith("https://"),
   applicationUrl: z.string().url().startsWith("https://").optional(),
   ats: z.enum(["greenhouse", "ashby", "workday", "lever", "long-tail"]),
-  category: z.enum(categories),
+  category: resumeCategorySchema,
   location: z.string().min(1),
   cv: z.object({ filename: z.string().min(1), verified: z.boolean() }).strict(),
   answers: z.array(answerSchema),

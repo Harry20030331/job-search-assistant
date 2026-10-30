@@ -20,13 +20,13 @@ Work on a feature branch and use a pull request for team review. Keep documentat
 
 - Read [workflow-contract](docs/workflow-contract.md) for preparation, review, authorization, submission evidence and recovery. It consolidates the user decisions through 2026-10-15; older dated instructions and ADR wording are historical where superseded.
 - Read [candidate-inputs](docs/candidate-inputs.md) for factual ownership and input loading. Candidate facts and preferences belong in their canonical data sources, not ATS skills.
-- Read [ui-contract](docs/ui-contract.md) before Status/Review updates. Its v1 renderer, interactions and baseline remain fixed. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check.
+- Read [ui-contract](docs/ui-contract.md) before Status/Review updates. Its current renderer, interactions and baseline remain fixed, including the user-requested v2 direction-label support. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check.
 
 ## Execution boundaries
 
 - Codex's in-app Browser is the only page executor. No Chrome profile dependency, extension, Simplify, alternate browser engine, hidden ATS API or retired executor.
 - Candidate scope is configured in the selected preferences file. Example data is fictional and is for local development, fixtures and offline evaluation. Never submit it to an employer. Legacy China code is inert compatibility code, not an active workflow.
-- Every new application needs an explicit configured category. Never infer or silently switch the category or mapped approved PDF.
+- Job directions are open configured values and do not require a resume to shortlist. Every new application needs an explicit configured resume profile; never infer it from the job direction or silently switch its approved PDF. See `docs/job-directions.md`.
 - For Matching, read `skills/matching/SKILL.md` and the stage it routes to: `skills/matching/intake/SKILL.md`, `skills/matching/discovery/SKILL.md`, or `skills/matching/feedback/SKILL.md`. For discovery, also read `docs/job-discovery.md`. Use the job-library interfaces; discovery does not authorize applying or submitting.
 - For filling, use `skills/submission/SKILL.md` and the applicable ATS module. Deterministic approved facts are automatic; genuinely unknown facts become review questions. Do not invent personal history.
 - Keep working answers and exact approval state in `data/drafts/`. After verified success is saved in `data/opportunities.json`, working drafts may be pruned. Keep a short source/reference and timestamp; permanent screenshots, raw mail and daily ledgers are not required.

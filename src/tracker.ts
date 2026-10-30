@@ -4,7 +4,8 @@ import { chmod, readFile, realpath, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { acquireFileLock } from "./recordLock.js";
 import { z } from "zod";
-import { categories, type Category } from "./preflight.js";
+import { type Category } from "./preflight.js";
+import { resumeCategorySchema } from "./classification.js";
 
 export const applicationStatuses = [
   "in_review",
@@ -35,7 +36,7 @@ const commonRecordShape = {
   location: z.string().min(1),
   ats: z.enum(atsTypes),
   jobUrl: httpsUrlSchema,
-  category: z.enum(categories),
+  category: resumeCategorySchema,
   cvFilename: z.string().min(1),
   visibleResult: z.enum(visibleResults),
   gmailConfirmation: z.enum(gmailStates),

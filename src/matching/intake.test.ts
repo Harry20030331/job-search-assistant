@@ -18,7 +18,7 @@ test("confirmed search intake preserves unknowns, needs no resume and remains bl
   const directory = await target();
   const result = await createMatchingWorkspace(directory, input, join(dirname(directory), "index.json"));
   expect(result.context.candidate.availability).toEqual({ relocation: null });
-  expect(result.context.categoriesWithoutResume).toEqual(["llm"]);
+  expect(result.context.availableResumeCategories).toEqual([]);
   expect(result.context.candidate).not.toHaveProperty("contact");
   expect(await readFile(result.paths.manifest, "utf8")).toBe("[]\n");
   const context = await runMatchingCli(["context", "--workspace", result.root]);

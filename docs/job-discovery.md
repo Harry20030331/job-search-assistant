@@ -4,7 +4,7 @@ Active discovery structure. Candidate-specific screening is owned by `../data/pr
 
 ## Sources and verification
 
-Default sources are `SimplifyJobs/New-Grad-Positions`, `speedyapply/2027-AI-College-Jobs`, and `speedyapply/2027-SWE-College-Jobs`. Explicit task instructions may add sources such as career-fair companies, referrals or Frontier Lab careers pages. Listings supply leads; the specific official employer page establishes availability and requirements.
+The supplied technology-oriented sources are `SimplifyJobs/New-Grad-Positions`, `speedyapply/2027-AI-College-Jobs`, and `speedyapply/2027-SWE-College-Jobs`. Explicit task instructions may add sources such as career-fair companies, referrals or Frontier Lab careers pages. Use sources appropriate to the selected direction instead of forcing every search through technology lists. Direct official-career observations use `official-careers`, with actual URL/evidence; a user-supplied lead retains `user-provided`. Listings supply leads; the specific official employer page establishes availability and requirements.
 
 Check requisition identity, employer, role, location, full-time status, qualifications, cohort/start timing, sponsorship/citizenship constraints and application limits. Event registration or referral links can expire independently from a public job. Do not mark an employer role closed from a failed browser connection or an expired event link alone.
 
@@ -12,7 +12,7 @@ Check requisition identity, employer, role, location, full-time status, qualific
 
 Read the current candidate profile and preferences each run. They own eligible locations, experience, education equivalence, start date, employer exclusions, category scope, quality exceptions and company limits. Apply only the scope and exceptions explicitly recorded in the selected preferences; no location or graduation year is a built-in candidate fact.
 
-Default category meanings are `llm` for Agent/Applied LLM and supporting systems, and `recommendation` for recommendation/retrieval/search/ranking/personalization and supporting infrastructure. Historical `robotics` storage does not authorize new work. Discovery records a category; application execution never guesses or changes it.
+Job directions are user-configured open labels, including Product Management, Design, Finance or other agreed scope. Existing `llm`/`recommendation` values retain their previous meaning. The job `category` field stores direction, not a required resume mapping. Discovery never selects an application resume profile. See [direction/resume interface](job-directions.md).
 
 ## Canonical library and narrow writes
 

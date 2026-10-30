@@ -147,10 +147,12 @@ describe("US job library", () => {
     }
   );
 
-  test("rejects unsupported categories and statuses", async () => {
+  test("accepts open job directions but rejects empty directions and invalid statuses", async () => {
     const path = await libraryPath();
-    await expect(upsertJob(path, { ...input, category: "quant" as never })).rejects.toThrow("invalid_job_record");
-    await writeFile(path, `${jobLibraryHeader}\n${input.jobId},Example Company,Role,Seattle,quant,https://example.com,source,2026-08-07,2026-08-07,new,note\n`);
+    await expect(upsertJob(path, { ...input, category: "Quantitative Research" })).resolves.toMatchObject({ category: "Quantitative Research" });
+    await expect(upsertJob(path, { ...input, category: "" })).rejects.toThrow("invalid_job_record");
+    await expect(upsertJob(path, { ...input, status: "applied" as never })).rejects.toThrow("invalid_job_record");
+    await writeFile(path, `${jobLibraryHeader}\n${input.jobId},Example Company,Role,Seattle,,https://example.com,user-provided,2026-08-07,2026-08-07,new,note\n`);
     await expect(readJobLibrary(path)).rejects.toThrow("invalid_job_library");
   });
 });

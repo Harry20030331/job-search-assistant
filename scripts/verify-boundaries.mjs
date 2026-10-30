@@ -13,7 +13,7 @@ pass("dependency surface is minimal");
 
 const required = [
   "AGENTS.md", "CONTEXT.md", "docs/workflow-contract.md", "docs/candidate-inputs.md",
-  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json",
+  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json", "docs/ui-contract-v2.json",
   "skills/submission/SKILL.md", "skills/matching/SKILL.md",
   "skills/matching/intake/SKILL.md", "skills/matching/discovery/SKILL.md", "skills/matching/feedback/SKILL.md",
   "skills/submission/greenhouse/SKILL.md", "skills/submission/ashby/SKILL.md", "skills/submission/lever/SKILL.md",

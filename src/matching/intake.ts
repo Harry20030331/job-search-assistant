@@ -7,10 +7,11 @@ import { initializeRuntime } from "../runtime.js";
 import { matchingContext, saveMatchingPreferences, type MatchingPaths } from "./matching.js";
 import { rememberWorkspace } from "./workspaces.js";
 import { loadExample } from "../example.js";
+import { jobDirectionSchema } from "../classification.js";
 
 const line = z.string().trim().min(1).max(2000);
 const rules = z.object({
-  categories: z.array(z.enum(["llm", "recommendation"])).min(1),
+  categories: z.array(jobDirectionSchema).min(1),
   workModes: z.array(z.enum(["remote", "hybrid", "onsite"])).min(1),
   locations: z.array(line), excludedCompanies: z.array(line), excludedJobIds: z.array(line),
   limit: z.number().int().min(1).max(25), perCompany: z.number().int().min(1).max(25)

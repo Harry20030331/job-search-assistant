@@ -19,7 +19,7 @@ export function convertLegacy(jobs: JobRecord[], applications: ApplicationRecord
     }
     // The application is the authoritative identity once filling has begun.
     Object.assign(job, { company: application.company, title: application.title, location: application.location,
-      category: application.category, officialUrl: application.jobUrl });
+      officialUrl: application.jobUrl });
   }
   mergeApplications(document, applications);
   // Keep the existing visible order without introducing a second ordering ledger.

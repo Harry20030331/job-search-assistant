@@ -4,7 +4,7 @@ Run these commands from the repository root. For directory ownership see [struct
 
 - `npm run example:load`: replace the working state from the default fictional example. Add `-- --from <example-directory> --dir <existing-workspace>` to select source and destination. Stop Review and other writers first. The prior data is backed up locally; the command prints its path.
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
-- `npm run ui:check`: verify the frozen UI v1 baseline.
+- `npm run ui:check`: verify the current frozen UI v2 baseline.
 - `npm run matching -- welcome`: print the English first-contact message without reading or changing candidate data. New project chats route `Hi` or `Start` to this welcome; see [welcome](welcome.md).
 - `npm run matching -- sources`: show the English invitation to share a LinkedIn URL, PDF/DOCX/TXT/Markdown document, pasted text, or a combination of sources.
 - `npm run matching -- linkedin-preview --input <observations.json>`: validate and preview visible facts from the designated profile without saving. Optional `--workspace <existing-directory>` reports conflicts; see [LinkedIn intake](linkedin-import.md).
@@ -18,7 +18,7 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run matching -- publish --input <round.json>`: atomically publish a complete evidence-bearing screening round. See [Matching](matching.md) for schemas and selected input flags.
 - `npm run matching:demo -- --dir <new-directory>`: isolated fictional two-round recommendation/feedback demonstration; does not replace current data.
 
-- `npm run preflight -- --url <https-url> --category <llm|recommendation>`: validate one active US Application input. Historical robotics remains schema-compatible.
+- `npm run preflight -- --url <https-url> --category <configured-resume-key>`: validate one active US Application input. The category flag is the approved resume-profile key, not the job direction; historical keys remain compatible.
 - Add `--profile <path> --manifest <path>` to either preflight mode to supply independent inputs. Relative CV paths resolve beside the manifest.
 - `npm run profile -- --profile <path> --check`: validate an explicit candidate source without printing personal facts.
 - `npm run preflight -- --batch <local-json-path>`: validate one bounded US Application Batch while parking item-local URL or category errors.

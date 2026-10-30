@@ -1,6 +1,6 @@
 # Candidate inputs
 
-Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping categories to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Open the default case with `npm run review`, or select a saved case with `npm run example:load -- --from <example-directory>`, then use the working copy:
+Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping approved resume-profile keys to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Open the default case with `npm run review`, or select a saved case with `npm run example:load -- --from <example-directory>`, then use the working copy:
 
 ```sh
 npm run profile -- --profile data/candidate.json --check
@@ -9,7 +9,7 @@ npm run preflight -- --url https://careers.example.com/jobs/demo --category llm 
 
 The profile loader accepts a flat schemaVersion 2 record, as in `examples/candidate.json`. It also supports schemaVersion 3 descriptors referencing separate profile/experience files for users who already maintain those sources. This is optional; there is no default personal directory dependency. Relative references resolve from the descriptor's directory. Preflight validates identity and resume integrity, not completeness for every employer form. Missing form facts must remain questions.
 
-`resumes.json` is an array of category, path and SHA-256 entries. Relative PDF paths resolve beside the manifest. Only configured categories are required. A missing mapping or changed PDF fails preflight. Resume text is supporting material; canonical facts govern form answers. Prefer direct entry and correct any mandatory ATS auto-parsing. Resolve actual contradictions explicitly.
+`resumes.json` is an array of category, path and SHA-256 entries. Here category is a resume-profile key such as `pm_general`, independent of job directions such as Product Management. Shortlisting needs no mapping; preflight before application does. Relative PDF paths resolve beside the manifest. Only configured categories are required. A missing mapping or changed PDF fails preflight. Resume text is supporting material; canonical facts govern form answers. Prefer direct entry and correct any mandatory ATS auto-parsing. Resolve actual contradictions explicitly.
 
 The example preferences apply only to the fictional candidate. Known answers retain their scope. A confirmed answer to one question cannot be generalized to another relationship, jurisdiction or timeframe.
 

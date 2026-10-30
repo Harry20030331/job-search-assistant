@@ -8,7 +8,7 @@ export interface StatusViewItem {
   company: string;
   title: string;
   location: string;
-  category: ApplicationRecord["category"];
+  category: JobRecord["category"];
   href: string;
   status: StatusViewStatus;
   dateLabel: string;
@@ -22,6 +22,7 @@ export function buildStatusView(
   jobs: readonly JobRecord[]
 ): StatusViewItem[] {
   const trackedJobIds = new Set(applications.map(({ jobId }) => jobId));
+  const directions = new Map(jobs.map(job => [job.jobId, job.category]));
   const shortlisted: StatusViewItem[] = jobs
     .filter(({ jobId, status, note }) => ["ready", "new", "closed"].includes(status) && !trackedJobIds.has(jobId) && !note.startsWith("user-excluded:"))
     .map((job) => ({
@@ -42,7 +43,7 @@ export function buildStatusView(
     company: application.company,
     title: application.title,
     location: application.location,
-    category: application.category,
+    category: directions.get(application.jobId) ?? application.category,
     href: application.applicationUrl ?? application.jobUrl,
     status: application.status,
     dateLabel: application.updatedAt.slice(5, 10),
