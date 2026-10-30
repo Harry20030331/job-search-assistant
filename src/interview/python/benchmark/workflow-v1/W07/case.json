@@ -1,0 +1,14 @@
+{
+  "case_id": "W07",
+  "suite": "preparation",
+  "title": "Accept current proposal before materials",
+  "user_script": {
+    "decision": "accept"
+  },
+  "public_task": "Prepare for the supplied interview within the candidate's budget. First propose a sourced outline and wait for my decision before full practice materials.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

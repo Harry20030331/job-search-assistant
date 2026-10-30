@@ -3,19 +3,20 @@ import { randomUUID } from "node:crypto";
 import { chmod, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
-import { categories } from "../preflight.js";
+import { jobDirectionSchema } from "../classification.js";
+import { jobSources } from "./sources.js";
 
 export const jobLibraryHeader = "job_id,company,title,location,category,official_url,sources,first_seen,last_verified,status,note";
 export const jobStatuses = ["new", "ready", "in_progress", "final_review", "submitted", "closed"] as const;
 const applicationOwnedStatuses = new Set<string>(["in_progress", "final_review", "submitted"]);
-const sourceNames = ["simplify-new-grad", "speedyapply-2027-ai", "speedyapply-2027-swe", "user-provided"] as const;
+const sourceNames = jobSources;
 
 const recordSchema = z.object({
   jobId: z.string().min(1),
   company: z.string().min(1),
   title: z.string().min(1),
   location: z.string().min(1),
-  category: z.enum(categories),
+  category: jobDirectionSchema,
   officialUrl: z.string().url().startsWith("https://"),
   sources: z.array(z.enum(sourceNames)).min(1),
   firstSeen: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

@@ -2,7 +2,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runInNewContext } from "node:vm";
-import { createReviewBatch, readReviewBatch, selectQuestionOption } from "./reviewStore.js";
+import { createReviewBatch, readReviewBatch, selectQuestionOption, saveQuestionText } from "./reviewStore.js";
 import { describe, expect, test } from "vitest";
 import type { ChinaStatusViewItem } from "../china/status/chinaStatusView.js";
 import type { ApplicationRecord } from "../tracker.js";
@@ -182,18 +182,18 @@ describe("review console views", () => {
     expect(JSON.stringify(document)).toBe(before);
   });
 
-  test("hides incomplete records and submitted history from the approval queue", () => {
+  test("shows local drafts independently of live readiness and hides submitted history", () => {
     const document = queue(["pending", "pending", "pending", "pending", "pending"]);
     document.applications[0]!.cv.verified = false;
     document.applications[1]!.snapshotCurrent = false;
     document.applications[2]!.validationErrors = ["Login required"];
     document.applications[3]!.questions = [{ id: "missing", prompt: "Required personal fact", required: true }];
     const html = renderReviewPage(document);
-    for (const id of [1, 2, 3]) expect(html).not.toContain(`data-application="application-${id}"`);
+    for (const id of [1, 2, 3]) expect(html).toContain(`data-application="application-${id}"`);
     expect(html).toContain('data-application="application-5"');
     const missing = html.match(/<article class="detail" data-detail="application-4"[\s\S]*?<\/article>/)?.[0] ?? "";
     expect(missing).toContain("Required personal fact");
-    expect(missing).not.toContain("<textarea");
+    expect(missing).toContain("<textarea");
     expect(missing).toContain('data-action="approve" disabled');
     document.applications[1]!.decision = { state: "stale" };
     const historical = renderReviewPage(document, "application-2", ["application-2"]);
@@ -203,7 +203,7 @@ describe("review console views", () => {
 
   });
 
-  test("presents escaped questions and saved answers without web input controls", () => {
+  test("presents editable long answers and retains choice controls", () => {
     const document = enumeratedBatch();
     document.applications[0]!.questions.push({ id: "saved", prompt: "Evidence <link>", required: false, draftAnswer: "Saved <answer>" });
     const html = renderReviewPage(document);
@@ -213,11 +213,11 @@ describe("review console views", () => {
     expect(visible).toMatch(/value="other-country"[^>]*checked/);
     expect(visible).toContain("Evidence &lt;link&gt;");
     expect(visible).toContain("Saved &lt;answer&gt;");
-    expect(visible).not.toContain("<textarea");
+    expect(visible).toContain("<textarea");
     expect(visible).toContain('class="choice-input"');
     expect(visible).not.toContain("\u5f85\u8865\u5145");
     expect(html).toContain("/api/review/answer");
-    expect(html).not.toContain("/api/review/text");
+    expect(html).toContain("/api/review/text");
     expect(html).toContain("approval.expectedDesiredRevision=state.desiredRevision");
   });
 
@@ -255,7 +255,7 @@ describe("review console views", () => {
       return { ok: true, json: async () => ({ applicationId: saved.applicationId, snapshotId: saved.snapshotId, questionId: body.questionId, selectedOptionId: body.optionId, desiredState: saved.desiredState, reviewReady: true }) };
     };
     runInNewContext(renderReviewPage(document).split("<script>")[1]!.split("</script>")[0]!, {
-      document: { querySelectorAll: (selector: string) => selector === ".choice-input" ? [radio] : selector === ".choice-input,.queue-item,.approve" ? [radio, oldRadio, queueControl, approve] : [] },
+      document: { querySelectorAll: (selector: string) => selector === ".choice-input" ? [radio] : selector === ".choice-input,.queue-item,.approve,.short-answer,.long-answer" ? [radio, oldRadio, queueControl, approve] : [] },
       fetch, alert() {}, location: { href: "" }
     });
     const pendingSave = change!();
@@ -265,19 +265,79 @@ describe("review console views", () => {
     release();
     await pendingSave;
     expect(radio.disabled).toBe(false);
-    expect(approve.disabled).toBe(false);
+    expect(approve.disabled).toBe(fail);
     expect(queueControl.disabled).toBe(false);
-    expect(requests).toEqual([{ url: "/api/review/answer", body: { applicationId: item.applicationId, snapshotId: item.snapshotId, questionId: "us-person-<status>", optionId: "protected-yes" } }]);
+    expect(requests).toEqual([{ url: "/api/review/answer", body: { applicationId: item.applicationId, snapshotId: item.snapshotId, questionId: "us-person-<status>", optionId: "protected-yes", expectedRevision: 3 } }]);
     const stored = (await readReviewBatch(path)).applications[0]!;
     expect(stored.questions[0]!.selectedOptionId).toBe(fail ? "other-country" : "protected-yes");
     expect(stored.desiredState?.revision).toBe(fail ? 3 : 4);
     expect(status.textContent).toBe(fail ? "Could not save. Previous choice restored." : "Saved");
-    expect(reason.textContent).toBe(fail ? "Required answers are missing" : "");
+    expect(reason.textContent).toBe(fail ? "Resolve the save error to approve." : "");
     if (fail) { expect(oldRadio.checked).toBe(true); expect(radio.checked).toBe(false); }
     expect(stored.decision.state).toBe("pending");
   });
 
-  test("keeps one disabled Approve on question-stage records with a concise current reason", () => {
+  test("renders short facts as escaped inputs and optional essays as editable drafts", () => {
+    const document = batch(true);
+    document.applications[0]!.questions = [
+      { id: "school", prompt: "High school name", required: true, inputType: "short-text", resolution: 'School <name> "quoted"' },
+      { id: "essay", prompt: "Tell us about a time you changed your mind.", required: false, resolution: "An example." }
+    ];
+    const visible = renderReviewPage(document).split("<script>")[0]!;
+    expect(visible).toContain('class="short-answer"');
+    expect(visible).toContain('aria-required="true"');
+    expect(visible).toContain('value="School &lt;name&gt; &quot;quoted&quot;"');
+    expect(visible).toContain("Optional · You can leave this blank.");
+    expect(visible).toContain("An example.</textarea>");
+    expect(visible).toContain("<textarea");
+  });
+
+  test.each([false, true])("short answer autosave preserves pending approval and rolls back failures (failure=%s)", async (fail) => {
+    const document = batch(true), item = document.applications[0]!;
+    item.questions = [{ id: "school", prompt: "High school name", required: true, inputType: "short-text" }];
+    const path = join(await mkdtemp(join(tmpdir(), "review-short-")), "review.json");
+    await createReviewBatch(path, document);
+    let change!: () => Promise<void>, inputChanged!: () => void;
+    const status = { textContent: "" }, reason = { textContent: "Required answers are missing" };
+    const approve = { disabled: true }, queueControl = { disabled: false };
+    const detail = { dataset: { detail: item.applicationId }, querySelector: (selector: string) => selector === ".save-status" ? status : selector === ".approval-reason" ? reason : approve };
+    const input = { value: "", disabled: false, classList: { contains: () => false }, dataset: { question: "school" }, closest: () => detail, addEventListener: (event: string, handler: () => Promise<void>) => { if(event === "change") change=handler; if(event === "input") inputChanged=handler; } };
+    let release!: () => void;
+    const wait = new Promise<void>(resolve => { release=resolve; });
+    runInNewContext(renderReviewPage(document).split("<script>")[1]!.split("</script>")[0]!, {
+      document: { querySelectorAll: (selector: string) => selector === ".short-answer,.question-answer,.generated-answer" ? [input] : selector === ".choice-input,.queue-item,.approve,.short-answer,.long-answer" ? [input, queueControl, approve] : [] },
+      fetch: async (url: string, options: { body: string }) => {
+        expect(url).toBe("/api/review/text"); await wait;
+        if(fail) return { ok: false, json: async () => ({}) };
+        const body=JSON.parse(options.body);
+        const saved=await saveQuestionText(path, body.applicationId, body.snapshotId, body.questionId, body.value);
+        return { ok: true, json: async () => ({...body, value:saved.questions[0]!.draftAnswer, desiredState:saved.desiredState, missingText:!saved.questions[0]!.draftAnswer?.trim(), reviewReady:true}) };
+      }, alert() {}, location:{href:""}
+    });
+    input.value="Example High School";
+    const pending=change(); expect(input.disabled).toBe(true); expect(queueControl.disabled).toBe(true); expect(approve.disabled).toBe(true);
+    release(); await pending;
+    const stored=(await readReviewBatch(path)).applications[0]!;
+    expect(input.value).toBe(fail ? "" : "Example High School");
+    expect(stored.questions[0]!.draftAnswer).toBe(fail ? undefined : "Example High School");
+    expect(stored.decision.state).toBe("pending");
+    expect(approve.disabled).toBe(fail);
+    expect(queueControl.disabled).toBe(false);
+    expect(status.textContent).toBe(fail ? "Could not save. Previous answer restored." : "Saved");
+    if (!fail) {
+      input.value="Changed school"; inputChanged();
+      expect(approve.disabled).toBe(true);
+      input.value="Example High School"; inputChanged();
+      expect(approve.disabled).toBe(false);
+      input.value=""; inputChanged();
+      expect(approve.disabled).toBe(true);
+      await change();
+      expect(approve.disabled).toBe(true);
+      expect((await readReviewBatch(path)).applications[0]!.questions[0]!.draftAnswer).toBe("");
+    }
+  });
+
+  test("disables Approve for missing required answers while allowing complete local content before live readiness", () => {
     const document = batch(true);
     const item = document.applications[0]!;
     item.reviewStage = "questions";
@@ -288,15 +348,16 @@ describe("review console views", () => {
     const missing = renderReviewPage(document).split("<script>")[0]!;
     expect(missing.match(/data-action="approve"/g)).toHaveLength(1);
     expect(missing).toContain('data-action="approve" disabled');
-    expect(missing).toContain("Required answers are missing");
+    expect(missing).toContain("Complete the required answers to approve.");
     expect(missing).not.toContain("INTERNAL SESSION DETAIL");
     item.questions[0]!.resolution = "User supplied answer";
     const sync = renderReviewPage(document).split("<script>")[0]!;
-    expect(sync).toContain("Ready to approve after form verification");
+    expect(sync).not.toContain("Approve content to add this application to the submission batch.");
     expect(sync).not.toContain("Required answers are missing");
+    expect(sync).not.toContain('data-action="approve" disabled');
   });
 
-  test("allows direct approval after a read-only GET and records viewed gates only on click", () => {
+  test("renders a read-only GET and uses the content-only approval endpoint on click", () => {
     const document = batch(true);
     delete document.applications[0]!.openedAt;
     delete document.applications[0]!.fullContentsViewedAt;
@@ -307,12 +368,13 @@ describe("review console views", () => {
     expect(JSON.stringify(document)).toBe(before);
     const script = html.split("<script>")[1] ?? "";
     const clickHandler = script.slice(script.indexOf("document.querySelectorAll('.approve')"));
-    expect(clickHandler).toContain("complete=await post('/api/review/open',item)&&await post('/api/review/viewed',item)&&await post('/api/review/decision',approval);if(!complete)return");
+    expect(clickHandler).toContain("fetch('/api/review/content-approval'");
+    expect(clickHandler).not.toContain("/api/review/decision");
     expect(clickHandler).toContain("applicationId===id");
     expect(script).toContain('"snapshotId":"snapshot-1"');
   });
 
-  test("offers only the exact application link and per-item approval", () => {
+  test("offers the exact application link, answer editing and per-item approval", () => {
     const html = renderReviewPage(batch(true));
     expect(html).toContain("Software Engineer, Early Career (AI)");
     expect(html).toContain("LLM");
@@ -330,7 +392,7 @@ describe("review console views", () => {
     expect(html).not.toContain("queue-summary");
     expect(html).not.toContain("Batch batch-1");
     expect(html).not.toContain("<input");
-    expect(html).not.toContain("<textarea");
+    expect(html).toContain("<textarea");
     expect(html).not.toContain("Submit application");
   });
 
@@ -348,23 +410,28 @@ describe("review console views", () => {
     expect(renderReviewPage(fallback)).toContain('href="#"');
   });
 
-  test("keeps queue entries compact and gates navigation behind open then viewed", () => {
+  test("queue navigation does not write audit or approval events", () => {
     const html = renderReviewPage(batch(true));
-    expect(html).toContain('<span class="queue-index">01</span><span><strong>Notion</strong><small>San Francisco, CA</small></span>');
-    expect(html).toContain("grid-template-columns:160px 1fr");
-    expect(html).toContain("await post('/api/review/open',item)");
-    expect(html).toContain("await post('/api/review/viewed',item)");
-    expect(html.indexOf("await post('/api/review/open',item)")).toBeLessThan(html.indexOf("await post('/api/review/viewed',item)"));
-    expect(html.indexOf("await post('/api/review/viewed',item)")).toBeLessThan(html.lastIndexOf("location.href='/review?application='"));
+    expect(html).toContain('id="application-picker"');
+    expect(html).not.toContain("/api/review/open");
+    expect(html).not.toContain("/api/review/viewed");
   });
 
-  test("prevents double actions and restores controls when a request fails", () => {
+  test("compact application picker navigates by stable ID and stays locked while saving", () => {
+    const handlers = new Map<string, () => void>();
+    const picker = { value: "application/with spaces", disabled: false, addEventListener: (name: string, handler: () => void) => handlers.set(name, handler) };
+    const location = { href: "/review" };
     const html = renderReviewPage(batch(true));
-    expect(html).toContain("const disabledStates=new Map");
-    expect(html).toContain("disabledStates.set(control,control.disabled);control.disabled=true");
-    expect(html).toContain("control.disabled=disabledStates.get(control)??false;disabledStates.delete(control)");
-    expect(html.match(/if\(button\.disabled\)return;setBusy\(true\)/g)).toHaveLength(2);
-    expect(html.match(/finally\{if\(!complete\)setBusy\(false\)\}/g)).toHaveLength(2);
+    const script = html.match(/<script>([\s\S]*?)<\/script>/)![1]!;
+    runInNewContext(script, {
+      document: { querySelectorAll: (selector: string) => selector === ".queue-picker" ? [picker] : [] }, location
+    });
+    handlers.get("change")!();
+    expect(location.href).toBe("/review?application=application%2Fwith%20spaces");
+    picker.disabled = true;
+    picker.value = "another-application";
+    handlers.get("change")!();
+    expect(location.href).toBe("/review?application=application%2Fwith%20spaces");
   });
 
   test("embeds only the exact action identity outside visible review content", () => {
@@ -396,18 +463,47 @@ describe("review console views", () => {
     expect(html).not.toContain('data-action="approve"');
   });
 
-  test("approves only the current item and advances through gates to the next pending item", () => {
-    const html = renderReviewPage(queue(["pending", "pending"]), "application-1");
-    const script = html.split("<script>")[1] ?? "";
+  test.each([false, true, "missing"])("content approval saves only the selected item, restores failures and focuses missing answers (%s)", async outcome => {
+    const document = queue(["pending", "pending"]);
+    let click!: () => Promise<void>;
+    const status = { textContent: "" }, location = { href: "" };
+    let focused = false, highlighted = false;
+    const row = { dataset: { required: "true", answered: "false" }, querySelectorAll: () => [], querySelector: () => null,
+      classList: { toggle: (_name: string, value: boolean) => { highlighted = value; } }, scrollIntoView() {}, focus() { focused = true; } };
+    const detail = { dataset: { detail: "application-1" }, querySelector: () => status, querySelectorAll: () => outcome === "missing" ? [row] : [] };
+    const button = { disabled: false, closest: () => detail, addEventListener: (_: string, fn: () => Promise<void>) => { click = fn; } };
+    const requests: unknown[] = [];
+    let release!: () => void; const wait = new Promise<void>(resolve => { release = resolve; });
+    runInNewContext(renderReviewPage(document).split("<script>")[1]!.split("</script>")[0]!, {
+      document: { querySelectorAll: (selector: string) => selector === ".approve" || selector === ".queue-item,.approve,.choice-input,.short-answer,.long-answer" ? [button] : [] }, location,
+      fetch: async (url: string, options: {body: string}) => { requests.push([url, JSON.parse(options.body)]); await wait;
+        return {ok: !outcome, json: async () => ({applicationId:"application-1",snapshotId:"snapshot-1",decision:{scope:"content-only"}})}; }
+    });
+    const saving = click();
+    if (outcome === "missing") { await saving; expect(requests).toHaveLength(0); expect(focused && highlighted).toBe(true); expect(button.disabled).toBe(false); return; }
+    expect(button.disabled).toBe(true); await click(); expect(requests).toHaveLength(1);
+    release(); await saving;
+    expect(requests).toEqual([["/api/review/content-approval", {applicationId:"application-1",snapshotId:"snapshot-1"}]]);
+    if (outcome) { expect(button.disabled).toBe(false); expect(status.textContent).toContain("Could not save approval"); expect(location.href).toBe(""); }
+    else expect(location.href).toBe("/review?application=application-2");
+  });
 
-    expect(script).toContain('"applicationId":"application-1","snapshotId":"snapshot-1","decision":"pending"');
-    expect(script).toContain('"applicationId":"application-2","snapshotId":"snapshot-2","decision":"pending"');
-    expect(script).toContain("const nextPending=");
-    expect(script).toContain("await post('/api/review/open',next)");
-    expect(script).toContain("await post('/api/review/viewed',next)");
-    expect(script).toContain("location.href='/review?application='+encodeURIComponent(next.applicationId)");
-    expect(script).toContain("location.href='/review'");
-    expect(script).not.toContain("decision:'approved'});if(complete)location.reload()");
+  test("keeps reviewed items in list order with a short status below the location", () => {
+    const document = queue(["approved", "pending"]);
+    const first = document.applications[0]!;
+    first.decision = { state: "approved", scope: "content-only", decidedAt: "2026-08-07T18:03:00.000Z" };
+    first.cv.verified = false; first.snapshotCurrent = false;
+    const html = renderReviewPage(document, first.applicationId);
+    const card = html.match(/<article class="detail" data-detail="application-1"[\s\S]*?<\/article>/)![0];
+    expect(card).toContain("Reviewed</span>");
+    const sidebar = html.split('<aside class="queue"')[1]!.split("</aside>")[0]!;
+    expect(sidebar.indexOf('data-application="application-1"')).toBeLessThan(sidebar.indexOf('data-application="application-2"'));
+    expect(sidebar).not.toContain("queue-index");
+    expect(sidebar).toContain('<strong>Company 1</strong><span class="queue-role">Role 1</span><small>San Francisco, CA</small><span class="review-label"');
+    expect(sidebar).toContain('>Reviewed</span>');
+    expect(sidebar).not.toContain("Reviewed · Awaiting execution"); expect(card).toContain('class="approved-contents" disabled');
+    expect(card).not.toContain('data-action="approve"'); expect(html).toContain('data-application="application-1"');
+    expect(renderReviewPage(document, first.applicationId, [first.applicationId])).not.toContain('data-application="application-1"');
   });
 
   test("renders the active five-stage lifecycle above one neutral line", () => {
@@ -434,7 +530,7 @@ describe("review console views", () => {
     expect(html).toContain("08-07");
   });
 
-  test("renders a shortlisted job with its official link and verification date but no row controls", () => {
+  test("renders a shortlisted job with its official link, verification date and Apply selection", () => {
     const html = renderStatusPage(buildStatusView([], [{
       jobId: "gm-ml-validation",
       company: "General Motors",
@@ -452,6 +548,7 @@ describe("review console views", () => {
     expect(html).toContain('href="https://example.com/jobs/gm-ml-validation?view=official"');
     expect(html).toContain("General Motors · Sunnyvale");
     expect(html).toContain('<span class="row-status">Shortlisted</span>');
+    expect(html).toContain('class="job-select"');
     expect(html).toContain('<time datetime="2026-08-07T00:00:00.000Z" aria-label="Updated 08-07">08-07</time>');
     const row = html.match(/<article class="status-row"[\s\S]*?<\/article>/)?.[0] ?? "";
     expect(row).not.toContain("<button");
@@ -499,7 +596,7 @@ describe("review console views", () => {
     expect(applications[5]?.status).toBe("closed");
     expect(applications[2]?.status).toBe("confirmed");
     expect(html).not.toContain("Confirmed");
-    expect(html.match(/data-status="submitted"/g)).toHaveLength(2);
+    expect(rows.filter(row => row.includes('data-status="submitted"'))).toHaveLength(2);
     rows.forEach((row, index) => {
       expect(row.match(/class="row-status"/g)).toHaveLength(1);
       expect(row).toContain(`>${labels[index]}</span>`);
@@ -550,7 +647,7 @@ describe("review console views", () => {
     expect(html).toContain('<div class="company-line">Notion · Fictional, ZZ</div>');
   });
 
-  test("omits evidence columns, application controls, full timestamps, and legacy lifecycle decoration", () => {
+  test("keeps tracked rows read-only without repeated review links", () => {
     const html = renderStatusPage(buildStatusView(tracker, []));
     const row = html.match(/<article class="status-row"[\s\S]*?<\/article>/)?.[0] ?? "";
     expect(html).not.toContain("CV");
@@ -561,6 +658,7 @@ describe("review console views", () => {
     expect(html).not.toContain(">2026-08-07T18:02:00.000Z<");
     expect(row).not.toContain("<button");
     expect(row).not.toContain("<input");
+    expect(row).not.toContain("Review answers");
     expect(row).not.toContain("<select");
     expect(html).not.toContain('data-action="approve"');
     expect(html).not.toContain('data-status="all"');
@@ -619,4 +717,23 @@ describe("review console views", () => {
     expect(html).toContain("No BOSS Zhipin jobs tracked yet.");
     expect(html).toContain("0");
   });
+});
+
+
+test("uses Status order for the sidebar, picker and next-review sequence regardless of legacy queue positions", () => {
+  const document=queue(["pending","pending","pending"]);
+  document.applications[0]!.queuePosition=3;
+  document.applications[1]!.queuePosition=1;
+  document.applications[2]!.queuePosition=2;
+  document.applications[1]!.decision={state:"approved",scope:"content-only",decidedAt:"2026-08-07T18:03:00.000Z"};
+  const html=renderReviewPage(document, undefined, [], new Map(), ["application-2", "application-3", "application-1"]);
+  const sidebar=html.split('<aside class="queue"')[1]!.split('</aside>')[0]!;
+  expect(sidebar.indexOf('data-application="application-2"')).toBeLessThan(sidebar.indexOf('data-application="application-3"'));
+  expect(sidebar.indexOf('data-application="application-3"')).toBeLessThan(sidebar.indexOf('data-application="application-1"'));
+  expect(sidebar).not.toContain("queue-index");
+  expect(sidebar.indexOf('value="application-2"')).toBeLessThan(sidebar.indexOf('value="application-3"'));
+  expect(sidebar.indexOf('value="application-3"')).toBeLessThan(sidebar.indexOf('value="application-1"'));
+  const items = JSON.parse(html.match(/const items=(.*?);const desiredStates/)![1]!);
+  expect(items.map((item: { applicationId: string }) => item.applicationId)).toEqual(["application-2", "application-3", "application-1"]);
+  expect(html).toContain('data-detail="application-3" >');
 });

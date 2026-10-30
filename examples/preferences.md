@@ -17,5 +17,9 @@ Use this profile only for local fixtures and offline evaluation. All names, orga
 - Shortlist up to five suitable roles per local exercise; no more than two per employer.
 - Explain match, gap and uncertainty with evidence from the candidate record and supplied job description.
 - Use concise English answers with concrete ownership. Avoid claiming team results as individual work.
-- Reuse confirmed facts only within their original scope. Ask about employer-specific relationships and demographic choices separately.
+- Reuse confirmed facts only within their original scope. Use applicationFacts.personalConnections for family and close-friend employment questions under the candidate-inputs contract. Ask about unknown demographic choices separately.
 - No accounts, external messages or real employer submissions are authorized by this fixture.
+
+## Saved checkpoints
+
+The shortlist and review snapshots use the same five saved public postings. Their availability and forms must be rechecked before live preparation. Review content is a fictional local checkpoint, not proof of current employer-form state. Never submit this fictional profile to an employer.

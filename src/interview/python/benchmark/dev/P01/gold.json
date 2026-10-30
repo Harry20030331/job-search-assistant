@@ -1,0 +1,14 @@
+{
+  "suite": "preparation",
+  "interview_id": "interview-p01",
+  "application_id": "app-cedar-p01",
+  "expected_event_count": 0,
+  "interview_fields": {
+    "duration_minutes": 45
+  },
+  "require_preparation": true,
+  "rubric_notes": [
+    "Only claim candidate facts found in profile; suggestions are not confirmed questions.",
+    "Prioritize capacity estimation and queue reliability for backend, or leakage and evaluation metrics for ML."
+  ]
+}

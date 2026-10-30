@@ -1,8 +1,8 @@
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, expect, test } from "vitest";
-import { createMatchingWorkspace } from "./intake.js";
+import { createExampleSearchWorkspace, createMatchingWorkspace } from "./intake.js";
 import { runMatchingCli } from "../cli/matchingCli.js";
 import { runPreflight } from "../preflight.js";
 const roots: string[] = [];
@@ -15,9 +15,10 @@ const input = {
 };
 async function target() { const parent = await mkdtemp(join(tmpdir(), "intake-")); roots.push(parent); return join(parent, "case"); }
 test("confirmed search intake preserves unknowns, needs no resume and remains blocked from application preflight", async () => {
-  const result = await createMatchingWorkspace(await target(), input);
+  const directory = await target();
+  const result = await createMatchingWorkspace(directory, input, join(dirname(directory), "index.json"));
   expect(result.context.candidate.availability).toEqual({ relocation: null });
-  expect(result.context.categoriesWithoutResume).toEqual(["llm"]);
+  expect(result.context.availableResumeCategories).toEqual([]);
   expect(result.context.candidate).not.toHaveProperty("contact");
   expect(await readFile(result.paths.manifest, "utf8")).toBe("[]\n");
   const context = await runMatchingCli(["context", "--workspace", result.root]);
@@ -29,4 +30,16 @@ test("confirmed search intake preserves unknowns, needs no resume and remains bl
 test("unconfirmed or empty-background intake cannot initialize a candidate workspace", async () => {
   await expect(createMatchingWorkspace(await target(), { ...input, confirmed: false })).rejects.toThrow();
   await expect(createMatchingWorkspace(await target(), { ...input, candidate: { ...input.candidate, education: [] } })).rejects.toThrow("matching_background_required");
+});
+
+test("creates a registered fictional workspace before research without running scripted recommendations", async () => {
+  const root = await target();
+  const registry = join(dirname(root), "index.json");
+  const result = await createExampleSearchWorkspace(root, registry);
+  expect(JSON.parse(await readFile(result.paths.profile, "utf8")).fictional).toBe(true);
+  const saved = JSON.parse(await readFile(result.paths.opportunities, "utf8")).opportunities;
+  expect(saved.map((job: { company: string }) => job.company)).toEqual(["Nooks", "Adobe", "Western Digital", "Scale AI", "Palantir"]);
+  expect(saved.every((job: { stage: string; application?: unknown }) => job.stage === "ready" && !job.application)).toBe(true);
+  expect(JSON.parse(await readFile(registry, "utf8")).paths).toHaveLength(1);
+  await expect(createExampleSearchWorkspace(root, registry)).rejects.toThrow();
 });

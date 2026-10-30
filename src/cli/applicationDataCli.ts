@@ -3,15 +3,20 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { setStatusVisibility } from "../tracker.js";
-import { publishReviewItem, type ReviewItem } from "../review/reviewStore.js";
+import { publishReviewItem, initializeReviewOrder, type ReviewItem } from "../review/reviewStore.js";
 
 const commandSchema = z.discriminatedUnion("operation", [
+  z.object({ version: z.literal(1), operation: z.literal("review.start"), reviewPath: z.string().min(1) }).strict(),
   z.object({ version: z.literal(1), operation: z.literal("status.visibility"), trackerPath: z.string().min(1), applicationId: z.string().min(1), visible: z.boolean() }).strict(),
   z.object({ version: z.literal(1), operation: z.literal("review.publish"), reviewPath: z.string().min(1), item: z.unknown(), expected: z.object({ snapshotId: z.string().min(1), revision: z.number().int().positive().nullable(), decision: z.enum(["pending", "approved", "skipped", "stale", "consumed"]) }).strict().nullable() }).strict()
 ]);
 
 export async function applyApplicationData(input: unknown) {
   const command = commandSchema.parse(input);
+  if (command.operation === "review.start") {
+    const batch = await initializeReviewOrder(command.reviewPath);
+    return { ok: true, applicationIds: [...batch.applications].sort((a,b) => a.queuePosition! - b.queuePosition!).map(item => item.applicationId) };
+  }
   if (command.operation === "status.visibility") {
     const record = await setStatusVisibility(command.trackerPath, command.applicationId, command.visible);
     return { ok: true, applicationId: record.applicationId, visible: !record.hiddenFromStatus };

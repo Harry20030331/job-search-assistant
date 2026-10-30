@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c05",
+    "application_id": "application-c05",
+    "interview_id": "interview-c05",
+    "company": "Elm Learning",
+    "role": "Associate Data Scientist"
+  },
+  "association": "verified",
+  "budget_minutes": 40,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Taylor Lane analyzed survey response bias in a student learning study and used SQL for missing-data checks. No deployed ML project is documented.",
+      "content_sha256": "70a1eaa3bbfe63c664d5911214be584d1e7bf808b8f06629cc36adde54320941"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c05",
+      "company": "Elm Learning",
+      "role": "Associate Data Scientist",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "EL-505 Associate Data Scientist: hiring-manager conversation. The original job page is unavailable; the recruiter has not provided a topic list or level definition.",
+      "content_sha256": "ffef8b3f03421b99bfde979ccfe6e1c8b4d3d36e8b8004af9af88316e6434bc4"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Elm Learning",
+      "role": null,
+      "locator": "https://c05.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Elm Learning builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "f81af8e0bb51a8bbd3046e76ff961b66b21b12b6d126953d9f13a1f0c671e34c"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "same_company_analogue",
+      "matched_job_id": "fictional-other-c05",
+      "company": "Elm Learning",
+      "role": "Different reference role",
+      "locator": "https://c05.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "EL-ALT: Product Data Scientist, mid-level at Elm Learning. Study onboarding funnels, design experiments and partner with curriculum teams. This is a different requisition and level.",
+      "content_sha256": "426291bc43ba24aa5e4d14c82bdc71f7aec3c5b86337dbd75e48c2687c97744b"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

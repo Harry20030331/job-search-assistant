@@ -1,0 +1,14 @@
+{
+  "protocol": "enrichment-fixtures-v1",
+  "authorship": "AI-assisted developer-authored fictional protocol scenarios; not reviewed retrieval gold or a model benchmark",
+  "scenarios": [
+    {"case_id": "R01", "name": "Exact official JD", "direct": "exact", "search_hit": null, "include_company": true, "gold": {"status": "exact", "relationship": "exact_role", "rejected_min": 0}},
+    {"case_id": "R02", "name": "Closed exact posting retains role evidence", "direct": "closed", "search_hit": null, "include_company": false, "gold": {"status": "exact", "relationship": "exact_role", "rejected_min": 0}},
+    {"case_id": "R03", "name": "Same-company analogue with explicit limits", "direct": "unavailable", "search_hit": "same_company_analogue", "include_company": true, "gold": {"status": "analogue", "relationship": "same_company_analogue", "rejected_min": 0}},
+    {"case_id": "R04", "name": "Other-company analogue", "direct": "unavailable", "search_hit": "other_company_analogue", "include_company": false, "gold": {"status": "analogue", "relationship": "other_company_analogue", "rejected_min": 0}},
+    {"case_id": "R05", "name": "No usable search result", "direct": "unavailable", "search_hit": null, "include_company": false, "gold": {"status": "missing", "relationship": null, "rejected_min": 0}},
+    {"case_id": "R06", "name": "Conflicting requisition is not selected identity", "direct": "unavailable", "search_hit": "conflicting_requisition", "include_company": false, "gold": {"status": "missing", "relationship": null, "rejected_min": 1}},
+    {"case_id": "R07", "name": "Wrong-role near match", "direct": "wrong_role", "search_hit": null, "include_company": false, "gold": {"status": "missing", "relationship": null, "rejected_min": 1}},
+    {"case_id": "R08", "name": "Injected webpage text remains inert evidence", "direct": "injection", "search_hit": null, "include_company": true, "gold": {"status": "exact", "relationship": "exact_role", "rejected_min": 0}}
+  ]
+}

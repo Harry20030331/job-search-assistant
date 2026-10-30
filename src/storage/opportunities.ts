@@ -1,13 +1,16 @@
 import { randomUUID } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 import { chmod, readFile, realpath, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { acquireFileLock } from "../recordLock.js";
 import type { JobRecord } from "../jobs/jobLibrary.js";
 import { validateApplicationRecords, type ApplicationRecord } from "../tracker.js";
+import { isLegacyResumeCategory, jobDirectionSchema, resumeCategorySchema, type ResumeCategory } from "../classification.js";
+import { jobSources } from "../jobs/sources.js";
 
 const stages = ["new", "ready", "in_review", "submitted", "interviewing", "offer", "closed"] as const;
-type ApplicationData = Omit<ApplicationRecord, "jobId" | "company" | "title" | "location" | "category" | "jobUrl" | "status">;
+type ApplicationData = Omit<ApplicationRecord, "jobId" | "company" | "title" | "location" | "category" | "jobUrl" | "status"> & { resumeCategory?: ResumeCategory };
 export type Opportunity = Omit<JobRecord, "status"> & {
   availability: "open" | "closed" | "unknown";
   stage: typeof stages[number];
@@ -18,8 +21,8 @@ const schema = z.object({
   schemaVersion: z.literal(1),
   opportunities: z.array(z.object({
     jobId: z.string().min(1), company: z.string().min(1), title: z.string().min(1), location: z.string().min(1),
-    category: z.enum(["llm", "recommendation", "robotics"]), officialUrl: z.string().url().startsWith("https://"),
-    sources: z.array(z.enum(["simplify-new-grad", "speedyapply-2027-ai", "speedyapply-2027-swe", "user-provided"])).min(1),
+    category: jobDirectionSchema, officialUrl: z.string().url().startsWith("https://"),
+    sources: z.array(z.enum(jobSources)).min(1),
     firstSeen: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), lastVerified: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     note: z.string(), availability: z.enum(["open", "closed", "unknown"]), stage: z.enum(stages),
     application: z.record(z.unknown()).optional()
@@ -47,7 +50,7 @@ export function parseOpportunities(value: unknown): Opportunities {
   validateApplicationRecords(projectApplications(result));
   return result;
 }
-export function isOpportunityPath(path: string): boolean { return path.endsWith("/opportunities.json") || path === "opportunities.json"; }
+export function isOpportunityPath(path: string): boolean { return path.replaceAll("\\", "/").split("/").at(-1) === "opportunities.json"; }
 export async function readOpportunities(path: string): Promise<Opportunities> {
   return parseOpportunities(JSON.parse(await readFile(path, "utf8")));
 }
@@ -84,20 +87,31 @@ export function projectJobs(document: Opportunities): JobRecord[] {
   }));
 }
 export function projectApplications(document: Opportunities): { schemaVersion: 3; applications: ApplicationRecord[] } {
-  return { schemaVersion: 3, applications: document.opportunities.filter(item => item.application).map(item => ({
-    ...item.application!, jobId: item.jobId, company: item.company, title: item.title, location: item.location,
-    category: item.category, jobUrl: item.officialUrl,
-    status: item.stage === "submitted" && (item.application?.confirmedAt || item.application?.gmailConfirmation === "confirmed" || item.application?.websiteConfirmation) ? "confirmed" : item.stage as ApplicationRecord["status"]
-  })) };
+  return { schemaVersion: 3, applications: document.opportunities.filter(item => item.application).map(item => {
+    const { resumeCategory: _resumeCategory, ...application } = item.application!;
+    return { ...application, jobId: item.jobId, company: item.company, title: item.title, location: item.location,
+      category: applicationResumeCategory(item), jobUrl: item.officialUrl,
+      status: item.stage === "submitted" && (item.application?.confirmedAt || item.application?.gmailConfirmation === "confirmed" || item.application?.websiteConfirmation) ? "confirmed" : item.stage as ApplicationRecord["status"] };
+  }) };
+}
+function applicationResumeCategory(item: Opportunity): ResumeCategory {
+  const bound = item.application?.resumeCategory;
+  if (bound !== undefined) return resumeCategorySchema.parse(bound);
+  if (isLegacyResumeCategory(item.category)) return item.category;
+  throw new Error("application_resume_category_required");
 }
 export function mergeApplications(document: Opportunities, records: ApplicationRecord[]): void {
   for (const record of records) {
     const item = document.opportunities.find(item => item.jobId === record.jobId);
     if (!item) throw new Error("job_not_found");
     const { jobId, company, title, location, category, jobUrl, status, ...application } = record;
-    if (company !== item.company || title !== item.title || location !== item.location || category !== item.category || jobUrl !== item.officialUrl) throw new Error("opportunity_identity_mismatch");
+    if (company !== item.company || title !== item.title || location !== item.location || jobUrl !== item.officialUrl) throw new Error("opportunity_identity_mismatch");
+    if (item.application && category !== applicationResumeCategory(item)) throw new Error("opportunity_identity_mismatch");
+    // Projected siblings must not acquire a resume binding during an unrelated update.
+    const previous = projectApplications({ schemaVersion: 1, opportunities: [item] }).applications[0];
+    if (previous && isDeepStrictEqual(previous, record)) continue;
     item.stage = status === "confirmed" ? "submitted" : status;
-    item.application = application;
+    item.application = { ...application, resumeCategory: resumeCategorySchema.parse(category) };
   }
 }
 export function mergeJobs(document: Opportunities, records: JobRecord[]): void {

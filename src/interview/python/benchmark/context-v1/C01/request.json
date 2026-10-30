@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c01",
+    "application_id": "application-c01",
+    "interview_id": "interview-c01",
+    "company": "Aster Market",
+    "role": "Product Data Scientist I"
+  },
+  "association": "verified",
+  "budget_minutes": 45,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Morgan Vale completed a university marketplace experiment project, wrote SQL cohort queries and checked randomization balance. No employment or revenue impact is established.",
+      "content_sha256": "3d75b50ace5af05bb7613919a0040fc29c91cc367fc1d7c4449fbd356efd3518"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c01",
+      "company": "Aster Market",
+      "role": "Product Data Scientist I",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Your technical round for Product Data Scientist I, requisition AM-101, covers product metrics, experiment analysis and SQL. You will explain your own contribution.",
+      "content_sha256": "20e16980c78cd083a5f69d349be8cc7760998dd0e4bd30dde7532104ae0a4df7"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Aster Market",
+      "role": null,
+      "locator": "https://c01.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Aster Market builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "6d8181415af013253960a7c977a81b745ec229b3446b3527ae15ed61ab638ebe"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c01",
+      "company": "Aster Market",
+      "role": "Product Data Scientist I",
+      "locator": "https://c01.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "AM-101: Product Data Scientist I, early-career. Define activation metrics, analyze randomized experiments, investigate funnels and write SQL. Partner with product managers.",
+      "content_sha256": "21ce2d1533ae0807ebb080584a217ba2d0dba2b8017f9fb3607aebc94b4094b9"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

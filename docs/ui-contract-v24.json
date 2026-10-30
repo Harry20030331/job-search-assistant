@@ -1,0 +1,11 @@
+{
+  "version": 24,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated UI contract and server/view checks; local HTTP verification.",
+  "files": {
+    "src/review/reviewViews.ts": "cd9b6cb9f8d874610eb4181aa290e3284743939575ea996cb41aad402f644e3a",
+    "src/review/statusView.ts": "af76f114923eab712556abf8850551d3c56a9ac4ca314a9111fdce2e9ef13b2d",
+    "src/review/workflowViews.ts": "97fdbebef2c45f9de999c98a0b43363a0c91fd2e869f48c4805462e3645f595d",
+    "src/review/applicationStyles.ts": "a4868afc9bd9fd7dc59570bb0109df88f2c0044e21cead4e64fa7a626e3841fd"
+  }
+}

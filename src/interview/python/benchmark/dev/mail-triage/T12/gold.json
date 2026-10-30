@@ -1,0 +1,6 @@
+{
+  "category": "logistics_update",
+  "interview_id": "interview-northstar-backend",
+  "route": "logistics_review",
+  "reason": "Only logistics changed; do not create a second interview."
+}

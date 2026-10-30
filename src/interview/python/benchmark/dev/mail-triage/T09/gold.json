@@ -1,0 +1,6 @@
+{
+  "category": "reschedule",
+  "interview_id": "interview-northstar-backend",
+  "route": "reschedule_review",
+  "reason": "Latest proposal changes an existing slot; preserve interview identity."
+}

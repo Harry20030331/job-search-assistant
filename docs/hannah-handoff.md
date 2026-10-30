@@ -17,7 +17,7 @@
 - 明确的“无”“不适用”“不愿披露”与未填写分开处理。
 - 必填／选填清单见 [evaluation.md](evaluation.md#候选人资料)，不另维护一套规则。
 
-**待开发：**LinkedIn 导入、资料确认／补全流程、完整的必填检查。现有 profile 校验不能代表这些检查已经完成。新增共享字段先与 Yuming 对齐；真实资料留在本地，仓库只放虚构样例。
+**Implementation status (2026-10-29):** The designated LinkedIn URL choice, browser-observation preview and confirmed new-candidate intake are implemented; see [LinkedIn intake](linkedin-import.md). Live LinkedIn extraction validation, complete application-required-field checks and existing-candidate correction writes remain pending. Profile validation alone does not establish completeness. Coordinate shared fields with Yuming; keep real inputs local and commit fictional fixtures only.
 
 ## 交付二：匹配后的岗位
 

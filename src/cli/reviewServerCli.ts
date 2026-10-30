@@ -3,7 +3,11 @@ import { fileURLToPath } from "node:url";
 import { startReviewServer } from "../review/reviewServer.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
 import { ensureExampleData } from "../example.js";
-import { readReviewBatch } from "../review/reviewStore.js";
+import { readReviewBatch, initializeReviewOrder } from "../review/reviewStore.js";
+import { ApplicationTaskService, demoTaskExecutor } from "../review/applicationTasks.js";
+import { readChatTaskConfig, createChatTaskDispatcher } from "../review/chatTaskBridge.js";
+import { codexTaskExecutor } from "../review/codexTaskExecutor.js";
+import { assertLiveCandidate } from "../review/liveCandidate.js";
 
 export interface ReviewServerCliArgs {
   reviewPath: string;
@@ -12,10 +16,12 @@ export interface ReviewServerCliArgs {
   chinaJobsPath?: string;
   chinaOutreachPath?: string;
   port: number;
+  profilePath?: string;
+  googleRoot?: string;
 }
 
 export function parseReviewServerArgs(argv: readonly string[]): ReviewServerCliArgs {
-  const allowed = new Set(["--review", "--tracker", "--jobs", "--china-jobs", "--china-outreach", "--port"]);
+  const allowed = new Set(["--review", "--tracker", "--jobs", "--china-jobs", "--china-outreach", "--port", "--profile", "--google-root"]);
   if (argv.length % 2 !== 0) throw new Error("invalid_cli_arguments");
   const values = new Map<string, string>();
   for (let index = 0; index < argv.length; index += 2) {
@@ -33,11 +39,14 @@ export function parseReviewServerArgs(argv: readonly string[]): ReviewServerCliA
   if (!reviewPath || !trackerPath || !jobsPath || !Number.isInteger(port) || port < 1 || port > 65_535) {
     throw new Error("invalid_cli_arguments");
   }
-  return { reviewPath, trackerPath, jobsPath, chinaJobsPath, chinaOutreachPath, port };
+  return { reviewPath, trackerPath, jobsPath, chinaJobsPath, chinaOutreachPath, port,
+    ...(values.has("--profile") ? { profilePath: values.get("--profile")! } : {}),
+    ...(values.has("--google-root") ? { googleRoot: values.get("--google-root")! } : {}) };
 }
 
 export function formatReviewServerStartup(address: string, reviewPath: string, applicationIds: readonly string[]): string {
   return [
+    `workspace_url=${address}${applicationIds.length ? "/review" : "/status/us"}`,
     `review_url=${address}/review`,
     `us_status_url=${address}/status/us`,
     `review_record=${reviewPath}`,
@@ -65,18 +74,34 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
   const jobsPath = resolve(parsed.jobsPath);
   const chinaJobsPath = parsed.chinaJobsPath ? resolve(parsed.chinaJobsPath) : undefined;
   const chinaOutreachPath = parsed.chinaOutreachPath ? resolve(parsed.chinaOutreachPath) : undefined;
+  await initializeReviewOrder(reviewPath);
   const explicitReview = recovered ? undefined : await readReviewBatch(reviewPath);
   const applicationIds = recovered?.applicationIds ??
     explicitReview!.applications.map((application) => application.applicationId);
+  const mode = process.env.APPLICATION_RUNNER ?? "demo";
+  if (mode !== "demo" && mode !== "codex") throw new Error("invalid_application_runner");
+  if (mode === "codex") await assertLiveCandidate(projectRoot);
+  const chat = await readChatTaskConfig(projectRoot);
+  const tasks = new ApplicationTaskService({ reviewPath, trackerPath, jobsPath, taskPath: resolve(dirname(trackerPath), "application-tasks.json") },
+    mode, mode === "demo" ? demoTaskExecutor : codexTaskExecutor(projectRoot, process.env.CODEX_CLI_PATH ?? "codex"), chat ? createChatTaskDispatcher(projectRoot, chat) : undefined);
+  await tasks.start();
   const running = await startReviewServer({
     reviewPath,
     trackerPath,
     jobsPath,
     chinaJobsPath,
     chinaOutreachPath,
-    port: parsed.port
+    profilePath: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : undefined,
+    googleRoot: "googleRoot" in parsed && parsed.googleRoot ? resolve(parsed.googleRoot) : undefined,
+    port: parsed.port,
+    tasks
   });
+  const stop = async () => { await tasks.close(); await running.close(); process.exit(0); };
+  process.once("SIGTERM", () => { void stop(); });
+  process.once("SIGINT", () => { void stop(); });
+  process.stdout.write(`application_runner=${mode}\napplication_dispatch=${chat ? "chat" : "runner"}\n`);
   process.stdout.write(formatReviewServerStartup(running.address, reviewPath, applicationIds));
+  process.stdout.write(`interviews_url=${running.address}/interviews\n`);
 }
 
 if (process.argv[1] && modulePath === resolve(process.argv[1])) {

@@ -1,0 +1,36 @@
+{
+  "suite": "memory",
+  "interview_id": "interview-m01",
+  "application_id": "app-cedar-m01",
+  "expected_event_count": 0,
+  "interview_fields": {
+    "duration_minutes": 45
+  },
+  "require_preparation": true,
+  "rubric_notes": [
+    "Only claim candidate facts found in profile; suggestions are not confirmed questions.",
+    "Prioritize capacity estimation and queue reliability for backend, or leakage and evaluation metrics for ML.",
+    "For M01, prioritize capacity estimation; do not keep treating the corrected project-story issue as current. For M02, do not force unrelated frontend/backend history into ML preparation."
+  ],
+  "expected_history": {
+    "debrief-1": "In the backend system-design interview I struggled with capacity estimation. I need to practice requests per second and storage estimates.",
+    "debrief-2": "My backend project-story explanation has improved after practice. Do not treat unclear personal contribution as my current main weakness. Capacity estimation still needs work."
+  },
+  "expected_history_by_visit": {
+    "1": {
+      "debrief-1": "In the backend system-design interview I struggled with capacity estimation. I need to practice requests per second and storage estimates."
+    },
+    "2": {
+      "debrief-1": "In the backend system-design interview I struggled with capacity estimation. I need to practice requests per second and storage estimates.",
+      "debrief-2": "My backend project-story explanation has improved after practice. Do not treat unclear personal contribution as my current main weakness. Capacity estimation still needs work."
+    }
+  },
+  "require_fresh_visits": 3,
+  "relevant_history_ids": [
+    "debrief-1",
+    "debrief-2"
+  ],
+  "forbidden_current_history_ids": [
+    "old-project"
+  ]
+}

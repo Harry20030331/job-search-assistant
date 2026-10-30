@@ -3,12 +3,14 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { z } from "zod";
 import { loadCandidateProfile } from "./profile.js";
+import { isLegacyResumeCategory, legacyResumeCategories, resumeCategorySchema, type ResumeCategory } from "./classification.js";
 
-export const categories = ["llm", "robotics", "recommendation"] as const;
-export type Category = (typeof categories)[number];
+/** Historical exported keys; allowed resume categories now come from the selected manifest. */
+export const categories = legacyResumeCategories;
+export type Category = ResumeCategory;
 
 const manifestSchema = z.array(z.object({
-  category: z.enum(categories),
+  category: resumeCategorySchema,
   path: z.string().min(1),
   sha256: z.string().regex(/^[a-f0-9]{64}$/i)
 }));
@@ -83,10 +85,11 @@ export interface BatchPreflightResult {
   parked: BatchPreflightParked[];
 }
 
-function parseCategory(category: string): Category {
+function parseCategory(category: string, manifest?: Manifest): Category {
   if (!category) throw new Error("explicit_category_required");
-  const parsedCategory = z.enum(categories).safeParse(category);
+  const parsedCategory = resumeCategorySchema.safeParse(category);
   if (!parsedCategory.success) throw new Error("unsupported_category");
+  if (manifest && !manifest.some(entry => entry.category === category) && !isLegacyResumeCategory(category)) throw new Error("unsupported_category");
   return parsedCategory.data;
 }
 
@@ -146,6 +149,7 @@ export async function runPreflight(input: PreflightInput): Promise<PreflightResu
   const category = parseCategory(input.category);
   const jobUrl = parseJobUrl(input.jobUrl);
   const canonical = await loadCanonicalInputs(input.profilePath, input.manifestPath, defaultDependencies);
+  parseCategory(category, canonical.manifest);
   const approved = await verifyApprovedCv(category, canonical.manifest, defaultDependencies);
 
   return {
@@ -180,7 +184,7 @@ export async function runBatchPreflight(
   const parked: BatchPreflightParked[] = [];
   for (const item of parsed.data.items) {
     try {
-      const category = parseCategory(item.category);
+      const category = parseCategory(item.category, canonical.manifest);
       const jobUrl = parseJobUrl(item.jobUrl);
       const approved = approvedByCategory.get(category);
       if (!approved) throw new Error("approved_cv_not_configured");

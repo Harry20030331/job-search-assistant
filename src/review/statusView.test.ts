@@ -53,6 +53,7 @@ describe("status view projection", () => {
       },
       {
         jobId: "tracked-job",
+        applicationId: "tracked-application",
         company: "Tracked Co",
         title: "Machine Learning Engineer",
         location: "San Francisco, CA",

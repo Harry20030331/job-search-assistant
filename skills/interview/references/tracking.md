@@ -1,0 +1,11 @@
+# Shared application tracking and interview view
+
+Read [the workbench contract](../../../docs/interview-workbench.md) for payloads, revisions, ownership and preview commands. Use the selected candidate runtime, canonical profile and existing job/application IDs. This mode records local recruiting progress; it grants no calendar, material-generation or application-submission approval.
+
+After actually verifying the account, message/thread, company, exact role and round association, construct a private `interview:track link` payload. Use its real source/reference/time, or `synthetic_test_script` for an explicitly fictional exercise. Do not use title/sender similarity alone as proof. Unknown time remains null and the round stays invited. A scheduled time is not a claim that Google Calendar was written.
+
+Link through the existing confirmed application before staging preparation. Preserve submission evidence and lifecycle rules; missing confirmation or application identity must be resolved through the owning module, not fabricated. Cancellation affects one round, not the whole application. Use a new interview ID for another round and the current registry revision for an update. Never rewrite shared opportunity or registry files ad hoc.
+
+Then use the existing staged preparation flow and exact chat acceptance. Publish the fresh work directory through `interview:track publish`, retaining the current expected registry revision. A candidate/account learning binding is a separate explicit operation. A reschedule or source change requires a fresh run/context; do not delete guards or copy prior approval. Show stale state and withhold old materials.
+
+Open the server's `/interviews` URL for the user when requested. The page reads real business state and offers Overview, Preparation and Debrief. State updates, plan acceptance and free-text debrief input remain in chat; construct tool payloads rather than asking the user to edit JSON. Use `interview:demo` in a new directory for a fictional preview; it must never overwrite current candidate data or be described as a model benchmark.

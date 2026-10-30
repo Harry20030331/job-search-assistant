@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c11",
+    "application_id": "application-c11",
+    "interview_id": "interview-c11",
+    "company": "Larch Audio",
+    "role": "ML Engineer, Graduate"
+  },
+  "association": "verified",
+  "budget_minutes": 35,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Robin Glen evaluated a toy keyword detector using held-out audio clips. Distributed platform ownership and model-serving deployment are not documented.",
+      "content_sha256": "2a7a7af90044019272bf67c488d0594483f6b68b5917662d3d03c3587996d45a"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c11",
+      "company": "Larch Audio",
+      "role": "ML Engineer, Graduate",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "LA-1111 ML Engineer, Graduate: early-career technical round on evaluating a simple model. The exact JD cannot be located.",
+      "content_sha256": "a991f0857360eaa706d2c8702194ddd2f396f7217a2da9a321ae8c08b3b80eb9"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Larch Audio",
+      "role": null,
+      "locator": "https://c11.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Larch Audio builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "bf99a5b434dde03aec7b54c5f947f4a20ade013cd67454908c068745f6184842"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "unrelated_role",
+      "matched_job_id": "fictional-other-c11",
+      "company": "Larch Audio",
+      "role": "Different reference role",
+      "locator": "https://c11.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "LA-OTHER: Principal Data Platform Architect. Own organization-wide warehouse infrastructure and lead senior architecture reviews. This is unrelated to the graduate ML opening.",
+      "content_sha256": "fa4be9f9989602f57f947a18dfe71bca91e6bc784e47ff84623315749ec35229"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

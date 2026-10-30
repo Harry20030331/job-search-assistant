@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Move our interview",
+      "body": "Could we move our interview to next Thursday afternoon? I don't have the original invitation thread here."
+    }
+  ],
+  "known_interviews": []
+}

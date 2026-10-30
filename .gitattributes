@@ -1,1 +1,7 @@
 *.pdf binary
+# The frozen UI manifest hashes LF bytes on every checkout.
+src/review/reviewViews.ts text eol=lf
+src/review/statusView.ts text eol=lf
+src/interview/interviewView.ts text eol=lf
+src/interview/practiceText.ts text eol=lf
+src/workbench/views.ts text eol=lf

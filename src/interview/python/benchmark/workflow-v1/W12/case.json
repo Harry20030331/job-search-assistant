@@ -1,0 +1,31 @@
+{
+  "case_id": "W12",
+  "suite": "lifecycle",
+  "title": "Invitation to next-session preparation",
+  "user_script": {
+    "confirm": true,
+    "facts": {},
+    "decision": "accept"
+  },
+  "public_task": "Handle the supplied interview invitation, then prepare after my plan decision, record my practice debrief and prepare for the next session.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  },
+  "debriefs": [
+    {
+      "record_id": "W12-report",
+      "interview_id": "fictional-past-practice",
+      "occurred_at": "2026-10-17T16:00:00+00:00",
+      "mode": "practice",
+      "origin": "synthetic_test_script",
+      "subject": {
+        "company": null,
+        "role": "backend_swe",
+        "round": null
+      },
+      "text": "In practice I could not explain why retrying a task can duplicate its effects. I also lost the structure of my QueueLab project story. No interviewer feedback was provided."
+    }
+  ]
+}

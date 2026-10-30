@@ -1,0 +1,23 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "old-invite",
+      "subject": "Northstar interview invitation",
+      "body": "Your backend interview is November 3, 2026, 10:00-11:00 America/Los_Angeles."
+    },
+    {
+      "source_id": "latest",
+      "subject": "Re: Northstar interview invitation",
+      "body": "Here is the video URL for our November 3 interview: https://meet.example/northstar-test . The date and time are unchanged."
+    }
+  ],
+  "known_interviews": [
+    {
+      "interview_id": "interview-northstar-backend",
+      "thread_source_ids": [
+        "old-invite"
+      ]
+    }
+  ]
+}

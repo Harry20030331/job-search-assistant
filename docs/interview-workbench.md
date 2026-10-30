@@ -1,0 +1,86 @@
+# Shared interview workbench
+
+Maintenance date: 2026-10-26. Interview rounds now link to existing shared applications and appear at `/interviews` on the same local Review server. This is a host-orchestrated business integration with a read-only interview page. No background mail daemon, Google write, shared schema migration or extra AI dependency is installed.
+
+## Ownership and lifecycle
+
+`opportunities.json` remains authoritative for job identity, application identity and lifecycle. The new host-only `<runtime>/interviews/registry.json` stores stable interview/job/application IDs, round state/time, association provenance, a revision and an optional absolute preparation-workspace pointer. It contains no duplicate company/role/profile facts or approval record. The page hydrates these facts from the selected shared opportunity and exports current preparation from that run's SQLite store.
+
+An actual verified invitation can advance an existing confirmed application through `transitionApplication(..., "interviewing")`. A new optional expected-identity argument checks job/company/title/URL while holding the existing application transaction lock. A link never invents submission evidence or creates another application. Existing unconfirmed/unsuccessful applications remain subject to the shared lifecycle rules; resolve their real evidence through the owning module rather than manufacturing confirmation to enable Interview.
+
+Cancelling a round updates only that round. It does not close the application or change another job. Existing interviewing/offer applications are not regressed. Multiple rounds can share the same application ID and have distinct interview IDs. The host supplies explicit association source/reference/time; metadata is a provenance assertion, not proof that mail was actually read. The skill remains responsible for verifying the account, thread and exact role/round.
+
+## Publish order and commands
+
+The host constructs the files and commands; users should not need to author JSON. Use absolute paths and stable IDs. First link the verified interview using a private payload:
+
+```json
+{
+  "interviewId": "exact-round-id",
+  "jobId": "existing-job-id",
+  "applicationId": "existing-application-id",
+  "state": "scheduled",
+  "schedule": {
+    "start": "2026-10-29T10:00:00-07:00",
+    "end": "2026-10-29T11:00:00-07:00",
+    "timezone": "America/Los_Angeles"
+  },
+  "association": {
+    "source": "email",
+    "reference": "Actual inspected message/thread reference and role-association basis",
+    "verifiedAt": "2026-10-26T18:00:00Z"
+  },
+  "expectedRevision": null
+}
+```
+
+Values above illustrate the schema; they are not evidence or authorization for a real operation. Allowed round states are `invited`, `scheduled`, `completed`, `cancelled`; `schedule` can be null except when scheduled. Provenance sources are `email`, `human_chat`, `synthetic_test_script`. Unknown time stays null. A scheduled interview time does not prove Google Calendar synchronization.
+
+```text
+npm run interview:track -- link --runtime-dir <selected-candidate-runtime> --input <actual-link.json>
+```
+
+Use `expectedRevision: null` only for a new interview. Updates require the current positive revision and cannot reassign a round to another application. Repeated stale updates fail rather than overwrite new state. A time change detaches the old preparation pointer; the previous run remains on disk. Link and shared lifecycle changes use separate locks, not a cross-file transaction: lifecycle advances first, and a failure before registry persistence can be safely retried with the same interview ID/current expected revision. Existing interviewing state is accepted without repeating the lifecycle transition.
+
+**Advance lifecycle before staging preparation.** A canonical handoff's source guard hashes the opportunity file. Linking after staging changes that file and correctly makes the old run stale. For a batch, complete verified lifecycle updates before freezing the runs. An unrelated later opportunity update currently also invalidates this conservative whole-file guard; use a fresh handoff instead of deleting the guard.
+
+Then run the existing `interview context|stage`, optional explicit learning binding, enrichment/context analysis, proposal, exact chat approval and material flow. Publish the selected fresh work directory:
+
+```text
+npm run interview:track -- publish --runtime-dir <selected-candidate-runtime> --interview-id <exact-round-id> --workspace <staged-run>/work --expected-revision <current-revision>
+npm run interview:track -- inspect --runtime-dir <selected-candidate-runtime>
+```
+
+All commands accept optional `--profile <selected-profile-or-v3-descriptor>`. Without it, they select `<runtime>/candidate.json`. The registry binds that canonical source path and identity hash, so another candidate cannot inherit it merely because their name matches. Publish validates candidate anchor, job, application, interview, company and role, plus run freshness and the expected registry revision. Existing handoffs without a canonical anchor must be restaged.
+
+## Page and authority
+
+Start the existing server with explicit paths when needed:
+
+```text
+npm run review -- --review <runtime>/drafts --tracker <runtime>/opportunities.json --jobs <runtime>/opportunities.json --profile <selected-candidate.json> --port 8767
+```
+
+Open `/` for Home. All pages share Home, Status, Review, Interviews and Google account links. Interview detail separates Overview, Plan, Practice and Debrief. Plan is a time allocation. Practice asks direct questions with essential inputs and follow-ups; Show answer reveals Method, clarification/coverage guidance and Sample answer, including Python implementations for coding. More questions provides alternatives within the existing plan rather than extra mandatory work. Historical packs remain readable. These user-requested changes follow the controlled UI contract, preserving earlier manifests. Application approval interactions and Status projection retain their existing behavior.
+
+`/settings/accounts` starts authorization on Google's page through `/google/connect`. The developer can explicitly pass `--google-root <private-config-directory>`; otherwise the server selects `<runtime>/.google-local`. A configured installation uses its existing desktop OAuth client in `client.json`. End users choose their account and consent without Cloud Console setup or an application password form. The loopback proxy uses PKCE, a fixed callback, one-use state, an expiring browser-bound session and same-origin/CSRF checks. The page exposes verified account metadata, never credentials. Sign-out clears the browser session without deleting or revoking saved grants. This is a local prototype connection, not production tenant authentication. Connecting does not bind a fictional candidate to a real account, select a calendar, start inbox polling or authorize writes.
+
+For real OAuth, start the service in an execution environment allowed to reach Google. A browser can sign in successfully while a network-restricted backend cannot exchange the code. When launched through Codex's restricted shell, request the normal network-enabled tool execution approval for this explicit local service; do not disable TLS or change OAuth protections. The server remains loopback-only. On 2026-10-26 the restricted launch reproduced Windows network error 10013 against Google's public token endpoint; the approved network-enabled launch reached it and a subsequent human authorization produced Connected with Gmail account verification. See [connection troubleshooting](interview-google-connection-verification.md).
+
+The interview page has no write/approval endpoint and no arbitrary-file download route. Plans display their actual version, budget and status. Full materials are read only from the exact current approved proposal; stale sources/history, a new proposal or an unavailable/changed run suppress material access. Historical outlines can remain visible with a refresh notice. Approval and revisions stay in Codex chat; this page cannot authorize an application, calendar operation or new material generation.
+
+Debriefs display original reports separately from derived observations and suggested practice. Raw reports can appear before model extraction completes. Retrieval requires this interview ID and compatible historical role/company/round. Account-level reports are read only when an explicit candidate/account binding is present and still active; other interviews/accounts are not discovered or merged. A new account debrief may invalidate the old preparation snapshot while remaining visible as a scoped report. Revocation withholds account reports. Local business reports remain owned by their selected run.
+
+## Fictional preview
+
+```text
+npm run interview:demo -- --output <new-absolute-directory> --port 8767
+```
+
+Set `INTERVIEW_PYTHON` to the configured Python 3.12 environment first. The parent must exist; initialization refuses an existing target and never resets the working candidate. It creates three fictional scenarios: a 50-minute DS plan, a 20-minute recruiter plan, and Harbor's completed SWE round with a reconstructed 60-minute plan plus debrief. All three get authored simulation-v2 packs with declared synthetic acceptance; Harbor's reconstruction does not assert historical human approval. Initialization uses actual business APIs with zero model or Google calls. Later explicitly run generation is separate and does not inherit that zero-call claim. The private manifest and synthetic approval files preserve provenance. These fixtures are a UI exercise, not an agent benchmark or human acceptance. Restart with explicit `review` paths; do not reinitialize over them. See [simulation generation](interview-practice.md).
+
+## Windows and verification limits
+
+Windows now selects a native atomic exclusive-create lock with a per-acquisition token and bounded waiting. POSIX keeps the existing `shlock` implementation. Concurrent processes are serialized; a changed owner is never silently removed. Abandoned Windows locks deliberately fail closed. Stop all writers and establish that the recorded process is gone before any manual lock recovery; this change adds no automatic stale-lock reaper. Windows ACLs and POSIX mode bits are not interchangeable, and the existing recovery checks are not bypassed.
+
+Opportunity-path detection now recognizes both path separators, so native Windows absolute paths reach the canonical opportunity adapter. Tests cover lifecycle preservation, expected identity/revision, cancellation, rescheduling, candidate isolation, stale publication, HTML escaping, read-only routes, native cross-process locking and exact preparation/debrief export. Desktop and narrow-screen behavior were checked in the in-app Browser. See [local verification observations](interview-workbench-verification.md) for actual results and unresolved full-repository Windows failures.

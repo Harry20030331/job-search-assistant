@@ -2,7 +2,17 @@
 
 These instructions apply throughout this repository.
 
-Work on a feature branch and use a pull request for team review. Keep documentation, UI text, examples, comments and test descriptions in English. External-language recognition patterns and intentional non-English rejection probes may use Unicode escapes; do not translate away their behavior. Use fictional fixtures only. Never copy personal histories or credentials.
+## Job-seeker welcome and setup
+
+In a fresh conversation, treat a standalone greeting (for example, "Hi", "Hello"), "Start", "Get started", or a request to begin job-search setup as the onboarding entry point. Read `docs/welcome.md` and `skills/matching/SKILL.md`, then display the English welcome from `npm run matching -- welcome` and ask the user to choose a new candidate, an existing search, or the fictional example. Do not require a long activation prompt, JSON, or terminal commands from the user. Keep the welcome, setup questions, confirmation summary, search explanations and feedback interaction in English unless the user explicitly requests another language. Do not greet repeatedly in an ongoing session or hijack code, review, debugging, architecture or other explicit development requests.
+
+The greeting routes the first user message; it is not a background task or a zero-message startup hook. Merely opening a folder does not establish candidate selection, consent to save facts, or permission to search. Never load the fictional example as the user's real identity. Follow the workflow contract for confirmed intake and search execution.
+
+For a new candidate, accept a LinkedIn profile URL, PDF/DOCX/TXT/Markdown background document, pasted text, or combined sources using `npm run matching -- sources`; follow `docs/linkedin-import.md` for the designated LinkedIn source. Never require a resume for initial search or fabricate facts from an inaccessible profile.
+
+For "Continue an existing search", first run `npm run matching -- workspaces` and present the numbered saved results and locations; do not make the user remember a path. After selecting/creating the workspace, start `npm run matching -- serve --workspace <directory>` and visibly open its returned Status URL before source browsing. Keep this results tab available, research in background tabs, and reload the results after each round. See `docs/workspaces.md` for discovery limits and missing-data handling.
+
+Collaborate directly on `main`. Sync the latest remote state before editing or pushing, resolve conflicts without overwriting others, and run the checks relevant to the change before pushing. The author owns validation and integration; no separate reviewer or pull request is required. Coordinate shared-interface changes with the affected module owner. Keep documentation, UI text, examples, comments and test descriptions in English. External-language recognition patterns and intentional non-English rejection probes may use Unicode escapes; do not translate away their behavior. Use fictional fixtures only. Never copy personal histories or credentials.
 
 ## Active authorities
 
@@ -10,18 +20,21 @@ Work on a feature branch and use a pull request for team review. Keep documentat
 
 - Read [workflow-contract](docs/workflow-contract.md) for preparation, review, authorization, submission evidence and recovery. It consolidates the user decisions through 2026-10-15; older dated instructions and ADR wording are historical where superseded.
 - Read [candidate-inputs](docs/candidate-inputs.md) for factual ownership and input loading. Candidate facts and preferences belong in their canonical data sources, not ATS skills.
-- Read [ui-contract](docs/ui-contract.md) before Status/Review updates. Its v1 renderer, interactions and baseline remain fixed. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check.
+- Read [ui-contract](docs/ui-contract.md) before UI updates. Its active versioned renderer, interactions and baseline remain fixed; preserve historical manifests. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check. Explicit user-directed UI changes follow the contract's controlled successor process.
 
 ## Execution boundaries
 
 - Codex's in-app Browser is the only page executor. No Chrome profile dependency, extension, Simplify, alternate browser engine, hidden ATS API or retired executor.
 - Candidate scope is configured in the selected preferences file. Example data is fictional and is for local development, fixtures and offline evaluation. Never submit it to an employer. Legacy China code is inert compatibility code, not an active workflow.
-- Every new application needs an explicit configured category. Never infer or silently switch the category or mapped approved PDF.
-- For discovery, read `skills/matching/SKILL.md` and `docs/job-discovery.md`. Use the job-library interfaces; discovery does not authorize applying or submitting.
+- Job directions are open configured values and do not require a resume to shortlist. Every new application needs an explicit configured resume profile; never infer it from the job direction or silently switch its approved PDF. See `docs/job-directions.md`.
+- For Matching, read `skills/matching/SKILL.md` and the stage it routes to: `skills/matching/intake/SKILL.md`, `skills/matching/discovery/SKILL.md`, or `skills/matching/feedback/SKILL.md`. For discovery, also read `docs/job-discovery.md`. Use the job-library interfaces; discovery does not authorize applying or submitting.
 - For filling, use `skills/submission/SKILL.md` and the applicable ATS module. Deterministic approved facts are automatic; genuinely unknown facts become review questions. Do not invent personal history.
+- For interview scheduling, preparation or debriefs, read `skills/interview/SKILL.md` and only the relevant mode reference. Reuse canonical candidate/opportunity inputs; keep interview state separate from evaluator outputs. Follow `docs/interview-storage.md` for ownership and paths. Calendar confirmation and preparation-plan acceptance are separate from application authorization.
 - Keep working answers and exact approval state in `data/drafts/`. After verified success is saved in `data/opportunities.json`, working drafts may be pruned. Keep a short source/reference and timestamp; permanent screenshots, raw mail and daily ledgers are not required.
-- Explicit acceptance of the exact current application in chat is valid approval and submission authorization under the workflow contract. Apply and verify agreed edits before submitting; do not manufacture a website event or demand a duplicate click.
+- Approve means local content accepted, awaiting execution. It does not authorize submission. Follow the workflow contract for separate, explicit execution authorization and live verification; never manufacture a website approval.
 - Restore the existing local service with `npm run review:resume`. Fresh, isolated storage uses `npm run runtime:init -- --dir <new-directory>`. Neither operation proves live ATS continuity or authorizes submission.
+
+- Website messages with saved task IDs use the existing-chat workflow in `docs/commands.md`. Claim through `src/cli/chatTaskCli.ts`; never replay an already claimed task. Demo tasks remain fictional local rehearsals even when delivered to a real Codex chat.
 
 ## Maintenance
 
@@ -29,6 +42,6 @@ Keep shared operational policy in the workflow contract and platform-specific te
 
 ## Course ownership
 
-Hannah Guan owns Matching; Yuming Feng owns Submission and integration; Erica Zhao owns Interview Coordination. The shared opportunity record is the handoff. Coordinate shared schema changes with affected owners. Interview implementation is pending; do not claim it exists. Candidate facts and resume paths belong to selected inputs, never skills.
+Hannah Guan owns Matching; Yuming Feng owns Submission and integration; Erica Zhao owns Interview Coordination. The shared opportunity record is the handoff. Coordinate shared schema changes with affected owners. Interview has a development Python implementation and a read-only shared-input handoff; see `docs/interview.md` for verified scope and remaining integration work. Candidate facts and resume paths belong to selected inputs, never skills.
 
 Use `npm run review` to open the current candidate workspace; absent data loads the default fictional case. Use `npm run example:load` to explicitly replace the current state from a saved example. Stop Review and other writers before switching cases. Preserve the prior state in the ignored local backup returned by the loader. Never merge two candidates or copy working data back to examples automatically. Read `docs/demo.md` only when running the optional fictional submission exercise.

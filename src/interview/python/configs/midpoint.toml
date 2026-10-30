@@ -1,0 +1,20 @@
+version = 1
+verified_cli_version = "0.163.0"
+seed = 329
+agent_model = "gpt-6-luna"
+agent_reasoning_effort = "high"
+agent_timeout_seconds = 180
+max_responses_per_visit = 4
+max_shell_commands_per_response = 24
+judge_model = "anthropic/claude-opus-4.7"
+judge_endpoint = "https://openrouter.ai/api/v1/chat/completions"
+judge_provider = "anthropic"
+judge_max_tokens = 8192
+judge_timeout_seconds = 180
+judge_retry_delays = [10, 30]
+groups = ["A", "B", "C", "D"]
+
+[suites]
+scheduling = ["A", "B", "C"]
+preparation = ["A", "B", "C"]
+memory = ["A", "B", "C", "D"]

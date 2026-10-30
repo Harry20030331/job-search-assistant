@@ -1,0 +1,25 @@
+{
+  "human_review": "reviewed",
+  "jd_status": "exact",
+  "role_focus_expected": [
+    "ml_evaluation",
+    "system_design",
+    "project_ownership"
+  ],
+  "round_focus_expected": [
+    "project_ownership",
+    "collaboration",
+    "motivation"
+  ],
+  "seniority_expected": "senior",
+  "round_expected": "hiring_manager",
+  "review_notes": [
+    "Hiring manager is a mixed discussion; neither pure behavioral nor a confirmed coding exam."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

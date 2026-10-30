@@ -1,0 +1,6 @@
+{
+  "category": "invitation",
+  "interview_id": "interview-northstar-backend",
+  "route": "scheduling_review",
+  "reason": "Same interview reminder; scheduler must deduplicate, classifier retains known identity."
+}

@@ -1,0 +1,25 @@
+{
+  "suite": "scheduling",
+  "interview_id": "interview-s02",
+  "application_id": "app-cedar-s02",
+  "expected_event_count": 1,
+  "interview_fields": {
+    "duration_minutes": 45
+  },
+  "require_preparation": false,
+  "rubric_notes": [
+    "Only supplied fictional candidate facts are evidence.",
+    "Suggested exercises are not employer-confirmed questions.",
+    "A self-report does not establish objective ability or interviewer feedback."
+  ],
+  "event": {
+    "start": "2026-10-27T14:00:00+00:00",
+    "end": "2026-10-27T14:45:00+00:00",
+    "timezone": "America/New_York",
+    "duration_minutes": 45
+  },
+  "reminders": [
+    "2026-10-26T14:00:00+00:00",
+    "2026-10-27T13:00:00+00:00"
+  ]
+}

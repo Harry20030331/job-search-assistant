@@ -1,0 +1,6 @@
+{
+  "category": "reschedule",
+  "interview_id": null,
+  "route": "needs_review",
+  "reason": "Reschedule intent is clear but the target interview is not linked."
+}

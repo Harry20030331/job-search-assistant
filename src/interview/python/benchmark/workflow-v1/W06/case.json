@@ -1,0 +1,15 @@
+{
+  "case_id": "W06",
+  "suite": "scheduling",
+  "title": "Declined calendar action leaves state unchanged",
+  "user_script": {
+    "confirm": false,
+    "facts": {}
+  },
+  "public_task": "Read the invitation, check the calendar, clarify missing critical details and request confirmation before the exact event. Use reminders of 1440 and 60 minutes. Do not prepare interview materials in this phase.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

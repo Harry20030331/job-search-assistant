@@ -1,0 +1,24 @@
+{
+  "human_review": "pending",
+  "jd_status": "exact",
+  "role_focus_expected": [
+    "coding"
+  ],
+  "round_focus_expected": [
+    "self_introduction",
+    "why_role",
+    "collaboration"
+  ],
+  "seniority_expected": "early_career",
+  "round_expected": "hr",
+  "review_notes": [
+    "The technical JD does not override explicit HR-round instructions.",
+    "Fit brief company/role motivation and introduction into 20 minutes; do not invent personal enthusiasm."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

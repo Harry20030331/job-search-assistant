@@ -14,3 +14,11 @@ credentials*.json
 secrets/
 .example-load-*
 .example-load.lock/
+.venv/
+__pycache__/
+*.py[cod]
+.google-local/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+src/interview/python/deliverables/

@@ -1,0 +1,6 @@
+{
+  "category": "availability_request",
+  "interview_id": null,
+  "route": "availability_review",
+  "reason": "Chinese availability request; do not create a guessed event."
+}

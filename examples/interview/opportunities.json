@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "opportunities": [{
+    "jobId": "fictional-cedar-ml",
+    "company": "Cedar Example (fictional)",
+    "title": "Machine Learning Engineer",
+    "location": "Remote, United States",
+    "category": "llm",
+    "officialUrl": "https://example.invalid/jobs/cedar-ml",
+    "sources": ["user-provided"],
+    "firstSeen": "2026-10-25",
+    "lastVerified": "2026-10-25",
+    "note": "Independent fictional handoff fixture, never a live job list.",
+    "availability": "open",
+    "stage": "ready"
+  }]
+}

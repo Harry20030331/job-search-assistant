@@ -1,0 +1,11 @@
+{
+  "version": 21,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated workflow checks; in-app Browser responsive layout, filter and selection-count checks without executing tasks. Live ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "30362d2f7f17278f83c1a75dc84994f547894a302589523055f75c9f21f67819",
+    "src/review/statusView.ts": "af76f114923eab712556abf8850551d3c56a9ac4ca314a9111fdce2e9ef13b2d",
+    "src/review/workflowViews.ts": "97fdbebef2c45f9de999c98a0b43363a0c91fd2e869f48c4805462e3645f595d",
+    "src/review/applicationStyles.ts": "ed17ba48e6a55bc2e3e53910e85ba1673f4f4a63c905de841b0037af5214abcd"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "protocol": "preparation-context-v1",
+  "dataset": "context-v1",
+  "split": "development",
+  "provenance": "AI-assisted fictional authored stories; provisional labels awaiting human review. No model outputs or holdout claims.",
+  "cases": [
+    {
+      "case_id": "C01",
+      "role": "Product Data Scientist I",
+      "round": "technical",
+      "jd_condition": "exact",
+      "budget_minutes": 45
+    },
+    {
+      "case_id": "C02",
+      "role": "Senior Modeling Data Scientist",
+      "round": "technical",
+      "jd_condition": "exact",
+      "budget_minutes": 90
+    },
+    {
+      "case_id": "C03",
+      "role": "Graduate Backend Engineer",
+      "round": "hr",
+      "jd_condition": "exact",
+      "budget_minutes": 20
+    },
+    {
+      "case_id": "C04",
+      "role": "Senior ML Engineer",
+      "round": "hiring_manager",
+      "jd_condition": "exact",
+      "budget_minutes": 75
+    },
+    {
+      "case_id": "C05",
+      "role": "Associate Data Scientist",
+      "round": "hiring_manager",
+      "jd_condition": "same_company_analogue",
+      "budget_minutes": 40
+    },
+    {
+      "case_id": "C06",
+      "role": "Backend Engineer I",
+      "round": "technical",
+      "jd_condition": "other_company_analogue",
+      "budget_minutes": 60
+    },
+    {
+      "case_id": "C07",
+      "role": "Machine Learning Engineer",
+      "round": "hr",
+      "jd_condition": "missing",
+      "budget_minutes": 30
+    },
+    {
+      "case_id": "C08",
+      "role": "Junior Modeling Data Scientist",
+      "round": "technical",
+      "jd_condition": "exact",
+      "budget_minutes": 50
+    },
+    {
+      "case_id": "C09",
+      "role": "Senior Backend Engineer",
+      "round": "hiring_manager",
+      "jd_condition": "exact",
+      "budget_minutes": 80
+    },
+    {
+      "case_id": "C10",
+      "role": "Senior Product Data Scientist",
+      "round": "hr",
+      "jd_condition": "exact",
+      "budget_minutes": 25
+    },
+    {
+      "case_id": "C11",
+      "role": "ML Engineer, Graduate",
+      "round": "technical",
+      "jd_condition": "unrelated_role",
+      "budget_minutes": 35
+    },
+    {
+      "case_id": "C12",
+      "role": "Backend Engineer, New Graduate",
+      "round": "behavioral",
+      "jd_condition": "exact",
+      "budget_minutes": 20
+    }
+  ]
+}

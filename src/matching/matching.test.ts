@@ -89,7 +89,7 @@ test("CLI accepts explicit inputs and refuses malformed commands", async () => {
   expect(await runMatchingCli(["context", "--profile", paths.profile, "--preferences", paths.preferences, "--manifest", paths.manifest])).toHaveProperty("token");
   await expect(runMatchingCli(["feedback"])).rejects.toThrow("invalid_arguments");
   await feedback(paths, { categories: ["recommendation"] });
-  expect((await matchingContext(paths)).categoriesWithoutResume).toEqual(["recommendation"]);
+  expect((await matchingContext(paths)).availableResumeCategories).toEqual(["llm"]);
 });
 
 test("an outdated observation rolls back the complete publication", async () => {
@@ -119,7 +119,7 @@ test("remote-only feedback turns an unknown work mode into a saved research ques
 test("offline demo is isolated and refuses to replace existing state", async () => {
   const parent = await mkdtemp(join(tmpdir(), "matching-demo-")); roots.push(parent);
   const root = join(parent, "case");
-  const demo = await runMatchingDemo(root);
+  const demo = await runMatchingDemo(root, join(parent, "index.json"));
   expect(demo.before.filter(r => r.decision === "recommend")).toHaveLength(2);
   expect(demo.after.filter(r => r.decision === "recommend").map(r => r.jobId)).toEqual(["fictional-meadow"]);
   await expect(runMatchingDemo(root)).rejects.toThrow();

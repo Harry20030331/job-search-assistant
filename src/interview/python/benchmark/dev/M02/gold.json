@@ -1,0 +1,33 @@
+{
+  "suite": "memory",
+  "interview_id": "interview-m02",
+  "application_id": "app-cedar-m02",
+  "expected_event_count": 0,
+  "interview_fields": {
+    "duration_minutes": 45
+  },
+  "require_preparation": true,
+  "rubric_notes": [
+    "Only claim candidate facts found in profile; suggestions are not confirmed questions.",
+    "Prioritize capacity estimation and queue reliability for backend, or leakage and evaluation metrics for ML.",
+    "For M01, prioritize capacity estimation; do not keep treating the corrected project-story issue as current. For M02, do not force unrelated frontend/backend history into ML preparation."
+  ],
+  "expected_history": {
+    "debrief-1": "I practiced frontend CSS spacing. This note applies only to frontend UI interviews.",
+    "debrief-2": "My old backend project-story issue is resolved. There is no current debrief about ML evaluation."
+  },
+  "expected_history_by_visit": {
+    "1": {
+      "debrief-1": "I practiced frontend CSS spacing. This note applies only to frontend UI interviews."
+    },
+    "2": {
+      "debrief-1": "I practiced frontend CSS spacing. This note applies only to frontend UI interviews.",
+      "debrief-2": "My old backend project-story issue is resolved. There is no current debrief about ML evaluation."
+    }
+  },
+  "require_fresh_visits": 3,
+  "relevant_history_ids": [],
+  "forbidden_current_history_ids": [
+    "old-project"
+  ]
+}

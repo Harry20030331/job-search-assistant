@@ -1,0 +1,34 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "old-invite",
+      "subject": "Northstar interview invitation",
+      "body": "Your backend interview is November 3, 2026, 10:00-11:00 America/Los_Angeles."
+    },
+    {
+      "source_id": "old-ml",
+      "subject": "Northstar ML interview",
+      "body": "Your ML interview is November 6, 2026, 10:00-11:00 America/Los_Angeles."
+    },
+    {
+      "source_id": "latest",
+      "subject": "Re: Interviews",
+      "body": "Please move one of our interviews to Friday afternoon. I will confirm which role shortly."
+    }
+  ],
+  "known_interviews": [
+    {
+      "interview_id": "interview-northstar-backend",
+      "thread_source_ids": [
+        "old-invite"
+      ]
+    },
+    {
+      "interview_id": "interview-northstar-ml",
+      "thread_source_ids": [
+        "old-ml"
+      ]
+    }
+  ]
+}

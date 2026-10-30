@@ -1,0 +1,24 @@
+{
+  "human_review": "pending",
+  "jd_status": "analogue",
+  "role_focus_expected": [
+    "coding",
+    "system_design"
+  ],
+  "round_focus_expected": [
+    "coding",
+    "system_design"
+  ],
+  "seniority_expected": "early_career",
+  "round_expected": "technical",
+  "review_notes": [
+    "Bounded junior design is appropriate because the invitation explicitly requests it.",
+    "Keep another employer's JD separate from Fir's actual requirements."
+  ],
+  "general_coverage": [
+    "self_introduction",
+    "why_company",
+    "why_role"
+  ],
+  "coverage_rule": "Consider these areas in a later plan; allocate or explicitly defer within the actual budget. No plan is requested by this context-only task."
+}

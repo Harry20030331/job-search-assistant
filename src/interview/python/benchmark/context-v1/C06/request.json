@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c06",
+    "application_id": "application-c06",
+    "interview_id": "interview-c06",
+    "company": "Fir Logistics",
+    "role": "Backend Engineer I"
+  },
+  "association": "verified",
+  "budget_minutes": 60,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Alex Rowan built a file-import service in a bootcamp and tested a failed-job retry path. No production throughput or distributed-system deployment is established.",
+      "content_sha256": "1e16e4eaaad6e109820224712a4b391600e7e72d205158bd288f282f7b8ecfaf"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c06",
+      "company": "Fir Logistics",
+      "role": "Backend Engineer I",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "FL-606 Backend Engineer I: early-career technical round. Expect basic coding and a bounded discussion of a retrying import worker, not a whole-company architecture exercise.",
+      "content_sha256": "2efc7d876c0e8451b67ad6d29891fb82988a805beec59631331f56dd7dc6bdb5"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Fir Logistics",
+      "role": null,
+      "locator": "https://c06.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Fir Logistics builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "f6ae63730c4e7b8cf8518094596d5b6bb0f6f07497c1e9676be575b21404b8f1"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "other_company_analogue",
+      "matched_job_id": "fictional-other-c06",
+      "company": "Grove Parcel",
+      "role": "Different reference role",
+      "locator": "https://c06.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Grove Parcel GP-ALT: Backend Engineer I. Implement APIs, reason about retries and test small worker services. This posting belongs to another employer.",
+      "content_sha256": "20803527d1f60bd46f22abd2693b0b9a9a8a60059c72a683c50a97600b5199f2"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

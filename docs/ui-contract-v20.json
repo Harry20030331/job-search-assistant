@@ -1,0 +1,11 @@
+{
+  "version": 20,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated review workflow and ordering checks; local HTTP comparison with Status. Live ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "fc1565f535463e7e41e1e647d2a70361cde11d37469408ab87c4427ce90c1ca2",
+    "src/review/statusView.ts": "af76f114923eab712556abf8850551d3c56a9ac4ca314a9111fdce2e9ef13b2d",
+    "src/review/workflowViews.ts": "a224277d62c9fd650cb3286416e6c76e338cdb5181f6d00f1445498ede79fb7a",
+    "src/review/applicationStyles.ts": "0ab5412bce308a5e344eec719cea4f7375196108f6a01e865e161187d58125c0"
+  }
+}

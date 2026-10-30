@@ -1,0 +1,11 @@
+{
+  "version": 19,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated workflow checks and in-app Browser responsive inspection at 320, 390, 768, 1280 and 1440px. Status presentation preserved. Live ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "d8614570d103d60365da0c34dae8813db0f37a14d415c45c7f175c5c8878e469",
+    "src/review/statusView.ts": "af76f114923eab712556abf8850551d3c56a9ac4ca314a9111fdce2e9ef13b2d",
+    "src/review/workflowViews.ts": "a224277d62c9fd650cb3286416e6c76e338cdb5181f6d00f1445498ede79fb7a",
+    "src/review/applicationStyles.ts": "4f226c427e28e3e60fad15262c19e6e9d4de17eb4db8b5fa641dbf1e228c0fde"
+  }
+}

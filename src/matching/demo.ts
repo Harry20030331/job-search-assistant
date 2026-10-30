@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadExample } from "../example.js";
 import { matchingContext, publishMatchingRound, saveMatchingPreferences, type Assessment, type MatchingPaths } from "./matching.js";
+import { rememberWorkspace } from "./workspaces.js";
 
 export const demoRules = {
   categories: ["llm" as const], workModes: ["remote" as const, "hybrid" as const, "onsite" as const],
@@ -27,7 +28,7 @@ export function demoAssessments(date: string): Assessment[] {
   }));
 }
 
-export async function runMatchingDemo(directory: string) {
+export async function runMatchingDemo(directory: string, registryPath?: string) {
   const root = resolve(directory);
   await mkdir(root, { mode: 0o700 }); // Refuse to overwrite any existing workspace.
   await loadExample(root, resolve(dirname(fileURLToPath(import.meta.url)), "../../examples"));
@@ -47,7 +48,9 @@ export async function runMatchingDemo(directory: string) {
   // Fixed observations are deliberately reused in this offline mechanics demonstration.
   const after = await publishMatchingRound(paths, { version: 1, contextToken: (await matchingContext(paths)).token, assessments });
   await writeFile(join(root, "matching-demo-report.json"), JSON.stringify({ fictional: true, purpose: "Offline mechanics demonstration; not matching accuracy evidence", before, after }, null, 2), { mode: 0o600 });
-  return { root, before: before.results.map(r => ({ jobId: r.jobId, decision: r.decision })), after: after.results.map(r => ({ jobId: r.jobId, decision: r.decision })), report: join(root, "matching-demo-report.json"), paths };
+  let registryWarning: string | undefined;
+  try { await rememberWorkspace(root, registryPath); } catch { registryWarning = "workspace_index_update_failed"; }
+  return { root, ...(registryWarning ? { registryWarning } : {}), before: before.results.map(r => ({ jobId: r.jobId, decision: r.decision })), after: after.results.map(r => ({ jobId: r.jobId, decision: r.decision })), report: join(root, "matching-demo-report.json"), paths };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

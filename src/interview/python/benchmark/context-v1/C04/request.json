@@ -1,0 +1,72 @@
+{
+  "protocol": "preparation-context-v1",
+  "identity": {
+    "job_id": "fictional-c04",
+    "application_id": "application-c04",
+    "interview_id": "interview-c04",
+    "company": "Dune Signals",
+    "role": "Senior ML Engineer"
+  },
+  "association": "verified",
+  "budget_minutes": 75,
+  "sources": [
+    {
+      "source_id": "candidate",
+      "kind": "candidate",
+      "origin": "canonical",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": null,
+      "role": null,
+      "locator": "fixture://candidate",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Casey Brook led a small evaluation-tooling effort and coordinated with an analyst on failure labeling. The candidate record gives no hiring, management or scale claims.",
+      "content_sha256": "b0f1ec4abb7528e16a5a3dafbdcc55cd7370f1b9a5bb372db1a9a9f7798eeb84"
+    },
+    {
+      "source_id": "invitation",
+      "kind": "invitation",
+      "origin": "user_record",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c04",
+      "company": "Dune Signals",
+      "role": "Senior ML Engineer",
+      "locator": "fixture://invitation",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "DS-404 Senior ML Engineer: meet the hiring manager to discuss a project you owned, technical decisions, collaboration and what you want from the role. Format details beyond this are not confirmed.",
+      "content_sha256": "241b242d9f2a4f7ea2d33d7cdb4791c0385abda3f716907062243874967fc084"
+    },
+    {
+      "source_id": "company",
+      "kind": "company",
+      "origin": "official",
+      "relationship": "context_only",
+      "matched_job_id": null,
+      "company": "Dune Signals",
+      "role": null,
+      "locator": "https://c04.example.test/about",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "Dune Signals builds tools for its customers. Its official fictional values emphasize explaining decisions and learning from users.",
+      "content_sha256": "02030e88bde9a85eff4089a7e4bd194dd654255038cb54a23f389bf51c2e1539"
+    },
+    {
+      "source_id": "jd",
+      "kind": "jd",
+      "origin": "official",
+      "relationship": "exact_role",
+      "matched_job_id": "fictional-c04",
+      "company": "Dune Signals",
+      "role": "Senior ML Engineer",
+      "locator": "https://c04.example.test/careers/reference",
+      "retrieved_at": "2026-10-25T12:00:00-07:00",
+      "content": "DS-404: Senior ML Engineer. Own model evaluation and serving tradeoffs; coordinate engineering and research delivery; improve monitoring and mentor peers.",
+      "content_sha256": "9de5b1f759e28cc35d15d16a3ccda98f6baf90d0b8e0b5c32ef5a2469fc088f6"
+    }
+  ],
+  "research": {
+    "search_queries": 0,
+    "opened_pages": 0,
+    "max_search_queries": 6,
+    "max_opened_pages": 8
+  }
+}

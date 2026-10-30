@@ -4,6 +4,8 @@ import { dirname, join } from "node:path";
 import { describe, expect, test } from "vitest";
 import {
   consumeApproval,
+  initializeReviewOrder,
+  approveReviewContent,
   createReviewBatch,
   decideReview,
   invalidateSnapshot,
@@ -1349,4 +1351,28 @@ describe("fixed review publication interface", () => {
     await expect(publishReviewItem(path, { ...batch.applications[0]!, snapshotId: "new", questions: [{ id: "q", prompt: "\u8bf7\u8865\u5145", required: true }] }, { snapshotId: batch.applications[0]!.snapshotId, revision: null, decision: "pending" })).rejects.toThrow("english_review_content_required");
     expect(await readReviewBatch(path)).toEqual(batch);
   });
+});
+
+
+test("initial review order prioritizes judgment and persists through approval, answer changes and restart", async () => {
+  const path = await reviewPath(), document = validBatch(), base = document.applications[0]!;
+  document.applications = [
+    {...structuredClone(base),applicationId:"no-questions",snapshotId:"one"},
+    {...structuredClone(base),applicationId:"question",snapshotId:"two",questions:[{id:"location",prompt:"Location?",required:true,resolution:"Seattle"}]},
+    {...structuredClone(base),applicationId:"essay",snapshotId:"three",answers:[{label:"Why this role?",value:"Draft",kind:"generated"}]}
+  ];
+  await createReviewBatch(path,document);
+  const initialized = await initializeReviewOrder(path);
+  expect(initialized.applications.map(a=>a.queuePosition)).toEqual([3,1,2]);
+  await approveReviewContent(path,"question","two");
+  let current=(await readReviewBatch(path)).applications.find(a=>a.applicationId==="question")!;
+  const {openedAt,fullContentsViewedAt,...rest}=current;
+  await publishReviewItem(path,{...rest,queuePosition:undefined,snapshotId:"replacement",questions:[],decision:{state:"pending"}}, {snapshotId:current.snapshotId,revision:null,decision:"approved"});
+  const restarted=await initializeReviewOrder(path);
+  expect(restarted.applications.map(a=>a.queuePosition)).toEqual([3,1,2]);
+  current=restarted.applications.find(a=>a.applicationId==="question")!;
+  await expect(publishReviewItem(path,{...current,queuePosition:4,snapshotId:"reordered"},{snapshotId:current.snapshotId,revision:null,decision:"pending"})).rejects.toThrow("review_queue_position_immutable");
+  await publishReviewItem(path,{...structuredClone(base),applicationId:"new-question",snapshotId:"four",questions:[{id:"q",prompt:"New?",required:true}]},null);
+  const appended=await initializeReviewOrder(path);
+  expect(appended.applications.map(a=>a.queuePosition)).toEqual([3,1,2,4]);
 });

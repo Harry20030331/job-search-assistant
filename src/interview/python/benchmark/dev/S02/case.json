@@ -1,0 +1,28 @@
+{
+  "case_id": "S02",
+  "suite": "scheduling",
+  "task": "Process the invitation: clarify critical unknowns, check the calendar, ask me to confirm the exact event, then create it with reminders and save a reply draft. Also prepare a concise interview practice plan within my time budget using the supplied sources.",
+  "visits": [
+    {
+      "clock": "2026-10-19T16:00:00+00:00",
+      "message": "Please handle my invitation and prepare me for this interview.",
+      "user_script": {
+        "confirm": true,
+        "facts": {
+          "timezone": "America/New_York"
+        }
+      }
+    }
+  ],
+  "user_script": {
+    "confirm": true,
+    "facts": {
+      "timezone": "America/New_York"
+    }
+  },
+  "provenance": {
+    "kind": "synthetic_with_ai_assistance",
+    "human_review": "pending",
+    "development_only": true
+  }
+}

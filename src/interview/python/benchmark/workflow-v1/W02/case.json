@@ -1,0 +1,12 @@
+{
+  "case_id": "W02",
+  "suite": "triage",
+  "title": "A rejection reply is not a new invitation",
+  "user_script": {},
+  "public_task": "Handle this fictional interview task using the supplied evidence. Keep unknown facts explicit.",
+  "provenance": {
+    "fictional": true,
+    "human_review": "pending",
+    "development_only": true
+  }
+}

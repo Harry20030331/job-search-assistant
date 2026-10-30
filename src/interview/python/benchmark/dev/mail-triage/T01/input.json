@@ -1,0 +1,11 @@
+{
+  "latest_source_id": "latest",
+  "messages": [
+    {
+      "source_id": "latest",
+      "subject": "Interview tips newsletter",
+      "body": "Read our article: ten tips for your next technical interview. Subscribe for more career advice."
+    }
+  ],
+  "known_interviews": []
+}
