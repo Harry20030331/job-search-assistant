@@ -3,9 +3,14 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { matchingContext, publishMatchingRound, saveMatchingPreferences, type MatchingPaths } from "../matching/matching.js";
 import { createMatchingWorkspace, readIntakeFile, workspaceMatchingPaths } from "../matching/intake.js";
+import { matchingWelcome } from "../matching/welcome.js";
 
 export async function runMatchingCli(args: string[]) {
   const [operation, ...rest] = args;
+  if (operation === "welcome") {
+    if (rest.length) throw new Error("invalid_arguments");
+    return matchingWelcome;
+  }
   if (!["intake", "context", "feedback", "publish"].includes(operation ?? "") || rest.length % 2) throw new Error("invalid_arguments");
   const options = new Map<string, string>();
   for (let i = 0; i < rest.length; i += 2) {
@@ -34,7 +39,10 @@ export async function runMatchingCli(args: string[]) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  try { console.log(JSON.stringify(await runMatchingCli(process.argv.slice(2)), null, 2)); }
+  try {
+    const result = await runMatchingCli(process.argv.slice(2));
+    console.log(typeof result === "string" ? result : JSON.stringify(result, null, 2));
+  }
   catch (error) {
     const message = error instanceof Error ? error.message : "";
     console.error(/^matching_[a-z_]+$|^duplicate_(feedback_id|matching_assessment)$|^invalid_arguments$/.test(message) ? message : "matching_failed");

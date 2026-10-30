@@ -4,6 +4,8 @@
 
 ## Candidate information
 
+For first-time users, the [English welcome](welcome.md) starts when they send `Hi` or `Start` in a fresh project chat. Codex is instructed to guide setup without requiring the detailed technical prompts used in the meeting walkthrough below.
+
 The user can paste a resume or describe their background and search preferences in ordinary language. They do not need to edit JSON or know the CLI. Collect only information needed for the initial search: a name/alias, education or experience, skills, role direction with an explicit category, seniority, locations and work modes, start timing, and desired batch size/company limit. Retain unknown work-authorization, relocation and other facts as unknown. Ask about them only when needed to determine eligibility. Contact details and an approved PDF are not prerequisites for discovery.
 
 Show the extracted facts and constraints to the user for confirmation before creating a new case. User messages explicitly confirming an existing summary count; do not require a duplicate confirmation. Never import a developer's personal history from chat memory into a candidate.

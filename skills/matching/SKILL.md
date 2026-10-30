@@ -7,6 +7,8 @@ description: Use when discovering, screening, deduplicating, or refreshing Unite
 
 ## Chat entry and candidate intake
 
+A fresh greeting or `Start` follows `../../docs/welcome.md` before intake. Use the canonical English welcome, ask whether to create a candidate, resume a selected case, or try the fictional example, and guide the next step in English. Do not greet again mid-workflow or restart setup on a feedback turn. Read the user's supplied facts before asking questions; welcome does not itself authorize initialization or browsing.
+
 When the user asks to find jobs or start Matching, execute the workflow in this Codex chat. The user supplies ordinary language or a resume; do not ask them to author JSON, run CLI commands, or translate their own feedback. The webpage displays the saved shortlist; this chat is the input and feedback surface. Follow `../../docs/matching-chat.md` for the runnable intake and interactive walkthrough.
 
 For a new candidate, collect a name or alias, education/experience summary, core skills, target roles and explicit categories, locations/work modes, seniority, start timing, and batch/company limits. Ask only for missing search-critical scope, in one concise question. Preserve unknowns such as relocation and sponsorship; conditional eligibility must remain explicit. Show a concise summary of extracted facts and constraints for confirmation, then call `matching intake` in a NEW workspace. Never merge a real candidate into the fictional example or overwrite another candidate. Resume mapping, contact details and full application-onboarding checks may wait until preparation.

@@ -2,6 +2,12 @@
 
 These instructions apply throughout this repository.
 
+## Job-seeker welcome and setup
+
+In a fresh conversation, treat a standalone greeting (for example, "Hi", "Hello"), "Start", "Get started", or a request to begin job-search setup as the onboarding entry point. Read `docs/welcome.md` and `skills/matching/SKILL.md`, then display the English welcome from `npm run matching -- welcome` and ask the user to choose a new candidate, an existing search, or the fictional example. Do not require a long activation prompt, JSON, or terminal commands from the user. Keep the welcome, setup questions, confirmation summary, search explanations and feedback interaction in English unless the user explicitly requests another language. Do not greet repeatedly in an ongoing session or hijack code, review, debugging, architecture or other explicit development requests.
+
+The greeting routes the first user message; it is not a background task or a zero-message startup hook. Merely opening a folder does not establish candidate selection, consent to save facts, or permission to search. Never load the fictional example as the user's real identity. Follow the workflow contract for confirmed intake and search execution.
+
 Work on a feature branch and use a pull request for team review. Keep documentation, UI text, examples, comments and test descriptions in English. External-language recognition patterns and intentional non-English rejection probes may use Unicode escapes; do not translate away their behavior. Use fictional fixtures only. Never copy personal histories or credentials.
 
 ## Active authorities

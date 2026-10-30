@@ -12,6 +12,8 @@ committed to Git               local, persistent
 
 ## Start developing
 
+For the job-seeker experience, open this repository as the primary folder of a local Codex project, start a new chat inside it, and send **Hi**. Codex is instructed to show an English welcome and guide setup. Opening the folder alone does not start a conversation. See [the welcome walkthrough](docs/welcome.md); development instructions follow below.
+
 Requires Node.js 22 or later and npm. Open the repository in Codex.
 
 ```sh

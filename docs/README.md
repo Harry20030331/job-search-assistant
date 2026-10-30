@@ -10,6 +10,8 @@ Maintain shared project documentation in this repository's `docs/` directory. Th
 
 ## Development and operation
 
+- [Welcome and setup](welcome.md): open the project, send Hi, and follow the English candidate setup flow.
+
 - [Structure](structure.md): files, data ownership and workspace lifecycle.
 - [Commands](commands.md): runnable entrypoints and record updates.
 - [Candidate inputs](candidate-inputs.md): current input formats and factual ownership.
