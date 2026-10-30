@@ -3,7 +3,10 @@
 Skills describe work; data holds inputs and progress; source code validates updates and renders the fixed interface.
 
 ```text
-skills/matching/
+skills/matching/SKILL.md    Workflow entry and stage routing
+  intake/SKILL.md          Candidate sources, confirmation and new intake
+  discovery/SKILL.md       Official job leads and source verification
+  feedback/SKILL.md        Assessment, publication and feedback loop
 skills/submission/          ATS modules are nested here
 src/                       logic, CLI, UI and colocated tests
 scripts/                   verification

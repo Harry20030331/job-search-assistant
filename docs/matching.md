@@ -4,7 +4,7 @@ Implemented 2026-10-25. This is a Codex-driven workflow with deterministic publi
 
 ## Responsibilities
 
-Codex follows `skills/matching/SKILL.md`, reads current candidate inputs, observes listings through the in-app Browser, and assesses required versus preferred qualifications. It produces ranked assessments with candidate and job evidence, gaps and unresolved questions. No keyword score substitutes for this judgment.
+Codex starts at [the Matching workflow](../skills/matching/SKILL.md), then reads only the needed child: [candidate intake](../skills/matching/intake/SKILL.md), [job discovery](../skills/matching/discovery/SKILL.md), or [matching and feedback](../skills/matching/feedback/SKILL.md). Intake confirms inputs, discovery observes official roles, and assessment compares required versus preferred qualifications. It produces ranked assessments with candidate and job evidence, gaps and unresolved questions. No keyword score substitutes for this judgment.
 
 The Matching CLI binds those assessments to a hash of the resolved candidate, complete preferences and resume manifest. It enforces confirmed category, work-mode, location, company/job exclusions and shortlist limits. It publishes accepted roles atomically through the existing job/storage domain functions. It never creates an application, approves a draft or submits anything.
 
@@ -97,3 +97,5 @@ Open `http://127.0.0.1:64442/status/us`. The normal workspace remains on its ori
 ## Maintenance note — 2026-10-25
 
 Added Matching context/version binding, canonical preference feedback, transactional shortlist publication and an isolated scripted demo. No new source IDs, opportunity fields, application authorization rules or UI baseline changes. Search intake and actual chat feedback are covered by the follow-up in [Interactive Matching](matching-chat.md). Full application onboarding, LinkedIn import, automatic scheduling and empirical matching evaluation remain outside this change.
+
+Skill structure maintenance — 2026-10-29: split the existing Matching instructions into one stable entry point and three linked stage skills. Shared policy remains in the workflow contract; CLI commands, canonical state and the fixed UI are unchanged. Feedback can return to discovery for replacements and then resume assessment/publication.

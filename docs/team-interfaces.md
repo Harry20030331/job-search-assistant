@@ -1,8 +1,8 @@
 # Team interfaces
 
-Hannah Guan owns Matching, Yuming Feng owns Submission and system integration, and Erica Zhao owns Interview Coordination. The existing Matching skill is a starting implementation; Interview is pending. No placeholder skill claims a working implementation.
+Hannah Guan owns Matching, Yuming Feng owns Submission and system integration, and Erica Zhao owns Interview Coordination. The Matching entry skill routes to candidate intake, job discovery, and matching/feedback child skills; Interview is pending. No placeholder skill claims a working implementation.
 
-The [Hannah handoff](hannah-handoff.md) specifies the agreed LinkedIn candidate-onboarding work, required/optional input completion, and the existing opportunity JSON interface. Import and complete onboarding validation remain to be implemented.
+The [Hannah handoff](hannah-handoff.md) specifies the agreed LinkedIn candidate-onboarding work, required/optional input completion, and the existing opportunity JSON interface. Source preview and confirmed new-candidate search intake are implemented; live LinkedIn validation and complete application-onboarding validation remain pending.
 
 Matching uses the jobs API to create/update an opportunity: stable job ID, employer, role, location, canonical URL, explicit category, sources and observed availability. Submission advances that same record and owns its application, working draft and success evidence. Neither module should keep a second authoritative job list.
 
