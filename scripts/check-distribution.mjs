@@ -13,7 +13,7 @@ async function walk(dir){for(const entry of await readdir(dir,{withFileTypes:tru
  if(entry.isDirectory()){if(entry.name==='archive')throw new Error('archive_in_distribution');await walk(file);continue;}
  if(path===relative(root,fileURLToPath(import.meta.url)))continue;
  if(/\.(png|jpg|jpeg|docx)$/.test(path)||/\.local\.json$/.test(path))throw new Error(`private_artifact_type:${path}`);
- const bytes=await readFile(file);if(path.endsWith('.pdf')){if(path!=='examples/alex-morgan-resume.pdf')throw new Error(`unexpected_pdf:${path}`);continue;}
+ const bytes=await readFile(file);if(path.endsWith('.pdf')){if(path!=='examples/alex-liu-resume.pdf')throw new Error(`unexpected_pdf:${path}`);continue;}
  const text=bytes.toString('utf8');if(forbidden.some(pattern=>pattern.test(text)))throw new Error(`private_content_pattern:${path}`);if(!chinesePlanningDocs.has(path)&&/[\u3400-\u9fff]/u.test(text))throw new Error(`non_english_authored_content:${path}`);count++;
 }}
 await walk(root);console.log(`PASS distribution scan: ${count} text files. PDF requires separate content review.`);

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "jobId": "alex-wd-744000138717897",
+  "identitySha256": "668fdda82239d9906ea7aa659af3064cc050b95596e237aeb82f548b0f6ddf57",
+  "cvVerified": false,
+  "snapshotId": "example:alex-liu:review:alex-wd-744000138717897:v1",
+  "answers": [],
+  "consents": [],
+  "questions": [
+    {
+      "id": "message",
+      "prompt": "Message to the hiring team",
+      "required": true,
+      "draftAnswer": "I am completing an MS in Computer Science in June 2027 and am available for full-time work from July 2027. I am interested in application software and data tooling that help engineers build reliable systems. In a software engineering internship, I built a Python document-search prototype and owned evaluation scripts and citation checks. My Study Search project combines retrieval, source citations and regression tests. I would bring practical experience with Python, SQL, REST APIs and testing, while learning the storage domain from experienced engineers. These examples describe a fictional candidate used for a pre-submission course test."
+    },
+    {
+      "id": "location",
+      "prompt": "Select your desired work locations in the U.S.: California — San Jose/Milpitas/Fremont/Roseville; California — Irvine; Arizona — Chandler; Colorado — Colorado Springs; Colorado — Longmont; Minnesota — Rochester.",
+      "required": true,
+      "inputType": "short-text"
+    }
+  ],
+  "validationErrors": [],
+  "friction": [
+    "Saved fictional review checkpoint; live form values and resume upload are unverified."
+  ],
+  "snapshotCurrent": false,
+  "reviewStage": "questions",
+  "preparedAt": "2026-10-30T00:00:00.000Z",
+  "decision": {
+    "state": "pending"
+  },
+  "desiredState": {
+    "revision": 1,
+    "syncState": "pending"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "version": 25,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated retry, lifecycle, review and fresh-case checks; local HTTP verification. Live ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "886567dafee549bed88551e9a9b33c9707ff85f2d3ec5ec78ca2682bb6792006",
+    "src/review/statusView.ts": "cccd29105f43e6bfea4d7ecf5b570ca79c75b5d9485d25f72dee01b885eee3e6",
+    "src/review/workflowViews.ts": "97fdbebef2c45f9de999c98a0b43363a0c91fd2e869f48c4805462e3645f595d",
+    "src/review/applicationStyles.ts": "6b698313a8eb9aa999381637ed88c1d3b69f6eecac655003a577508d653a246c"
+  }
+}

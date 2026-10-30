@@ -10,7 +10,7 @@ Work on a feature branch and use a pull request for team review. Keep documentat
 
 - Read [workflow-contract](docs/workflow-contract.md) for preparation, review, authorization, submission evidence and recovery. It consolidates the user decisions through 2026-10-15; older dated instructions and ADR wording are historical where superseded.
 - Read [candidate-inputs](docs/candidate-inputs.md) for factual ownership and input loading. Candidate facts and preferences belong in their canonical data sources, not ATS skills.
-- Read [ui-contract](docs/ui-contract.md) before Status/Review updates. Its v1 renderer, interactions and baseline remain fixed. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check.
+- Read [ui-contract](docs/ui-contract.md) before Status/Review updates. Its v28 renderer, interactions and baseline remain fixed outside explicit design work. Change data through documented domain APIs and `npm run data`; use stable IDs, never row numbers. Do not rewrite entire existing tracker/review files or rebaseline the UI to bypass a check.
 
 ## Execution boundaries
 
@@ -20,8 +20,10 @@ Work on a feature branch and use a pull request for team review. Keep documentat
 - For discovery, read `skills/matching/SKILL.md` and `docs/job-discovery.md`. Use the job-library interfaces; discovery does not authorize applying or submitting.
 - For filling, use `skills/submission/SKILL.md` and the applicable ATS module. Deterministic approved facts are automatic; genuinely unknown facts become review questions. Do not invent personal history.
 - Keep working answers and exact approval state in `data/drafts/`. After verified success is saved in `data/opportunities.json`, working drafts may be pruned. Keep a short source/reference and timestamp; permanent screenshots, raw mail and daily ledgers are not required.
-- Explicit acceptance of the exact current application in chat is valid approval and submission authorization under the workflow contract. Apply and verify agreed edits before submitting; do not manufacture a website event or demand a duplicate click.
+- Approve means local content accepted, awaiting execution. It does not authorize submission. Follow the workflow contract for separate, explicit execution authorization and live verification; never manufacture a website approval.
 - Restore the existing local service with `npm run review:resume`. Fresh, isolated storage uses `npm run runtime:init -- --dir <new-directory>`. Neither operation proves live ATS continuity or authorizes submission.
+
+- Website messages with saved task IDs use the existing-chat workflow in `docs/commands.md`. Claim through `src/cli/chatTaskCli.ts`; never replay an already claimed task. Demo tasks remain fictional local rehearsals even when delivered to a real Codex chat.
 
 ## Maintenance
 

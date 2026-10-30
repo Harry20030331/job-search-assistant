@@ -1,0 +1,11 @@
+{
+  "version": 28,
+  "approvedAt": "2026-10-30",
+  "validation": "16 status and transition tests passed. In-app Browser verified five Submitted labels; internal demo outcomes and no-send execution unchanged.",
+  "files": {
+    "src/review/reviewViews.ts": "886567dafee549bed88551e9a9b33c9707ff85f2d3ec5ec78ca2682bb6792006",
+    "src/review/statusView.ts": "9d5e65be503f8349372e6949d2aec6087fd4fb4617dfe8c64c658572b55f8dd4",
+    "src/review/workflowViews.ts": "99f4aa47413931f43321bc308e4f051def6505ea0b068af9b6026e32b708bc57",
+    "src/review/applicationStyles.ts": "6b698313a8eb9aa999381637ed88c1d3b69f6eecac655003a577508d653a246c"
+  }
+}

@@ -2,12 +2,12 @@
   "schemaVersion": 2,
   "fictional": true,
   "identity": {
-    "fullName": "Alex Morgan",
+    "fullName": "Alex Liu",
     "firstName": "Alex",
-    "lastName": "Morgan"
+    "lastName": "Liu"
   },
   "contact": {
-    "email": "alex.morgan@example.com",
+    "email": "alex.liu@example.com",
     "phone": "+1 202 555 0142",
     "currentLocation": "Seattle, WA, United States"
   },
@@ -25,7 +25,12 @@
         "Machine Learning",
         "Distributed Systems",
         "AI Agents"
-      ]
+      ],
+      "gpa": {
+        "value": null,
+        "scale": null,
+        "asOf": null
+      }
     },
     {
       "institution": "Pacific Coast University (fictional)",
@@ -33,7 +38,12 @@
       "field": "Computer Science",
       "startDate": "2021-09",
       "endDate": "2025-06",
-      "status": "Completed"
+      "status": "Completed",
+      "gpa": {
+        "value": null,
+        "scale": null,
+        "asOf": null
+      }
     }
   ],
   "experiences": [
@@ -118,7 +128,17 @@
     "authorizedUs": true,
     "sponsorshipNow": false,
     "sponsorshipFuture": false,
-    "scope": "Fictional US work-authorization scenario; no visa history is copied from a real person."
+    "scope": "Fictional US work-authorization scenario; no visa history is copied from a real person.",
+    "immigrationSupport": {
+      "requiredNowOrFuture": null,
+      "includes": [
+        "Employer visa sponsorship",
+        "OPT",
+        "CPT",
+        "STEM OPT",
+        "Other employer-supported immigration benefits"
+      ]
+    }
   },
   "availability": {
     "startDate": "2027-07-01",
@@ -137,9 +157,19 @@
     "unknowns": [
       "availability.relocation",
       "applicationFacts.desiredCompensation",
-      "applicationFacts.employerSpecificRelationships",
       "links.github",
-      "links.linkedin"
+      "links.linkedin",
+      "citizenship.countryCodes",
+      "citizenship.usPermanentResident",
+      "citizenship.usAsyleeOrRefugee",
+      "citizenship.subsequentStatusHistory",
+      "militaryService.hasServed",
+      "militaryService.serviceCountryCodes",
+      "militaryService.isVeteran",
+      "education[].gpa",
+      "workAuthorization.immigrationSupport.requiredNowOrFuture",
+      "applicationFacts.employmentRestrictions",
+      "applicationFacts.outsideActivities"
     ],
     "evidenceRule": "All claims and metrics are fictional input facts. They are not evaluation results for this repository. Unknown values must not be guessed."
   },
@@ -179,7 +209,7 @@
     }
   ],
   "links": {
-    "portfolio": "https://portfolio.example.com/alex-morgan",
+    "portfolio": "https://portfolio.example.com/alex-liu",
     "github": null,
     "linkedin": null
   },
@@ -190,6 +220,36 @@
     "previousFullTimeEmploymentExcludingInternships": false,
     "desiredCompensation": null,
     "demographicSelfIdentification": "Ask the candidate; do not infer from name, language or education.",
-    "employerSpecificRelationships": "Unknown; ask separately for each employer."
+    "personalConnections": {
+      "entries": [],
+      "unlistedCompanyAnswer": "No",
+      "scope": "Family members (including parents and relatives) and close friends; current or former employment.",
+      "source": "Fictional example default."
+    },
+    "employmentHistoryCoverage": {
+      "complete": true,
+      "scope": "All employment in this fictional candidate scenario, including internships and part-time roles.",
+      "source": "The supplied fictional scenario defines the full employment history; not a claim about the real project owner."
+    },
+    "employmentRestrictions": {
+      "hasRestrictions": null,
+      "details": null,
+      "asOf": null
+    },
+    "outsideActivities": {
+      "entries": null,
+      "asOf": null
+    }
+  },
+  "citizenship": {
+    "countryCodes": null,
+    "usPermanentResident": null,
+    "usAsyleeOrRefugee": null,
+    "subsequentStatusHistory": null
+  },
+  "militaryService": {
+    "hasServed": null,
+    "serviceCountryCodes": null,
+    "isVeteran": null
   }
 }

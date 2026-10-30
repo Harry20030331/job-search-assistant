@@ -19,7 +19,9 @@
     "drafts": "tsx src/cli/draftsCli.ts",
     "discovery": "tsx src/cli/discoveryCli.ts",
     "demo": "tsx src/demo/cli.ts",
-    "example:load": "tsx src/cli/exampleLoadCli.ts"
+    "example:load": "tsx src/cli/exampleLoadCli.ts",
+    "example:shortlist": "tsx src/cli/exampleLoadCli.ts --snapshot shortlist",
+    "example:review": "tsx src/cli/exampleLoadCli.ts --snapshot review"
   },
   "dependencies": {
     "zod": "^3.23.8"

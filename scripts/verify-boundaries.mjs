@@ -13,7 +13,7 @@ pass("dependency surface is minimal");
 
 const required = [
   "AGENTS.md", "CONTEXT.md", "docs/workflow-contract.md", "docs/candidate-inputs.md",
-  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json",
+  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json", "docs/ui-contract-v2.json", "docs/ui-contract-v3.json", "docs/ui-contract-v4.json", "docs/ui-contract-v5.json", "docs/ui-contract-v6.json", "docs/ui-contract-v7.json", "docs/ui-contract-v8.json", "docs/ui-contract-v9.json", "docs/ui-contract-v10.json", "docs/ui-contract-v11.json", "docs/ui-contract-v12.json", "docs/ui-contract-v13.json", "docs/ui-contract-v14.json", "docs/ui-contract-v15.json", "docs/ui-contract-v16.json", "docs/ui-contract-v17.json", "docs/ui-contract-v18.json", "docs/ui-contract-v19.json", "docs/ui-contract-v20.json", "docs/ui-contract-v21.json", "docs/ui-contract-v22.json", "docs/ui-contract-v23.json", "docs/ui-contract-v24.json", "docs/ui-contract-v25.json", "docs/ui-contract-v26.json", "docs/ui-contract-v27.json", "docs/ui-contract-v28.json",
   "skills/submission/SKILL.md", "skills/matching/SKILL.md",
   "skills/submission/greenhouse/SKILL.md", "skills/submission/ashby/SKILL.md", "skills/submission/lever/SKILL.md",
   "skills/submission/workday/SKILL.md", "skills/submission/long-tail/SKILL.md",

@@ -1,0 +1,10 @@
+{
+  "version": 9,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated checks; browser inspection skipped at user request. Live Codex/ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "11f356e5e4e377d1df0cc44e84ec1ce36313cb084fd5c18113d2feb00c871449",
+    "src/review/statusView.ts": "832a0307e5eacf735dd71b819213d24fc680c19e5b6aed504969ff1753922879",
+    "src/review/workflowViews.ts": "64c4058426499446c6c057b8c3cfaf4a37062c01a38a0db7040cc9d4eae0a982"
+  }
+}

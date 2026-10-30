@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "jobId": "alex-scale-4730836005",
+  "identitySha256": "58ab10b2354b415ad767eb0fa7808b1262976b69e5f789fb84d4a67945e13d9a",
+  "cvVerified": false,
+  "snapshotId": "example:alex-liu:review:alex-scale-4730836005:v1",
+  "answers": [],
+  "consents": [],
+  "questions": [
+    {
+      "id": "degree-fit",
+      "prompt": "Keep this role for testing? The posting specifies Fall 2026 or Spring 2027 bachelor’s graduation; Alex’s MS ends in June 2027 and BS ended in June 2025.",
+      "required": true,
+      "options": [
+        {
+          "id": "0",
+          "label": "Retain for platform testing with eligibility caveat"
+        },
+        {
+          "id": "1",
+          "label": "Replace this role"
+        }
+      ]
+    },
+    {
+      "id": "relocation",
+      "prompt": "Are you willing to relocate to San Francisco?",
+      "required": true,
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ]
+    }
+  ],
+  "validationErrors": [],
+  "friction": [
+    "Saved fictional review checkpoint; live form values and resume upload are unverified."
+  ],
+  "snapshotCurrent": false,
+  "reviewStage": "questions",
+  "preparedAt": "2026-10-30T00:00:00.000Z",
+  "decision": {
+    "state": "pending"
+  }
+}

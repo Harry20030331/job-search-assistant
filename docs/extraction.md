@@ -20,7 +20,7 @@ For real use, supply your own facts and approved resume and use the documented w
 
 ## Example workbench refinement - 2026-10-15
 
-The default development flow is a single ignored `data/`, loaded from a saved example and reused on ordinary Review restarts. The original initialize-only entrypoint has been superseded by the reloadable state loader described below. The fixed fake-employer scenario remains optional. Alex Morgan now has a coherent education/work timeline, detailed ownership, skill limits, preferences and intentionally unanswered fields; the resume is derived from those fictional facts. The broader workbench architecture remains deliberately small, with no profile editor or multi-workspace selector.
+The default development flow is a single ignored `data/`, loaded from a saved example and reused on ordinary Review restarts. The original initialize-only entrypoint has been superseded by the reloadable state loader described below. The fixed fake-employer scenario remains optional. Alex Liu now has a coherent education/work timeline, detailed ownership, skill limits, preferences and intentionally unanswered fields; the resume is derived from those fictional facts. The broader workbench architecture remains deliberately small, with no profile editor or multi-workspace selector.
 
 Legacy report output and example text were translated to English. Compatibility patterns retain external-language recognition via Unicode escapes, and negative language tests retain their original meaning. English aliases are recognized by the inert regional classifier.
 

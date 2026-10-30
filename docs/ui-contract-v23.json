@@ -1,0 +1,11 @@
+{
+  "version": 23,
+  "approvedAt": "2026-10-30",
+  "validation": "Automated review tests and local HTTP verification. Live ATS operation unverified.",
+  "files": {
+    "src/review/reviewViews.ts": "fdac22cca9e8b263ecf8798ee0f57aaef5b0b4e0d1d6e9f0b7fc9db05573949c",
+    "src/review/statusView.ts": "af76f114923eab712556abf8850551d3c56a9ac4ca314a9111fdce2e9ef13b2d",
+    "src/review/workflowViews.ts": "97fdbebef2c45f9de999c98a0b43363a0c91fd2e869f48c4805462e3645f595d",
+    "src/review/applicationStyles.ts": "a4868afc9bd9fd7dc59570bb0109df88f2c0044e21cead4e64fa7a626e3841fd"
+  }
+}

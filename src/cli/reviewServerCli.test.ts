@@ -37,6 +37,7 @@ describe("review server CLI", () => {
       ["parallel-active", "servicenow-active"]
     ))
       .toBe([
+        "workspace_url=http://127.0.0.1:64440/review",
         "review_url=http://127.0.0.1:64440/review",
         "us_status_url=http://127.0.0.1:64440/status/us",
         "review_record=/project/reviews/2026-08-07.local.json",

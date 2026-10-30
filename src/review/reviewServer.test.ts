@@ -184,7 +184,7 @@ describe("local review server", () => {
     expect(review).not.toContain('data-action="approve" disabled');
     expect(status.status).toBe(302);
     expect(status.headers.get("location")).toBe("/status/us");
-    expect(us).toContain("Application status");
+    expect(us).toContain("Status");
     expect(us).not.toContain('href="/status/china"');
     expect(china.status).toBe(302);
     expect(china.headers.get("location")).toBe("/status/us");
@@ -231,6 +231,23 @@ describe("local review server", () => {
     expect((await post("/api/review/text", { ...identity, questionId: "portfolio", value: "Changed" })).status).toBe(400);
   });
 
+  test("short inputs reject multiline and oversized values and clearing removes an old resolution", async () => {
+    const document = batch();
+    document.applications[0]!.questions = [{ id: "school", prompt: "High school name", required: true, inputType: "short-text", resolution: "Old School" }];
+    const { server, reviewPath } = await fixture(undefined, document);
+    const post = (value: string) => fetch(`${server.address}/api/review/text`, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({applicationId:"notion-1",snapshotId:"snapshot-1",questionId:"school",value})
+    });
+    expect((await post("x".repeat(301))).status).toBe(400);
+    expect((await post("First\nSecond")).status).toBe(400);
+    const clear=await post("");
+    expect(await clear.json()).toMatchObject({value:"",missingText:true,reviewReady:false,desiredState:{revision:1,syncState:"pending"}});
+    const stored=(await readReviewBatch(reviewPath)).applications[0]!;
+    expect(stored.questions[0]!.resolution).toBeUndefined();
+    expect(stored.decision.state).toBe("pending");
+  });
+
   test("collects explicit stale questions without granting approval or live continuity", async () => {
     const document = batch();
     Object.assign(document.applications[0]!, { reviewStage: "questions", snapshotCurrent: false, decision: { state: "stale" }, validationErrors: ["Session lost"] });
@@ -242,9 +259,9 @@ describe("local review server", () => {
     const html = await (await fetch(`${server.address}/review`)).text();
     expect(html).not.toContain("\u5f85\u8865\u5145");
     expect(html).toContain("Share evidence");
-    expect(html).not.toContain("<textarea");
+    expect(html).toContain("<textarea");
     expect(html).toContain('data-action="approve" disabled');
-    expect(html).toContain("Required answers are missing");
+    expect(html).toContain("Complete the required answers to approve.");
     expect(html).not.toContain("Session lost");
     expect(html).not.toContain("CV:");
     const response = await fetch(`${server.address}/api/review/text`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ applicationId: "notion-1", snapshotId: "snapshot-1", questionId: "evidence", value: "My evidence" }) });
@@ -266,7 +283,7 @@ describe("local review server", () => {
     }
   });
 
-  test("migrates legacy tracker states before rendering status rows", async () => {
+  test("migrates legacy tracker states but keeps records without drafts out of Review", async () => {
     const { server } = await fixture({ schemaVersion: 2, applications: [trackerRecord()] });
     const response = await fetch(`${server.address}/status`);
     const html = await response.text();
@@ -274,7 +291,7 @@ describe("local review server", () => {
 
     expect(response.status).toBe(200);
     expect(row).toContain("Legacy Co · Washington");
-    expect(row).toContain('<span class="row-status">In Review</span>');
+    expect(row).toContain('<span class="row-status">Shortlisted</span>');
     expect(row).not.toContain("final_review");
   });
 
@@ -716,5 +733,36 @@ describe("local review server", () => {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ padding: "x".repeat(70_000) })
     })).status).toBe(413);
+  });
+});
+
+
+describe("content-only approval", () => {
+  test("accepts reviewed content without live readiness, persists it, and never grants submission authority", async () => {
+    const document = batch(); const item = document.applications[0]!;
+    item.cv.verified = false; item.snapshotCurrent = false; item.reviewStage = "questions"; item.validationErrors = ["Live upload pending"];
+    const {server, reviewPath} = await fixture(undefined, document);
+    const response = await fetch(server.address + "/api/review/content-approval", {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({applicationId:item.applicationId,snapshotId:item.snapshotId})});
+    expect(response.status).toBe(200);
+    const saved = (await readReviewBatch(reviewPath)).applications[0]!;
+    expect(saved.decision).toMatchObject({state:"approved",scope:"content-only"}); expect(saved.snapshotCurrent).toBe(false); expect(saved.cv.verified).toBe(false);
+    // Even making legacy live gates ready cannot turn content approval into execution authorization.
+    saved.snapshotCurrent = true; saved.cv.verified = true; saved.validationErrors = [];
+    saved.openedAt = saved.preparedAt; saved.fullContentsViewedAt = saved.preparedAt;
+    await writeFile(reviewPath, JSON.stringify({ ...document, applications:[saved] }));
+    await expect(consumeApproval(reviewPath,item.applicationId,item.snapshotId)).rejects.toThrow("execution_authorization_required");
+  });
+
+  test("rejects missing answers, stale revisions, changed snapshots and cross-origin approval", async () => {
+    const document = batch(), item = document.applications[0]!;
+    item.questions = [{id:"location",prompt:"Location?",required:true,inputType:"short-text",draftAnswer:""}]; item.desiredState={revision:1,syncState:"pending"};
+    const {server, reviewPath} = await fixture(undefined, document);
+    const post = (body:unknown,origin?:string) => fetch(server.address+"/api/review/content-approval",{method:"POST",headers:{"content-type":"application/json",...(origin?{origin}:{})},body:JSON.stringify(body)});
+    const body={applicationId:item.applicationId,snapshotId:item.snapshotId,expectedDesiredRevision:1};
+    expect((await post(body)).status).toBe(422);
+    expect((await post({...body,expectedDesiredRevision:2})).status).toBe(409);
+    expect((await post({...body,snapshotId:"changed"})).status).toBe(409);
+    expect((await post(body,"https://example.com")).status).toBe(403);
+    expect((await readReviewBatch(reviewPath)).applications[0]!.decision.state).toBe("pending");
   });
 });

@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { applyApplicationData } from "./applicationDataCli.js";
+import { createReviewBatch } from "../review/reviewStore.js";
 import { createApplication } from "../tracker.js";
 
 test("versioned data interface rejects layout fields and unsupported versions", async () => {
@@ -26,4 +27,14 @@ test("data command updates only the intended application's visibility", async ()
   const after = JSON.parse(await readFile(trackerPath, "utf8"));
   expect(after.applications[0]).toEqual({ ...before.applications[0], hiddenFromStatus: true });
   expect(after.applications[1]).toEqual(before.applications[1]);
+});
+
+
+test("review.start is an idempotent structured port and rejects presentation overrides", async () => {
+  const root=await mkdtemp(join(tmpdir(),"review-start-port-")),reviewPath=join(root,"review.json");
+  await createReviewBatch(reviewPath,{schemaVersion:1,batchId:"empty",createdAt:"2026-10-15T12:00:00Z",applications:[]});
+  const command={version:1,operation:"review.start",reviewPath};
+  expect(await applyApplicationData(command)).toEqual({ok:true,applicationIds:[]});
+  expect(await applyApplicationData(command)).toEqual({ok:true,applicationIds:[]});
+  await expect(applyApplicationData({...command,order:["invented"]})).rejects.toThrow();
 });

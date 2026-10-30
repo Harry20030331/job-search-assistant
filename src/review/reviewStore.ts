@@ -12,8 +12,9 @@ const answerSchema = z.object({
   label: z.string().min(1),
   value: z.string(),
   kind: z.enum(["deterministic", "generated"]),
+  edited: z.literal(true).optional(),
   source: z.string().min(1).optional()
-}).strict();
+}).strict().refine(answer => !answer.edited || answer.kind === "generated", "only generated answers can be edited");
 const consentSchema = z.object({
   label: z.string().min(1),
   value: z.string().min(1),
@@ -29,6 +30,7 @@ const questionSchema = z.object({
   required: z.boolean(),
   resolution: z.string().min(1).optional(),
   draftAnswer: z.string().max(16000).optional(),
+  inputType: z.literal("short-text").optional(),
   options: z.array(reviewChoiceSchema).min(1).optional(),
   recommendedOptionId: z.string().min(1).optional(),
   recommendationSource: z.string().min(1).optional(),
@@ -47,6 +49,12 @@ const questionSchema = z.object({
     question.selectedOptionId
   )) {
     context.addIssue({ code: "custom", message: "enumerated metadata requires options" });
+  }
+  if (question.inputType && question.options) {
+    context.addIssue({ code: "custom", message: "short text cannot have options" });
+  }
+  if (question.inputType && (question.draftAnswer?.length ?? 0) > 300) {
+    context.addIssue({ code: "custom", message: "short text exceeds 300 characters" });
   }
   if (question.options && (question.resolution || question.draftAnswer !== undefined)) {
     context.addIssue({ code: "custom", message: "enumerated question cannot have a resolution" });
@@ -77,6 +85,7 @@ const decisionSchema = z.discriminatedUnion("state", [
   z.object({ state: z.literal("pending") }).strict(),
   z.object({
     state: z.literal("approved"),
+    scope: z.literal("content-only").optional(),
     decidedAt: timestamp,
     desiredRevision: revision.optional()
   }).strict(),
@@ -107,6 +116,7 @@ const reviewItemSchema = z.object({
   friction: z.array(z.string().min(1)),
   snapshotCurrent: z.boolean(),
   reviewStage: z.enum(["final", "questions"]).optional(),
+  queuePosition: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional(),
   preparedAt: timestamp,
   openedAt: timestamp.optional(),
   fullContentsViewedAt: timestamp.optional(),
@@ -129,7 +139,7 @@ const reviewItemSchema = z.object({
       message: "canonical answers are execution evidence, not review questions"
     });
   }
-  const hasSelectedEnumeratedAnswer = item.questions.some((question) =>
+  const hasSelectedEnumeratedAnswer = item.answers.some(answer => answer.edited) || item.questions.some((question) =>
     Boolean(question.options && question.selectedOptionId) || question.draftAnswer !== undefined
   );
   if (hasSelectedEnumeratedAnswer !== Boolean(item.desiredState)) {
@@ -206,7 +216,7 @@ export type ReviewChoice = z.infer<typeof reviewChoiceSchema>;
 export type DesiredState = z.infer<typeof desiredStateSchema>;
 
 function desiredStateCoupled(item: ReviewItem): boolean {
-  const hasSelectedEnumeratedAnswer = item.questions.some((question) =>
+  const hasSelectedEnumeratedAnswer = item.answers.some(answer => answer.edited) || item.questions.some((question) =>
     Boolean(question.options && question.selectedOptionId) || question.draftAnswer !== undefined
   );
   return hasSelectedEnumeratedAnswer === Boolean(item.desiredState);
@@ -228,6 +238,7 @@ function parseBatch(value: unknown): ReviewBatch {
   const parsed = reviewBatchSchema.safeParse(value);
   if (!parsed.success) throw new Error("invalid_review_batch");
   const identities = new Set<string>();
+  const queuePositions = new Set<number>();
   const reviewSnapshotIds = new Set(
     parsed.data.applications.map((item) => item.snapshotId.toLowerCase())
   );
@@ -235,6 +246,10 @@ function parseBatch(value: unknown): ReviewBatch {
   for (const item of parsed.data.applications) {
     if (identities.has(item.applicationId)) throw new Error("invalid_review_batch");
     identities.add(item.applicationId);
+    if (item.queuePosition !== undefined) {
+      if (queuePositions.has(item.queuePosition)) throw new Error("invalid_review_batch");
+      queuePositions.add(item.queuePosition);
+    }
     if (item.desiredState?.syncState === "verified") {
       const liveSnapshotId = item.desiredState.verifiedLiveSnapshotId.toLowerCase();
       if (reviewSnapshotIds.has(liveSnapshotId)) throw new Error("invalid_review_batch");
@@ -405,21 +420,64 @@ export async function resolveQuestion(
 }
 
 export async function saveQuestionText(
-  path: string, applicationId: string, snapshotId: string, questionId: string, value: string
+  path: string, applicationId: string, snapshotId: string, questionId: string, value: string,
+  expectedRevision?: number
 ): Promise<ReviewItem> {
   if (value.length > 16000) throw new Error("invalid_question_resolution");
   return transact(path, (batch) => {
     const item = batch.applications.find((candidate) => candidate.applicationId === applicationId);
     if (!item) throw new Error("review_application_not_found");
+    if (expectedRevision !== undefined && expectedRevision !== (item.desiredState?.revision ?? 0)) throw new Error("desired_revision_mismatch");
     if (item.snapshotId !== snapshotId || (!item.snapshotCurrent && item.reviewStage !== "questions")) throw new Error("review_snapshot_mismatch");
     if (item.decision.state !== "pending" && !(item.reviewStage === "questions" && item.decision.state === "stale")) throw new Error("approval_not_available");
     const question = item.questions.find((candidate) => candidate.id === questionId);
     if (!question) throw new Error("review_question_not_found");
     if (question.options) throw new Error("invalid_question_resolution");
+    if (question.inputType === "short-text" && (value.length > 300 || /[\r\n]/.test(value))) throw new Error("invalid_question_resolution");
     if (question.draftAnswer === value.trim()) return { changed: false, result: item };
     if ((item.desiredState?.revision ?? 0) >= Number.MAX_SAFE_INTEGER) throw new Error("desired_state_revision_overflow");
     question.draftAnswer = value.trim();
+    delete question.resolution;
     item.desiredState = { revision: (item.desiredState?.revision ?? 0) + 1, syncState: "pending" };
+    return { changed: true, result: item };
+  });
+}
+
+/** Only generated prose can be edited here; canonical facts retain their source of truth. */
+export async function saveGeneratedAnswer(
+  path: string, applicationId: string, snapshotId: string, answerIndex: number,
+  value: string, expectedRevision: number
+): Promise<ReviewItem> {
+  if (!value.trim() || value.length > 16000) throw new Error("invalid_question_resolution");
+  return transact(path, batch => {
+    const item = batch.applications.find(candidate => candidate.applicationId === applicationId);
+    if (!item) throw new Error("review_application_not_found");
+    if (item.snapshotId !== snapshotId) throw new Error("review_snapshot_mismatch");
+    if (expectedRevision !== (item.desiredState?.revision ?? 0)) throw new Error("desired_revision_mismatch");
+    if (item.decision.state !== "pending" && !(item.reviewStage === "questions" && item.decision.state === "stale")) throw new Error("approval_not_available");
+    const answer = item.answers[answerIndex];
+    if (!Number.isSafeInteger(answerIndex) || !answer || answer.kind !== "generated") throw new Error("invalid_question_resolution");
+    if (answer.value === value.trim()) return { changed: false, result: item };
+    if (expectedRevision >= Number.MAX_SAFE_INTEGER) throw new Error("desired_state_revision_overflow");
+    answer.value = value.trim();
+    answer.edited = true;
+    item.desiredState = { revision: expectedRevision + 1, syncState: "pending" };
+    return { changed: true, result: item };
+  });
+}
+
+/** Reopening invalidates earlier execution requests by changing the snapshot identity. */
+export async function reopenReviewContent(path: string, applicationId: string, snapshotId: string): Promise<ReviewItem> {
+  return transact(path, batch => {
+    const item = batch.applications.find(candidate => candidate.applicationId === applicationId);
+    if (!item) throw new Error("review_application_not_found");
+    if (item.snapshotId !== snapshotId) throw new Error("review_snapshot_mismatch");
+    if (item.decision.state !== "approved" || item.decision.scope !== "content-only") throw new Error("approval_not_available");
+    item.snapshotId = `review:${randomUUID()}`;
+    item.decision = { state: "pending" };
+    if (item.desiredState) item.desiredState = { revision: item.desiredState.revision, syncState: "pending" };
+    delete item.openedAt;
+    delete item.fullContentsViewedAt;
     return { changed: true, result: item };
   });
 }
@@ -429,11 +487,13 @@ export async function selectQuestionOption(
   applicationId: string,
   snapshotId: string,
   questionId: string,
-  optionId: string
+  optionId: string,
+  expectedRevision?: number
 ): Promise<ReviewItem> {
   return transact(path, (batch) => {
     const item = batch.applications.find((candidate) => candidate.applicationId === applicationId);
     if (!item) throw new Error("review_application_not_found");
+    if (expectedRevision !== undefined && expectedRevision !== (item.desiredState?.revision ?? 0)) throw new Error("desired_revision_mismatch");
     if (item.snapshotId !== snapshotId || (!item.snapshotCurrent && item.reviewStage !== "questions")) throw new Error("review_snapshot_mismatch");
     if (item.decision.state !== "pending" && !(item.reviewStage === "questions" && item.decision.state === "stale")) throw new Error("approval_not_available");
     const question = item.questions.find((candidate) => candidate.id === questionId);
@@ -500,6 +560,28 @@ export async function decideReview(
   });
 }
 
+/** User accepts this local content revision; this does not authorize execution or submission. */
+export async function approveReviewContent(
+  path: string, applicationId: string, snapshotId: string,
+  expectedDesiredRevision?: number, now = new Date().toISOString()
+): Promise<ReviewItem> {
+  return transact(path, batch => {
+    const item = batch.applications.find(candidate => candidate.applicationId === applicationId);
+    if (!item) throw new Error("review_application_not_found");
+    if (item.snapshotId !== snapshotId) throw new Error("review_snapshot_mismatch");
+    assertDesiredStateCoupled(item);
+    if (expectedDesiredRevision !== item.desiredState?.revision) throw new Error("desired_revision_mismatch");
+    if (item.decision.state === "approved" && item.decision.scope === "content-only") return { changed: false, result: item };
+    if (item.decision.state !== "pending" && !(item.decision.state === "stale" && item.reviewStage === "questions")) throw new Error("approval_not_available");
+    if (item.questions.some(q => q.required && !(q.options ? q.selectedOptionId : (q.draftAnswer?.trim() || q.resolution)))) throw new Error("review_gate_incomplete");
+    const time = timestamp.safeParse(now);
+    if (!time.success || Date.parse(now) < Date.parse(item.fullContentsViewedAt ?? item.openedAt ?? item.preparedAt)) throw new Error("invalid_decision_timestamp");
+    item.decision = { state: "approved", scope: "content-only", decidedAt: now,
+      ...(item.desiredState ? { desiredRevision: item.desiredState.revision } : {}) };
+    return { changed: true, result: item };
+  });
+}
+
 export async function verifyDesiredStateApplied(
   path: string,
   applicationId: string,
@@ -563,6 +645,7 @@ export async function consumeApproval(
   return mutate(path, applicationId, snapshotId, (item) => {
     assertDesiredStateCoupled(item);
     assertQuestionShapes(item);
+    if (item.decision.state === "approved" && item.decision.scope === "content-only") throw new Error("execution_authorization_required");
     if (item.decision.state !== "approved" || !gateComplete(item)) throw new Error("approval_not_available");
     if (item.desiredState?.syncState === "pending") throw new Error("desired_state_sync_required");
     if (
@@ -580,6 +663,31 @@ export async function consumeApproval(
     ) throw new Error("invalid_consumption_chronology");
     item.decision = { ...item.decision, state: "consumed", consumedAt: consumedAt.data };
     return true;
+  });
+}
+
+/** Called only after a durable website task has reserved its one-time execution attempt. */
+export async function consumeWebsiteContent(
+  path: string, applicationId: string, snapshotId: string, expectedRevision: number,
+  verification: { liveSnapshotId: string; cvFilename: string; verifiedAt: string; contentMatches: true; validationPassed: true }
+): Promise<ReviewItem> {
+  return transact(path, batch => {
+    const item = batch.applications.find(i => i.applicationId === applicationId);
+    if (!item || item.snapshotId !== snapshotId) throw new Error("review_snapshot_mismatch");
+    if (item.decision.state !== "approved" || item.decision.scope !== "content-only") throw new Error("approval_not_available");
+    if ((item.desiredState?.revision ?? 0) !== expectedRevision) throw new Error("desired_revision_mismatch");
+    if (!liveSnapshotIdentity.safeParse(verification.liveSnapshotId).success || verification.liveSnapshotId === snapshotId ||
+        verification.cvFilename !== item.cv.filename || verification.contentMatches !== true || verification.validationPassed !== true ||
+        !timestamp.safeParse(verification.verifiedAt).success || Date.parse(verification.verifiedAt) < Date.parse(item.decision.decidedAt) ||
+        Date.parse(verification.verifiedAt) > Date.now() || Date.now() - Date.parse(verification.verifiedAt) > 60_000 ||
+        item.questions.some(q => q.required && !(q.options ? q.selectedOptionId : q.draftAnswer?.trim() || q.resolution))) throw new Error("review_gate_incomplete");
+    if (batch.applications.some(i => i.applicationId !== applicationId && (i.snapshotId === verification.liveSnapshotId || (i.desiredState?.syncState === "verified" && i.desiredState.verifiedLiveSnapshotId === verification.liveSnapshotId)))) throw new Error("desired_state_live_snapshot_reused");
+    item.snapshotCurrent = true;
+    item.cv.verified = true;
+    item.validationErrors = [];
+    if (item.desiredState) item.desiredState = { revision: expectedRevision, syncState: "verified", verifiedAt: verification.verifiedAt, verifiedLiveSnapshotId: verification.liveSnapshotId };
+    item.decision = { state: "consumed", decidedAt: item.decision.decidedAt, consumedAt: new Date().toISOString(), ...(expectedRevision ? { desiredRevision: expectedRevision } : {}) };
+    return { changed: true, result: item };
   });
 }
 
@@ -615,6 +723,19 @@ export async function invalidateSnapshot(
   });
 }
 
+/** Assign attention-first positions once. Later calls append new items without moving existing ones. */
+export async function initializeReviewOrder(path: string): Promise<ReviewBatch> {
+  return transact(path, batch => {
+    const unranked = batch.applications.filter(item => item.queuePosition === undefined);
+    const needsJudgment = (item: ReviewItem) => item.questions.length > 0 || item.answers.some(answer => answer.kind === "generated");
+    unranked.sort((a, b) => Number(needsJudgment(b)) - Number(needsJudgment(a)));
+    let position = Math.max(0, ...batch.applications.map(item => item.queuePosition ?? 0));
+    if (!Number.isSafeInteger(position + unranked.length)) throw new Error("review_queue_position_overflow");
+    for (const item of unranked) item.queuePosition = ++position;
+    return { changed: unranked.length > 0, result: batch };
+  });
+}
+
 /** Publish data into the fixed Review UI; never carries approval into a new snapshot. */
 export async function publishReviewItem(
   path: string,
@@ -641,8 +762,13 @@ export async function publishReviewItem(
       if (old.decision.state === "consumed") throw new Error("submitted_history_is_immutable");
       if (old.snapshotId === item.snapshotId) throw new Error("replacement_snapshot_required");
       if (old.category !== item.category || old.officialUrl !== item.officialUrl) throw new Error("application_identity_changed");
+      if (item.queuePosition !== undefined && item.queuePosition !== old.queuePosition) throw new Error("review_queue_position_immutable");
+      if (old.queuePosition !== undefined) item.queuePosition = old.queuePosition;
       batch.applications[index] = item;
-    } else batch.applications.push(item);
+    } else {
+      if (item.queuePosition !== undefined) throw new Error("review_queue_position_immutable");
+      batch.applications.push(item);
+    }
     return { changed: true, result: item };
   });
 }

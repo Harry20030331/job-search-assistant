@@ -19,7 +19,7 @@ const jobId = "fictional-role";
 const hash = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
 export async function startDemo(root: string) {
   const inputs = await initializeRuntime(root);
-  for (const name of ["candidate.json", "preferences.md", "resumes.json", "alex-morgan-resume.pdf"]) {
+  for (const name of ["candidate.json", "preferences.md", "resumes.json", "alex-liu-resume.pdf"]) {
     await copyFile(join(projectRoot, "examples", name), join(root, "data", name));
   }
   const candidate = JSON.parse(await readFile(join(root, "data/candidate.json"), "utf8"));
@@ -27,8 +27,8 @@ export async function startDemo(root: string) {
   const checked = await runPreflight({ category: "llm", jobUrl, profilePath: join(root, "data/candidate.json"), manifestPath: join(root, "data/resumes.json") });
   const now = new Date().toISOString(), day = now.slice(0, 10);
   await upsertJob(inputs.jobsPath, { jobId, company: "Example Labs (fictional)", title: "Software Engineer - Demo", location: "Example City", category: "llm", officialUrl: jobUrl, sources: ["user-provided"], firstSeen: day, lastVerified: day, note: "Local fictional fixture only", status: "ready" });
-  await createApplication(inputs.trackerPath, { applicationId: appId, jobId, company: "Example Labs (fictional)", title: "Software Engineer - Demo", location: "Example City", category: "llm", jobUrl, applicationUrl: jobUrl + "/apply", ats: "long-tail", cvFilename: "alex-morgan-resume.pdf" });
-  const item: ReviewItem = { applicationId: appId, company: "Example Labs (fictional)", title: "Software Engineer - Demo", location: "Example City", category: "llm", ats: "long-tail", officialUrl: jobUrl, applicationUrl: jobUrl + "/apply", cv: { filename: "alex-morgan-resume.pdf", verified: false }, snapshotId: "fixture-unprepared", snapshotCurrent: false, reviewStage: "questions", answers: [], consents: [], questions: [{ id: "relocation", prompt: "Are you willing to relocate for this fictional role?", required: true, options: [{ id: "yes", label: "Yes" }, { id: "no", label: "No" }] }], validationErrors: [], friction: [], preparedAt: now, decision: { state: "pending" } };
+  await createApplication(inputs.trackerPath, { applicationId: appId, jobId, company: "Example Labs (fictional)", title: "Software Engineer - Demo", location: "Example City", category: "llm", jobUrl, applicationUrl: jobUrl + "/apply", ats: "long-tail", cvFilename: "alex-liu-resume.pdf" });
+  const item: ReviewItem = { applicationId: appId, company: "Example Labs (fictional)", title: "Software Engineer - Demo", location: "Example City", category: "llm", ats: "long-tail", officialUrl: jobUrl, applicationUrl: jobUrl + "/apply", cv: { filename: "alex-liu-resume.pdf", verified: false }, snapshotId: "fixture-unprepared", snapshotCurrent: false, reviewStage: "questions", answers: [], consents: [], questions: [{ id: "relocation", prompt: "Are you willing to relocate for this fictional role?", required: true, options: [{ id: "yes", label: "Yes" }, { id: "no", label: "No" }] }], validationErrors: [], friction: [], preparedAt: now, decision: { state: "pending" } };
   await createReviewBatch(inputs.reviewPath, { schemaVersion: 1, batchId: "fictional-demo", createdAt: now, applications: [item] });
   const review = await startReviewServer({ ...inputs, port: 0 });
   let fixturePort = 0;
@@ -48,7 +48,7 @@ export async function startDemo(root: string) {
       if (typeof data !== "object" || data === null || Object.keys(data).sort().join() !== ["name", "email", "summary", "relocation", "resumeName", "resumeBase64"].sort().join() || Object.values(data).some(v => typeof v !== "string")) throw new Error("invalid_form");
       if (data.name !== candidate.identity.fullName || data.email !== candidate.contact.email) throw new Error("candidate_facts_mismatch");
       if (!data.summary.trim() || data.summary.length > 2000) throw new Error("summary_required");
-      if (data.resumeName !== "alex-morgan-resume.pdf" || hash(Buffer.from(data.resumeBase64, "base64")) !== checked.cvSha256) throw new Error("resume_mismatch");
+      if (data.resumeName !== "alex-liu-resume.pdf" || hash(Buffer.from(data.resumeBase64, "base64")) !== checked.cvSha256) throw new Error("resume_mismatch");
       if (!["", "yes", "no"].includes(data.relocation)) throw new Error("invalid_relocation");
       const application = (await readApplicationTracker(inputs.trackerPath)).applications[0]!;
       if (["submitted", "confirmed"].includes(application.status)) throw new Error("already_submitted");

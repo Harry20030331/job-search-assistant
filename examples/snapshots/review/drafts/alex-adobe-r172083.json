@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "jobId": "alex-adobe-r172083",
+  "identitySha256": "c670969ee5f18fb08d1f79e489cbeba796f47f61f380bb06d26434554464103a",
+  "cvVerified": false,
+  "snapshotId": "example:alex-liu:review:alex-adobe-r172083:v1",
+  "answers": [],
+  "consents": [],
+  "questions": [],
+  "validationErrors": [],
+  "friction": [
+    "Saved fictional review checkpoint; live form values and resume upload are unverified."
+  ],
+  "snapshotCurrent": false,
+  "reviewStage": "questions",
+  "preparedAt": "2026-10-30T00:00:00.000Z",
+  "decision": {
+    "state": "pending"
+  }
+}

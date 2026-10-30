@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "jobId": "alex-nooks-311d6e70",
+  "identitySha256": "8f2e4b6812e88ef60beae0ba73c5c48d95047721bab0a21ffcf510c904c4131a",
+  "cvVerified": false,
+  "snapshotId": "example:alex-liu:review:alex-nooks-311d6e70:v1",
+  "answers": [],
+  "consents": [],
+  "questions": [
+    {
+      "id": "relocation",
+      "prompt": "Are you able to come in to the San Francisco office 3 days per week (Monday, Tuesday, Thursday)?",
+      "required": true,
+      "options": [
+        {
+          "id": "relocate",
+          "label": "Yes, but I will need to relocate"
+        },
+        {
+          "id": "no",
+          "label": "No. I do not live locally nor do I plan to relocate"
+        }
+      ]
+    }
+  ],
+  "validationErrors": [],
+  "friction": [
+    "Saved fictional review checkpoint; live form values and resume upload are unverified."
+  ],
+  "snapshotCurrent": false,
+  "reviewStage": "questions",
+  "preparedAt": "2026-10-30T00:00:00.000Z",
+  "decision": {
+    "state": "pending"
+  }
+}
