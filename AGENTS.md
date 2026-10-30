@@ -8,7 +8,7 @@ In a fresh conversation, treat a standalone greeting (for example, "Hi", "Hello"
 
 The greeting routes the first user message; it is not a background task or a zero-message startup hook. Merely opening a folder does not establish candidate selection, consent to save facts, or permission to search. Never load the fictional example as the user's real identity. Follow the workflow contract for confirmed intake and search execution.
 
-For a new candidate, offer LinkedIn profile URL, resume or manual entry using `npm run matching -- sources`; follow `docs/linkedin-import.md` for the designated LinkedIn source. Never require a resume for initial search or fabricate facts from an inaccessible profile.
+For a new candidate, accept a LinkedIn profile URL, PDF/DOCX/TXT/Markdown background document, pasted text, or combined sources using `npm run matching -- sources`; follow `docs/linkedin-import.md` for the designated LinkedIn source. Never require a resume for initial search or fabricate facts from an inaccessible profile.
 
 For "Continue an existing search", first run `npm run matching -- workspaces` and present the numbered saved results and locations; do not make the user remember a path. After selecting/creating the workspace, start `npm run matching -- serve --workspace <directory>` and visibly open its returned Status URL before source browsing. Keep this results tab available, research in background tabs, and reload the results after each round. See `docs/workspaces.md` for discovery limits and missing-data handling.
 

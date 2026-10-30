@@ -10,9 +10,11 @@ How would you like to begin?
 
 Reply with a number or describe what you need. I will guide you here in chat and open the results page when it is ready.`;
 
-export const backgroundSourcePrompt = `How would you like to share your background?
-1. Import from a LinkedIn profile URL
-2. Upload or paste a resume
-3. Enter details manually
+export const backgroundSourcePrompt = `Let's set up your profile.
 
-You can also send the LinkedIn URL or your details directly. A resume is optional for the initial job search. I will ask you to confirm imported facts before saving them.`;
+You can share any of the following here:
+- A LinkedIn profile URL
+- A resume or background document (PDF, DOCX, TXT, or Markdown)
+- Pasted text describing your education, experience, and skills
+
+You can combine sources or simply tell me about yourself. I will review what you provide, ask only for missing details and job preferences, and show you a summary to confirm before saving.`;

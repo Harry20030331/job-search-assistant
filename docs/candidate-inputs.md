@@ -29,3 +29,5 @@ Initialization refuses an existing target. It creates empty opportunities, draft
 Resume existing runtime records with the same `--runtime-dir`; do not reinitialize over them. A service restart does not prove an employer form survived. See [workflow contract](workflow-contract.md).
 
 LinkedIn URL intake uses the in-app Browser and a read-only [source-backed preview](linkedin-import.md) before confirmation. Inaccessible profile fields remain unknown; the existing candidate is never overwritten by preview. Resume input is an alternative rather than a requirement for initial search.
+
+For new setup, accept PDF/DOCX/TXT/Markdown background documents and pasted text alongside LinkedIn URLs. Users may combine sources for the same candidate. Follow the document-reading and conflict-confirmation guidance in [Interactive Matching](matching-chat.md); attachment alone does not establish successful extraction or approval as an application resume.

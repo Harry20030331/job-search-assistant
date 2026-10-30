@@ -6,7 +6,7 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
 - `npm run ui:check`: verify the frozen UI v1 baseline.
 - `npm run matching -- welcome`: print the English first-contact message without reading or changing candidate data. New project chats route `Hi` or `Start` to this welcome; see [welcome](welcome.md).
-- `npm run matching -- sources`: show the English LinkedIn/resume/manual input choices.
+- `npm run matching -- sources`: show the English invitation to share a LinkedIn URL, PDF/DOCX/TXT/Markdown document, pasted text, or a combination of sources.
 - `npm run matching -- linkedin-preview --input <observations.json>`: validate and preview visible facts from the designated profile without saving. Optional `--workspace <existing-directory>` reports conflicts; see [LinkedIn intake](linkedin-import.md).
 - `npm run matching -- example --workspace <new-directory>`: copy and register the fictional inputs without running the scripted demo, then serve/open this workspace before live research.
 - `npm run matching -- workspaces`: discover and summarize saved results before asking which to resume; see [workspaces](workspaces.md).

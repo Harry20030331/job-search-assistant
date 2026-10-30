@@ -4,11 +4,7 @@ The handoff's LinkedIn input is an explicit supported choice alongside resume an
 
 ## English interaction
 
-When no source was supplied, display `npm run matching -- sources`:
-
-1. Import from a LinkedIn profile URL
-2. Upload or paste a resume
-3. Enter details manually
+When no source was supplied, display `npm run matching -- sources`, inviting a LinkedIn profile URL, a PDF/DOCX/TXT/Markdown resume or background document, pasted text, or combined sources. Accept the source directly rather than requiring another numbered choice. Already supplied documents are read before requesting more material.
 
 If the user selects LinkedIn, ask "Please share the LinkedIn profile URL you would like me to use. I will import the visible information and ask you to confirm it before saving." A user-provided profile URL is the designated source; do not search for a different person with the same name. The initial search needs no resume PDF. An approved PDF remains necessary before employer-form preparation.
 
