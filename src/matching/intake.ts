@@ -21,7 +21,7 @@ const intake = z.object({
     schemaVersion: z.literal(2),
     identity: z.object({ fullName: line }).passthrough(),
     summary: line, skills: z.array(line).min(1),
-    education: z.array(z.record(z.unknown())), experiences: z.array(z.record(z.unknown()))
+    education: z.array(z.record(z.unknown())).optional(), experiences: z.array(z.record(z.unknown())).optional()
   }).passthrough(),
   preferences: z.string().trim().min(1).max(20000), rules
 }).strict();
@@ -34,14 +34,19 @@ export function workspaceMatchingPaths(directory: string): MatchingPaths {
 /** Search intake is deliberately smaller than employer-application onboarding. */
 export async function createMatchingWorkspace(directory: string, input: unknown, registryPath?: string) {
   const parsed = intake.parse(input);
-  if (!parsed.candidate.education.length && !parsed.candidate.experiences.length) throw new Error("matching_background_required");
+  const metadata = z.record(z.unknown()).parse(parsed.candidate._meta ?? {});
+  if (metadata.linkedinImport !== undefined) {
+    const imported = z.object({ sourceUrl: z.string(), observedAt: z.string().datetime(), state: z.literal("pending_confirmation"), evidence: z.array(z.object({ field: z.string(), reference: z.string() }).strict()) }).strict().parse(metadata.linkedinImport);
+    metadata.linkedinImport = { ...imported, state: "confirmed", confirmedAt: new Date().toISOString(), confirmationReference: parsed.reference };
+  }
+  if (!parsed.candidate.education?.length && !parsed.candidate.experiences?.length) throw new Error("matching_background_required");
   const root = resolve(directory);
   // Exclusive initialization: a second candidate can never overwrite or merge with a current case.
   await initializeRuntime(root);
   try {
     const paths = workspaceMatchingPaths(root);
     await writeFile(paths.profile, JSON.stringify({ ...parsed.candidate,
-      _meta: { ...((parsed.candidate._meta as object | undefined) ?? {}), intake: { reference: parsed.reference, confirmedAt: new Date().toISOString() } }
+      _meta: { ...metadata, intake: { reference: parsed.reference, confirmedAt: new Date().toISOString() } }
     }, null, 2) + "\n", { mode: 0o600, flag: "wx" });
     await writeFile(paths.preferences, "# Candidate search preferences\n\n" + parsed.preferences + "\n", { mode: 0o600, flag: "wx" });
     // Search needs an explicit category, but does not need an approved application attachment.

@@ -8,6 +8,8 @@ As of 2026-10-29, a first greeting in a new job-seeker chat routes to the Englis
 
 The 2026-10-29 setup refinement discovers saved searches before asking for a workspace path. Once the user selects or confirms a workspace, start and visibly open its local Status website before external research; refresh it after publication. Listing and serving do not initialize or switch candidate data. See [workspaces](workspaces.md).
 
+The 2026-10-29 input refinement explicitly offers designated LinkedIn URL, resume and manual entry. LinkedIn facts require actual visible-page observations and user confirmation before new intake; blocked access yields an honest alternative and never inferred facts. Resume is optional for discovery. Read-only previews cannot overwrite confirmed candidate data; see [LinkedIn intake](linkedin-import.md).
+
 Discovery may begin from confirmed search inputs without an approved resume PDF. The Matching intake creates a new isolated workspace and records explicit categories in its preferences. An empty resume manifest permits search only; application preparation still requires complete applicable inputs, a mapped approved PDF and preflight. Interactive Matching takes candidate input and feedback through Codex chat; see [chat intake](matching-chat.md). This discovery/application distinction was clarified on 2026-10-25.
 
 Use Codex's in-app Browser for page actions. Load fresh candidate facts and preferences and the explicit category's approved CV through [candidate-inputs](candidate-inputs.md). Canonical facts override ATS parser output. Preflight validates the official HTTPS URL, category mapping and PDF hash; visibly verify the uploaded filename in the actual form.

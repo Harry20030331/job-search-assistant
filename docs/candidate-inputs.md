@@ -15,7 +15,7 @@ The example preferences apply only to the fictional candidate. Known answers ret
 
 ## Runtime
 
-Interactive search intake uses Codex chat: provide a background/resume and search preferences, review the extracted summary, and let Codex run the validated [Matching intake](matching-chat.md). Users do not need to author JSON. Intake creates a fresh isolated candidate workspace with an empty resume manifest; it cannot replace existing cases. Initial search can proceed, while application preflight continues to require approved PDFs. This is search intake, not the complete application-onboarding validator.
+Interactive search intake uses Codex chat: provide a designated LinkedIn profile URL, background/resume and search preferences, review the extracted summary, and let Codex run the validated [Matching intake](matching-chat.md). Users do not need to author JSON. Intake creates a fresh isolated candidate workspace with an empty resume manifest; it cannot replace existing cases. Initial search can proceed, while application preflight continues to require approved PDFs. This is search intake, not the complete application-onboarding validator.
 
 Run `npm run review` to use the current working state, automatically supplying the default fictional candidate when data is absent. `data/candidate.json` is the editable working profile. Use `npm run example:load` to replace current state from a saved case; changes remain local and do not alter `examples/`. Stop active writers before loading; the previous state is backed up locally.
 
@@ -27,3 +27,5 @@ npm run review -- --runtime-dir /tmp/my-new-runtime
 Initialization refuses an existing target. It creates empty opportunities, drafts and discovery state, not personal facts or approvals. Real inputs remain at the paths passed to preflight/profile. If using default commands, place user-owned input files under the ignored runtime `data/` and run commands with their explicit paths. The repository root is not a live personal installation.
 
 Resume existing runtime records with the same `--runtime-dir`; do not reinitialize over them. A service restart does not prove an employer form survived. See [workflow contract](workflow-contract.md).
+
+LinkedIn URL intake uses the in-app Browser and a read-only [source-backed preview](linkedin-import.md) before confirmation. Inaccessible profile fields remain unknown; the existing candidate is never overwritten by preview. Resume input is an alternative rather than a requirement for initial search.
