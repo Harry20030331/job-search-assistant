@@ -42,16 +42,16 @@ The target workspace must not exist. Intake creates canonical candidate/preferen
 }
 ```
 
-For an existing selected candidate, skip intake and use their existing workspace or explicit input paths. A search-only intake does not satisfy complete application onboarding: preflight still rejects an empty approved resume manifest before filling.
+For an existing candidate, first list saved searches with `npm run matching -- workspaces` and let the user select a numbered result. Only ask for a path as a fallback when discovery cannot find the intended case. Skip intake when resuming. A search-only intake does not satisfy complete application onboarding: preflight still rejects an empty approved resume manifest before filling.
 
 ## Initial search
 
-1. Read `matching context` and the shared library; state the active candidate and scope in chat.
+1. Read `matching context` and the shared library; state the active candidate and scope in chat. Before source browsing, start `npm run matching -- serve --workspace <workspace>` in a persistent terminal session and open its returned `statusUrl` visibly in the in-app Browser. Reuse the conversation's existing session if available. Keep this results tab while researching external pages in background tabs; refresh it after publication. A saved URL from another workspace is not interchangeable.
 2. Browse one or more supported source lists and official requisitions. Bound the search and distinguish partial sampling from a completed source scan.
 3. Assess qualifications, timing and preferences against actual candidate facts. Do not invent experience, employer availability, geographic eligibility or verification dates. Ranking and prose analysis are performed by Codex on the observed material.
 4. Write the current-context round to a private temporary file and run `npm run matching -- publish --workspace <workspace> --input <round.json>`. See [Matching](matching.md) for its schema. The agent constructs it; the user does not.
 5. Show official links, matches, gaps and questions in chat. Accepted recommendations are `ready`; conditional research leads are `new`. Both appear under the fixed Shortlisted projection, so clearly distinguish them in the chat explanation. Rejected new leads need not enter the library. A failed page connection is not employer closure.
-6. Open Status for that workspace and invite the user to give feedback in ordinary language here.
+6. Reload the already-open Status tab for that workspace, bring it back into view and invite the user to give feedback in ordinary language here. If the local service failed, explain the failure and recover it before claiming the results are visible.
 
 ## Real feedback turn
 

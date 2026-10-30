@@ -11,6 +11,7 @@ Maintain shared project documentation in this repository's `docs/` directory. Th
 ## Development and operation
 
 - [Welcome and setup](welcome.md): open the project, send Hi, and follow the English candidate setup flow.
+- [Saved searches and website startup](workspaces.md): discover existing results and open their local website before browsing sources.
 
 - [Structure](structure.md): files, data ownership and workspace lifecycle.
 - [Commands](commands.md): runnable entrypoints and record updates.

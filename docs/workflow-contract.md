@@ -6,6 +6,8 @@ Normative operational policy for this repository, consolidated on 2026-10-15. Re
 
 As of 2026-10-29, a first greeting in a new job-seeker chat routes to the English welcome/setup flow in [welcome](welcome.md). This is a first-message instruction, not a zero-message startup trigger; welcome alone selects no candidate and authorizes no state changes or browsing. Explicit development requests retain their normal workflow.
 
+The 2026-10-29 setup refinement discovers saved searches before asking for a workspace path. Once the user selects or confirms a workspace, start and visibly open its local Status website before external research; refresh it after publication. Listing and serving do not initialize or switch candidate data. See [workspaces](workspaces.md).
+
 Discovery may begin from confirmed search inputs without an approved resume PDF. The Matching intake creates a new isolated workspace and records explicit categories in its preferences. An empty resume manifest permits search only; application preparation still requires complete applicable inputs, a mapped approved PDF and preflight. Interactive Matching takes candidate input and feedback through Codex chat; see [chat intake](matching-chat.md). This discovery/application distinction was clarified on 2026-10-25.
 
 Use Codex's in-app Browser for page actions. Load fresh candidate facts and preferences and the explicit category's approved CV through [candidate-inputs](candidate-inputs.md). Canonical facts override ATS parser output. Preflight validates the official HTTPS URL, category mapping and PDF hash; visibly verify the uploaded filename in the actual form.

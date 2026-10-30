@@ -119,7 +119,7 @@ test("remote-only feedback turns an unknown work mode into a saved research ques
 test("offline demo is isolated and refuses to replace existing state", async () => {
   const parent = await mkdtemp(join(tmpdir(), "matching-demo-")); roots.push(parent);
   const root = join(parent, "case");
-  const demo = await runMatchingDemo(root);
+  const demo = await runMatchingDemo(root, join(parent, "index.json"));
   expect(demo.before.filter(r => r.decision === "recommend")).toHaveLength(2);
   expect(demo.after.filter(r => r.decision === "recommend").map(r => r.jobId)).toEqual(["fictional-meadow"]);
   await expect(runMatchingDemo(root)).rejects.toThrow();

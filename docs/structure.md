@@ -28,6 +28,8 @@ The source workflow's private archive and runtime are excluded. Inert regional a
 
 See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contract](ui-contract.md), and [workflow contract](workflow-contract.md).
 
+Ignored `local/search-workspaces.json` indexes known workspace paths only; it is not a second job store. Matching intake and fictional workspace creation register paths for resume discovery. See [saved searches](workspaces.md).
+
 ## Example and local workspace
 
 `examples/` contains saved fictional state. `data/` is the current working state. `npm run review` opens existing data; when data is absent, it supplies the default Alex case. `npm run example:load` replaces current data with the default example; `--from <directory>` selects another bundle, and `--dir <workspace>` selects the destination workspace. Stop Review and other writers before loading.

@@ -8,6 +8,8 @@ In a fresh conversation, treat a standalone greeting (for example, "Hi", "Hello"
 
 The greeting routes the first user message; it is not a background task or a zero-message startup hook. Merely opening a folder does not establish candidate selection, consent to save facts, or permission to search. Never load the fictional example as the user's real identity. Follow the workflow contract for confirmed intake and search execution.
 
+For "Continue an existing search", first run `npm run matching -- workspaces` and present the numbered saved results and locations; do not make the user remember a path. After selecting/creating the workspace, start `npm run matching -- serve --workspace <directory>` and visibly open its returned Status URL before source browsing. Keep this results tab available, research in background tabs, and reload the results after each round. See `docs/workspaces.md` for discovery limits and missing-data handling.
+
 Work on a feature branch and use a pull request for team review. Keep documentation, UI text, examples, comments and test descriptions in English. External-language recognition patterns and intentional non-English rejection probes may use Unicode escapes; do not translate away their behavior. Use fictional fixtures only. Never copy personal histories or credentials.
 
 ## Active authorities

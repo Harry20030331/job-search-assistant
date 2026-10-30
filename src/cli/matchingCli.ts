@@ -2,11 +2,30 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { matchingContext, publishMatchingRound, saveMatchingPreferences, type MatchingPaths } from "../matching/matching.js";
-import { createMatchingWorkspace, readIntakeFile, workspaceMatchingPaths } from "../matching/intake.js";
+import { createExampleSearchWorkspace, createMatchingWorkspace, readIntakeFile, workspaceMatchingPaths } from "../matching/intake.js";
 import { matchingWelcome } from "../matching/welcome.js";
+import { listMatchingWorkspaces, rememberWorkspace } from "../matching/workspaces.js";
+import { startMatchingSurface } from "../matching/surface.js";
 
 export async function runMatchingCli(args: string[]) {
   const [operation, ...rest] = args;
+  if (operation === "example") {
+    if (rest.length !== 2 || rest[0] !== "--workspace" || !rest[1] || rest[1].startsWith("--")) throw new Error("invalid_arguments");
+    return createExampleSearchWorkspace(rest[1]);
+  }
+  if (operation === "serve") {
+    if (rest.length !== 2 || rest[0] !== "--workspace" || !rest[1] || rest[1].startsWith("--")) throw new Error("invalid_arguments");
+    const { server: _server, ...urls } = await startMatchingSurface(rest[1]);
+    return urls;
+  }
+  if (operation === "workspaces") {
+    if (rest.length) throw new Error("invalid_arguments");
+    return listMatchingWorkspaces();
+  }
+  if (operation === "remember") {
+    if (rest.length !== 2 || rest[0] !== "--workspace" || !rest[1] || rest[1].startsWith("--")) throw new Error("invalid_arguments");
+    return { registered: await rememberWorkspace(rest[1]) };
+  }
   if (operation === "welcome") {
     if (rest.length) throw new Error("invalid_arguments");
     return matchingWelcome;

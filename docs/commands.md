@@ -6,6 +6,10 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
 - `npm run ui:check`: verify the frozen UI v1 baseline.
 - `npm run matching -- welcome`: print the English first-contact message without reading or changing candidate data. New project chats route `Hi` or `Start` to this welcome; see [welcome](welcome.md).
+- `npm run matching -- example --workspace <new-directory>`: copy and register the fictional inputs without running the scripted demo, then serve/open this workspace before live research.
+- `npm run matching -- workspaces`: discover and summarize saved results before asking which to resume; see [workspaces](workspaces.md).
+- `npm run matching -- remember --workspace <existing-directory>`: index an explicitly selected existing search locally.
+- `npm run matching -- serve --workspace <existing-directory>`: start the chosen website on an available loopback port; keep the session alive and open its Status URL before research.
 - `npm run matching -- intake --workspace <new-directory> --input <confirmed-intake.json>`: initialize confirmed search inputs without a resume; see [chat intake](matching-chat.md). The directory must not exist. Other Matching commands accept `--workspace <directory>` as a shortcut for all four canonical input paths.
 - `npm run matching -- context`: read selected candidate inputs and the current Matching context token.
 - `npm run matching -- feedback --input <command.json>`: save explicit preference feedback with a version check; a new screening round is required.
