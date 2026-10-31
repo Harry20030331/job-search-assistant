@@ -15,7 +15,7 @@ npm run interview -- stage <same-context-flags> --expected-token <token> --outpu
 npm run interview:prepare -- proposal --workspace <absolute-new-run>/work --output <absolute-new-run>/proposal-v1
 ```
 
-The second command invokes the model. Present `proposal.md` in chat and wait for actual acceptance of that exact version. A requested edit creates a revised proposal; prior acceptance does not transfer. When accepted:
+The second command invokes the model. Present `proposal.md` in chat or publish the current plan to the linked workbench for review. Wait for actual acceptance of that exact version in chat or through the website button. The website queues the matching practice job; do not also start a second chat generation. See [website actions](../../../docs/interview-web-actions.md). A requested edit creates a revised proposal; prior acceptance does not transfer. When accepted:
 
 ```text
 npm run interview:approve -- --workspace <run>/work --proposal <proposal-dir>/accepted.json --decision accept --origin human_current_chat --evidence <actual-approval-reference> --output <new-approval-file>

@@ -45,6 +45,7 @@ const simulationExerciseSchema = legacyExerciseSchema.extend({ exercise_type: z.
 const snapshotSchema = z.object({ schemaVersion: z.literal(1), candidateAnchor: anchorSchema,
   application: z.object({ job_id: id, application_id: id.nullable(), interview_id: id, company: id, role: id }).passthrough(),
   freshness: z.enum(["current", "stale"]),
+  generation: z.object({ job_id: id, status: z.enum(["queued", "running", "ready", "failed"]), updated_at: z.string(), error_code: z.string().nullable() }).strict().nullable().optional(),
   proposal: z.object({ proposal_id: id, version: z.number().int().positive(), draft: draftSchema,
     proposal_hash: id, status: z.string() }).strict().nullable(),
   materials: z.object({ material_format: z.literal("simulation-v2").optional(), question_bank: z.array(simulationExerciseSchema).optional(), sections: z.array(z.object({ section_id: z.string(), minutes: z.number(),
@@ -182,4 +183,20 @@ export async function readInterviewBoard(paths: WorkbenchPaths, exporter = expor
   }
   if (stable(await candidateAnchor(paths.profilePath)) !== stable(value.candidateAnchor)) throw new Error("interview_candidate_changed");
   return result.sort((a, b) => (a.entry.schedule?.start ?? "9999").localeCompare(b.entry.schedule?.start ?? "9999") || a.entry.interviewId.localeCompare(b.entry.interviewId));
+}
+
+/** Keep the registry's explicit recruiting state; elapsed time is a display fact. */
+export function interviewEnded(item: InterviewBoardItem, now = Date.now()): boolean {
+  return item.entry.state !== "cancelled" && item.entry.schedule !== null &&
+    ["scheduled", "completed"].includes(item.entry.state) && Date.parse(item.entry.schedule.end) <= now;
+}
+
+export async function withInterviewRun<T>(paths: WorkbenchPaths, interviewId: string, expectedRevision: number,
+  change: (item: InterviewBoardItem) => Promise<T>, exporter = exportInterview): Promise<T> {
+  return mutate(paths, async () => {
+    const item = (await readInterviewBoard(paths, exporter)).find(item => item.entry.interviewId === interviewId);
+    if (!item || item.entry.revision !== expectedRevision || !item.entry.workspace || item.entry.state === "cancelled" ||
+        !item.snapshot || item.snapshot.freshness !== "current" || item.problem) throw new Error("interview_plan_conflict");
+    return change(item);
+  });
 }

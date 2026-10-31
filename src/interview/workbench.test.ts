@@ -7,6 +7,7 @@ import { isOpportunityPath, readOpportunities } from "../storage/opportunities.j
 import { transitionApplication } from "../tracker.js";
 import { startReviewServer, type RunningReviewServer } from "../review/reviewServer.js";
 import { renderInterviewPage } from "./interviewView.js";
+import { acknowledgeNotice, pendingNotices } from "./notifications.js";
 
 const roots: string[] = [], servers: RunningReviewServer[] = [];
 afterEach(async () => { await Promise.all(servers.splice(0).map(s => s.close())); await Promise.all(roots.splice(0).map(path => rm(path, { recursive: true, force: true }))); });
@@ -85,9 +86,48 @@ test("interview rendering escapes source text, distinguishes approvals, and pres
   const data = await snapshot(paths); data.proposal!.draft.sections[0]!.objective = '<img src=x onerror="alert(1)">';
   await publishInterview(paths, "interview-1", join(root, "work"), 1, async () => data);
   const page = renderInterviewPage(await readInterviewBoard(paths, async () => data), "interview-1", "preparation");
-  expect(page).toContain("&lt;img"); expect(page).not.toContain('<img src=x'); expect(page).toContain("Awaiting your approval in chat");
+  expect(page).toContain("&lt;img"); expect(page).not.toContain('<img src=x'); expect(page).toContain("Awaiting your approval");
   expect(page).not.toContain("<form"); expect(page).toContain("30-minute plan");
   expect(renderInterviewPage([])).toContain("Room for your next conversation");
+});
+
+test("website plan approval binds the version and disables stale, cancelled and ready plans", async () => {
+  const { paths } = await setup(); await linkInterview(paths, link());
+  const data = await snapshot(paths); data.proposal!.draft.context_hash = "context";
+  const item = (await readInterviewBoard(paths))[0]!; item.snapshot = data;
+  const page = renderInterviewPage([item], "interview-1", "preparation");
+  expect(page).toContain("Approve plan & generate practice"); expect(page).toContain("data-plan-decision=");
+  expect(page).toContain("&quot;proposalId&quot;:&quot;plan-1&quot;");
+  expect(page).toContain("Describe revisions in Codex chat");
+  data.freshness = "stale"; expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");
+  data.freshness = "current"; item.entry.state = "cancelled";
+  expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");
+});
+
+test("notification dismissal and chat delivery are independent durable receipts", async () => {
+  const { paths } = await setup(); const record = link(); record.schedule.start = "2020-10-29T10:00:00-07:00"; record.schedule.end = "2020-10-29T11:00:00-07:00";
+  await linkInterview(paths, record);
+  const notices = await pendingNotices(paths, "website"); expect(notices).toHaveLength(1);
+  await acknowledgeNotice(paths, notices[0]!.id, "website"); expect(await pendingNotices(paths, "website")).toEqual([]);
+  expect(await pendingNotices(paths, "chat")).toHaveLength(1);
+  await acknowledgeNotice(paths, notices[0]!.id, "chat"); expect(await pendingNotices(paths, "chat")).toEqual([]);
+  expect(await acknowledgeNotice(paths, notices[0]!.id, "chat")).toBe(false);
+  await expect(acknowledgeNotice(paths, "wrong-id", "website")).rejects.toThrow("interview_notice_changed");
+});
+
+test("interview browser writes require exact origin, CSRF, JSON and a valid current plan", async () => {
+  const { paths, root } = await setup(); await linkInterview(paths, link());
+  const server = await startReviewServer({ ...paths, reviewPath: join(root, "drafts"), jobsPath: paths.trackerPath, port: 0 }); servers.push(server);
+  const state = await (await fetch(server.address + "/api/interviews/state")).json() as { csrf: string };
+  const headers = { "content-type": "application/json", "x-interview-csrf": state.csrf, origin: server.address };
+  const post = (extra: Record<string,string>, body = "{}") => fetch(server.address + "/api/interviews/approve-plan", { method: "POST", headers: extra, body });
+  expect((await post({ "content-type": "application/json" })).status).toBe(403);
+  expect((await post({ ...headers, origin: "https://example.invalid" })).status).toBe(403);
+  expect((await post({ ...headers, "x-interview-csrf": "incorrect" })).status).toBe(403);
+  expect((await post({ ...headers, "content-type": "text/plain" })).status).toBe(415);
+  expect((await post(headers)).status).toBe(400);
+  expect((await post(headers, JSON.stringify({ interviewId: "interview-1", expectedRevision: 999, proposalId: "plan-1", proposalHash: "hash-1", proposalVersion: 1, retry: false }))).status).toBe(409);
+  expect((await fetch(server.address + "/assets/interview-actions.js")).status).toBe(200);
 });
 test("same Review service exposes read-only interviews and existing shared lifecycle", async () => {
   const { paths, root } = await setup(); await linkInterview(paths, link());

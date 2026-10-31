@@ -4,7 +4,7 @@ Run these commands from the repository root. For directory ownership see [struct
 
 - `npm run example:load`: replace the working state from the default fictional example. Add `-- --from <example-directory> --dir <existing-workspace>` to select source and destination. Stop Review and other writers first. The prior data is backed up locally; the command prints its path.
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
-- `npm run ui:check`: verify the frozen UI v1 baseline.
+- `npm run ui:check`: verify the active frozen UI baseline.
 - `npm run matching -- intake --workspace <new-directory> --input <confirmed-intake.json>`: initialize confirmed search inputs without a resume; see [chat intake](matching-chat.md). The directory must not exist. Other Matching commands accept `--workspace <directory>` as a shortcut for all four canonical input paths.
 - `npm run matching -- context`: read selected candidate inputs and the current Matching context token.
 - `npm run matching -- feedback --input <command.json>`: save explicit preference feedback with a version check; a new screening round is required.
@@ -28,6 +28,10 @@ Run these commands from the repository root. For directory ownership see [struct
 
 ## Interview commands
 
+`npm run interview:virtual-tests -- --output <new-private-absolute-directory>` runs the virtual mailbox/calendar infrastructure suite without Google or model calls. Add `--live-classifier` for actual Codex classification of the synthetic messages; repeat `--case VM01` to select cases. See [virtual testing](interview-virtual-testing.md) for scope, outputs and interpretation.
+
+`npm run interview:notifications -- pending|ack --runtime-dir <absolute-selected-runtime>` reads pending chat follow-ups or records delivery with `--id`. Pending excludes fictional scenarios unless `--include-synthetic` is explicitly supplied. Register a candidate-scoped thread heartbeat for actual chat delivery; this CLI does not send a message itself. See [website approval and reminders](interview-web-actions.md).
+
 `npm run interview:enrich -- start|next|record|finish` runs bounded evidence research in the current Codex chat. The active search tool and in-app Browser execute its reserved actions; Python stores receipts and exports a context request without fetching pages or calling another LLM. `npm run interview:enrichment-checks -- --output <new-private-directory>` runs eight offline protocol scenarios, not a model retrieval benchmark. See [enrichment protocol](interview-enrichment.md).
 
 `npm run interview:learning -- bind|attach|revoke` explicitly connects a selected canonical candidate source to an existing account learning store, retrieves scoped active practice evidence read-only before context capture, or revokes a binding. It makes no Google/model calls. See [candidate learning](interview-learning.md) for provenance, scope and required absolute-path flags.
@@ -45,6 +49,8 @@ Run these commands from the repository root. For directory ownership see [struct
 `npm run interview:preparation-controls -- export|judge|report` diagnoses the unchanged semantic judge on 12 authored strong/partial/severe controls from four fictional stories. Export takes a new `--output`; judge/report take `--pack`, with optional host-only `--judge-env` for paid judge calls. Labels and packets freeze before judging. See [challenge controls](interview-preparation-controls.md); developer expectations are not independently validated labels or agent performance.
 
 `npm run interview:benchmark -- --run <absolute-new-output-outside-the-checkout>` runs the current-workflow simple-instruction developer batch and exports reports/review forms. Add `--judge --judge-env <absolute-local-dotenv>` for the independent OpenRouter audit. `npm run interview:review -- compare --batch <absolute-batch> --ratings <absolute-csv>` compares completed human scores. See [the protocol](interview-workflow-benchmark.md) for isolation, fixed sample selection, limits and resumption rules.
+
+Add `--method source-id-catalog-v1` in a new run directory to test exact source-reference guidance and schema constraints separately from the unchanged default baseline. See [source-reference repair](interview-source-reference-fix.md); method and implementation changes cannot resume an older run.
 
 See [Interview](interview.md) for Python setup, complete flags, the source-version token and an offline example. Run `npm run interview -- context --workspace <candidate-workspace> --job-id <stable-id> --settings <settings.json> --invitation <invitation.txt>` to inspect the read-only handoff. `stage` additionally requires `--expected-token <token> --output <new-absolute-directory>` and creates an isolated local workspace, without Google/model calls or shared-ledger writes.
 

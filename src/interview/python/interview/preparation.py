@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from interview.schemas import Contract
+from interview.schemas import Contract, strict_schema
 from interview.storage import Store, canonical, digest
 from interview.freshness import binding as source_binding, check as check_source
 
@@ -81,6 +81,47 @@ def known_refs(store):
     refs.update(r["record_id"] for r in store.rows("history"))
     refs.update(r["memory_id"] for r in store.rows("memories") if r["status"] == "active")
     return refs
+
+
+SOURCE_REFERENCE_CONTRACT = "source-id-catalog-v1"
+SOURCE_REFERENCE_POLICY_REVISION = 3
+SOURCE_REFERENCE_GUIDANCE = "Copy source_refs and basis_refs exactly from allowed_source_ids. Mail Message-ID headers, URLs, filenames and descriptive labels are not source IDs. Read the corresponding evidence using the catalog's access method before citing it; do not cite the entire catalog indiscriminately. Reserved profile/application references come from context.get, not documents.read. If explicit preparation priorities are absent, propose evidence-based focus as suggestions, not confirmed personal preferences; missing optional priorities alone does not block a plan when budget and interview context are available.\n"
+
+
+def source_catalog(store):
+    """Describe how to read references without exposing evaluator expectations."""
+    catalog = {ref: {"source_id": ref, "kind": "canonical_input", "access": {"operation": "context.get", "arguments": {}}}
+               for ref in ("profile", "application")}
+    for path in (store.workspace / "inputs/sources").glob("*.md"):
+        if path.stem not in catalog:
+            catalog[path.stem] = {"source_id": path.stem, "kind": "document", "access": {"operation": "documents.read", "arguments": {"source_id": path.stem}}}
+    for path in (store.workspace / "inputs/mail").glob("*.eml"):
+        catalog[path.stem] = {"source_id": path.stem, "kind": "mail", "access": {"operation": "mail.read", "arguments": {}}, "select_source_id": path.stem}
+    for record in store.rows("history"):
+        ref = record["record_id"]
+        catalog[ref] = {"source_id": ref, "kind": "raw_history", "access": {"operation": "history.read", "arguments": {"record_id": ref}}}
+    for note in store.rows("memories"):
+        if note["status"] == "active":
+            catalog[note["memory_id"]] = {"source_id": note["memory_id"], "kind": "derived_memory", "access": "memory.search in group D only; verify against its attributed raw history"}
+    return [catalog[ref] for ref in sorted(catalog)]
+
+
+def reference_schema(model, refs):
+    """Constrain output references without repairing or weakening host validation."""
+    allowed = sorted(set(refs))
+    if not allowed or any(not isinstance(ref, str) or not ref for ref in allowed):
+        raise ValueError("A nonempty source-ID catalog is required")
+    result = strict_schema(model)
+    def visit(value):
+        if isinstance(value, dict):
+            for name, field in value.get("properties", {}).items():
+                if name in {"source_refs", "basis_refs"}:
+                    field["items"] = {**field.get("items", {}), "enum": allowed}
+            for child in value.values(): visit(child)
+        elif isinstance(value, list):
+            for child in value: visit(child)
+    visit(result)
+    return result
 
 
 def schema(store):
@@ -177,6 +218,17 @@ def approved_plan(store, interview_id, approval_id):
     return record
 
 
+def guard_material_write(store, db, record):
+    """Serialize publication against a concurrently revised or rejected plan."""
+    db.execute("BEGIN IMMEDIATE")
+    check_source(store)
+    current = db.execute("SELECT proposal_id,proposal_hash,status FROM preparation_proposals WHERE interview_id=? ORDER BY version DESC LIMIT 1", (record["interview_id"],)).fetchone()
+    if not current or tuple(current[:2]) != (record["proposal_id"], record["proposal_hash"]) or current[2] not in {"plan_approved", "material_ready"} or record["input_fingerprint"] != context_fingerprint(store):
+        raise ValueError("Preparation changed before material publication")
+    from interview.practice_jobs import check_job
+    check_job(store, db, record, publish=True)
+
+
 def submit_material(store, interview_id, approval_id, data):
     record = approved_plan(store, interview_id, approval_id)
     pack = MaterialPack.model_validate(data)
@@ -190,6 +242,7 @@ def submit_material(store, interview_id, approval_id, data):
         raise ValueError("Materials reference unavailable or inactive sources")
     material_id = "prep-material-" + uuid.uuid4().hex[:12]
     with store.connect() as db:
+        guard_material_write(store, db, record)
         db.execute("INSERT INTO preparation_materials VALUES (?,?,?,?)", (material_id, pack.proposal_id, approval_id, canonical(pack.model_dump())))
         db.execute("UPDATE preparation_proposals SET status='material_ready' WHERE proposal_id=?", (pack.proposal_id,))
     store.audit("preparation.material_submitted", {"material_id": material_id, "approval_id": approval_id}, {"ok": True})

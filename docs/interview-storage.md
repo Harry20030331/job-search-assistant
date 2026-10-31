@@ -10,6 +10,8 @@ Maintenance date: 2026-10-25. Skills describe behavior; the selected candidate o
 | Jobs and applications | Selected `opportunities.json` | Stable job/application IDs; updates use existing shared domain APIs |
 | Local preparation run | Explicit output directory containing `handoff.json` and `work/state.sqlite3` | Sources, proposals, approvals and materials belong to this run; do not overwrite an existing run |
 | Shared interview view registry | Selected candidate runtime's `interviews/registry.json` | Stable round/job/application IDs, provenance, revision and a workspace pointer; company/role/lifecycle hydrate from opportunities and approvals stay in the business run |
+| Website generation jobs | Selected run's `web_practice_jobs` SQLite table | Exact proposal/approval binding, one claim per attempt, heartbeat lease, explicit retries and private output pointers; expired attempts remain as history |
+| Follow-up receipts | Selected runtime's `interviews/notification-receipts.json` | Candidate-bound schedule identities; independent website dismissal and chat delivery receipts |
 | Account inbox state | Module-local `.google-local/users/<account-hash>/inbox.sqlite3` | Account-bound cursor, queue, deduplication, thread revisions and handoffs |
 | Account debrief and memory | Same account directory's `learning/state.sqlite3` | Preserve original history; derived memory has source links, revisions and statuses |
 | Google connection | Module-local ignored `.google-local/client.json` and per-account connection/config/token files | Host-only; never copy credentials into agent workspaces or shareable fixtures |

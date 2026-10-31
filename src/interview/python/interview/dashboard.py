@@ -11,6 +11,7 @@ from interview.freshness import check
 from interview.memory import normalized
 from interview.preparation import context_fingerprint
 from interview.storage import Store, canonical, read_json
+from interview.practice_jobs import public_job
 
 
 def export(workspace):
@@ -36,12 +37,17 @@ def export(workspace):
         identity = db.execute("SELECT value FROM meta WHERE key='candidate_anchor'").fetchone()
         if not identity:
             raise ValueError("Publish a canonical candidate run with a source anchor")
-        proposal, materials, debriefs = None, None, []
+        proposal, materials, debriefs, generation = None, None, [], None
         if "preparation_proposals" in tables:
             row = db.execute("SELECT proposal_id,version,payload,fingerprint,proposal_hash,status FROM preparation_proposals WHERE interview_id=? ORDER BY version DESC LIMIT 1", (application["interview_id"],)).fetchone()
             if row:
                 proposal = {"proposal_id": row[0], "version": row[1], "draft": json.loads(row[2]),
                     "proposal_hash": row[4], "status": row[5]}
+                if "web_practice_jobs" in tables:
+                    jobs = db.execute("SELECT * FROM web_practice_jobs WHERE proposal_id=? ORDER BY rowid DESC LIMIT 1", (row[0],))
+                    job = jobs.fetchone()
+                    if job:
+                        generation = public_job(dict(zip((column[0] for column in jobs.description), job)))
                 if row[3] != context_fingerprint(store):
                     freshness = "stale"
                 if freshness == "current" and row[5] in {"plan_approved", "material_ready"} and {"preparation_materials", "preparation_approvals"} <= tables:
@@ -73,7 +79,7 @@ def export(workspace):
             except (ValueError, OSError, sqlite3.Error):
                 freshness = "stale"  # Revoked/changed accounts expose no account debriefs.
         result = {"schemaVersion": 1, "candidateAnchor": json.loads(identity[0]), "application": application,
-            "freshness": freshness, "proposal": proposal, "materials": materials, "debriefs": debriefs}
+            "freshness": freshness, "proposal": proposal, "materials": materials, "debriefs": debriefs, "generation": generation}
     # Reject concurrent changes rather than exporting an inconsistent approval/material state.
     try:
         check(store)

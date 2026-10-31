@@ -43,6 +43,9 @@ Organize your analysis in this order:
    You may leave round_focus empty and record the unknown topic scope instead of inventing certainty.
 7. Keep public reports anecdotal and check their role/level/date limits. Omit irrelevant themes rather than treating a past report as a question guarantee.
 8. Preserve source-linked practice attribution. One self-reported improvement is scoped, not proof of global mastery.
+9. company_brief references must come from sources whose kind is company and whose company matches the selected employer.
+   A JD can support role_focus but is not a company-typed source, even when it contains an About section.
+   If no company source is supplied, leave company_brief empty and record that limit; do not relabel source IDs or fabricate evidence.
 Keep important limits and targeted clarification questions visible. Do not generate the later introduction, behavioral answers or exercises here.
 """
 

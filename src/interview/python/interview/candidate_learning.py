@@ -21,6 +21,7 @@ from interview.calendar import parse_instant
 from interview.memory import normalized
 from interview.schemas import Contract
 from interview.storage import Store, canonical, digest, read_json, write_json
+from interview.topics import POLICY as TOPIC_POLICY, canonical_topics, memory_topics
 
 PROTOCOL = "candidate-learning-v1"
 GUARD = "candidate_learning_guard"
@@ -134,7 +135,7 @@ def select(data, application, scope, captured_at):
     No fuzzy title inference or embedding/API call is hidden in this selector.
     """
     scope = Scope.model_validate(scope)
-    topics = {normalized(t) for t in scope.topics if t.strip()}
+    topics = canonical_topics(scope.topics)
     if not topics:
         raise ValueError("Choose at least one nonempty learning topic")
     role, round_name = normalized(application["role"]), normalized(application.get("round") or "")
@@ -143,7 +144,8 @@ def select(data, application, scope, captured_at):
     selected = []
     for note in data["memories"]:
         raw = history.get(note["source_id"])
-        if note["status"] != "active" or normalized(note["role"]) != role or not (topics & set(note["topics"])):
+        selected_topics = memory_topics(note)
+        if note["status"] != "active" or normalized(note["role"]) != role or not (topics & selected_topics):
             continue
         if not raw or raw.get("mode") not in {"interview", "practice"} or not raw.get("subject"):
             continue
@@ -158,7 +160,7 @@ def select(data, application, scope, captured_at):
         if age < 0 or age > scope.max_age_days or parse_instant(note["created_at"]) > clock or parse_instant(raw["created_at"]) > clock:
             continue
         same_company = normalized(note.get("company") or "") == normalized(application["company"])
-        score = (len(topics & set(note["topics"])), int(bool(round_name) and round_name == note_round), int(same_company), -age)
+        score = (len(topics & selected_topics), int(bool(round_name) and round_name == note_round), int(same_company), -age)
         selected.append((score, note, raw))
     selected.sort(key=lambda item: (tuple(-v for v in item[0]), item[1]["memory_id"]))
     return [(note, raw) for _, note, raw in selected[:scope.limit]]
@@ -171,7 +173,8 @@ def practice_source(note, raw, account_hash, captured_at):
         "A suggested action is system advice. An improvement report is scoped to its reported activity, not global mastery.\n\n"
         + canonical({"record_id": raw["record_id"], "historical_interview_id": raw["interview_id"],
             "occurred_at": raw["occurred_at"], "mode": raw["mode"], "origin": raw["origin"],
-            "historical_subject": raw["subject"], "original_text": raw["text"], "selected_active_note": note}))
+            "historical_subject": raw["subject"], "original_text": raw["text"], "selected_active_note": note,
+            "retrieval_topics": sorted(memory_topics(note)), "topic_policy": TOPIC_POLICY}))
     return Source.model_validate({"source_id": "practice-" + digest({"memory": note["memory_id"], "account": account_hash})[:20],
         "kind": "practice", "origin": "user_record", "relationship": "context_only", "matched_job_id": None,
         "company": note.get("company"), "role": note["role"],
@@ -204,7 +207,7 @@ def attach(store, binding_path, scope):
     captured_at = now()
     selected = select(data, application, scope.model_dump(), captured_at)
     sources = [practice_source(note, raw, account_hash, captured_at) for note, raw in selected]
-    snapshot = {"protocol": PROTOCOL, "captured_at": captured_at, "scope": scope.model_dump(),
+    snapshot = {"protocol": PROTOCOL, "topic_policy": TOPIC_POLICY, "captured_at": captured_at, "scope": scope.model_dump(),
         "target": {k: application.get(k) for k in ("job_id", "application_id", "interview_id", "company", "role", "round")},
         "sources": sources, "retrieved_memory_ids": [n["memory_id"] for n, _ in selected]}
     guard = {"binding_path": str(binding_path), "binding_hash": binding_hash, "learning_hash": learning_hash,
@@ -245,6 +248,8 @@ def check_guard(store):
             digest(read_json(store.workspace / "inputs/application.json")) != guard["target_hash"]):
         raise ValueError("Learning snapshot or selected interview changed")
     snapshot = read_json(path)
+    if snapshot.get("topic_policy") != TOPIC_POLICY:
+        raise ValueError("Learning topic policy changed; select learning in a fresh preparation run")
     active_ids = [note["memory_id"] for note, _ in select(data, read_json(store.workspace / "inputs/application.json"), snapshot["scope"], now())]
     if active_ids != snapshot["retrieved_memory_ids"]:
         raise ValueError("Learning relevance or age window changed; capture a fresh preparation context")

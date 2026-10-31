@@ -26,7 +26,8 @@ class PracticeCodeTests(unittest.TestCase):
 
     def test_imports_io_reflection_and_indirect_calls_are_rejected(self):
         for code in ("import os\ndef double(n): return n * 2", "def double(n): return open('private')",
-                     "def double(n): return n.__class__", "def double(n): return (lambda: 4)()"):
+                     "def double(n): return n.__class__", "def double(n): return (lambda: 4)()",
+                     "def double(n): return type(n)"):
             with self.assertRaises(ValueError):
                 validate_code(code, "double")
 

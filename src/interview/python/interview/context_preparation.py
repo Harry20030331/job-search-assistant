@@ -12,7 +12,7 @@ from pydantic import Field
 
 from interview.freshness import check as check_source
 from interview.candidate_learning import sources as learning_sources
-from interview.preparation import MaterialPack, PlanSection, ProposalDraft, approved_plan, context_fingerprint, latest, schema
+from interview.preparation import MaterialPack, PlanSection, ProposalDraft, approved_plan, context_fingerprint, latest, schema, guard_material_write
 from interview.preparation_context import ContextRequest, ResearchUsage, Source, Topic, load_context, request_token
 from interview.schemas import Contract
 from interview.storage import Store, canonical, digest, read_json, write_json
@@ -297,6 +297,7 @@ def submit_material(store, approval_id, data, *, material_format="outline-v1"):
         raise ValueError("Alternative questions must fit existing approved plan sections")
     material_id = "context-material-" + uuid.uuid4().hex[:12]
     with store.connect() as db:
+        guard_material_write(store, db, record)
         db.execute("INSERT INTO preparation_materials VALUES (?,?,?,?)", (material_id, pack.proposal_id, approval_id, canonical(pack.model_dump())))
         db.execute("UPDATE preparation_proposals SET status='material_ready' WHERE proposal_id=?", (pack.proposal_id,))
     store.audit("preparation.context_material_submitted", {"material_id": material_id, "approval_id": approval_id}, {"ok": True})

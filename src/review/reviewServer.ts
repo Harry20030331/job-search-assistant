@@ -13,10 +13,14 @@ import { readJobLibrary } from "../jobs/jobLibrary.js";
 import { renderReviewPage, renderUsStatusPage } from "./reviewViews.js";
 import { buildStatusView } from "./statusView.js";
 import { dirname, join } from "node:path";
-import { readInterviewBoard } from "../interview/workbench.js";
+import { readInterviewBoard, interviewEnded } from "../interview/workbench.js";
 import { renderInterviewPage } from "../interview/interviewView.js";
 import { renderHomePage, renderAccountPage } from "../workbench/views.js";
 import { GoogleBridge, googleRoutes } from "../interview/googleBridge.js";
+import { randomBytes } from "node:crypto";
+import { approveWebsitePlan } from "../interview/webActions.js";
+import { acknowledgeNotice, pendingNotices } from "../interview/notifications.js";
+import { interviewBrowserScript } from "../interview/browserActions.js";
 
 export interface ReviewServerOptions {
   reviewPath: string;
@@ -182,6 +186,9 @@ function publicError(error: unknown): { status: number; code: string } {
     ["invalid_request", { status: 400, code: "invalid_request" }],
     ["invalid_request_authority", { status: 403, code: "invalid_request_authority" }],
     ["invalid_request_origin", { status: 403, code: "invalid_request_origin" }],
+    ["interview_plan_conflict", { status: 409, code: "interview_plan_conflict" }],
+    ["interview_notice_changed", { status: 409, code: "interview_notice_changed" }],
+    ["interview_generation_unavailable", { status: 503, code: "interview_generation_unavailable" }],
     ["review_application_not_found", { status: 400, code: "invalid_review_target" }],
     ["review_question_not_found", { status: 400, code: "invalid_review_answer" }],
     ["review_question_option_not_found", { status: 400, code: "invalid_review_answer" }],
@@ -202,9 +209,38 @@ function publicError(error: unknown): { status: number; code: string } {
 
 export async function startReviewServer(options: ReviewServerOptions): Promise<RunningReviewServer> {
   const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
+  const interviewPaths = { trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
+  const interviewCsrf = randomBytes(32).toString("hex");
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
     try {
+      if (request.method === "GET" && url.pathname === "/assets/interview-actions.js") {
+        send(response, 200, interviewBrowserScript, "text/javascript; charset=utf-8"); return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/interviews/state") {
+        const address = server.address();
+        if (!address || typeof address === "string") throw new Error("request_failed");
+        assertBrowserMutationAuthority(request, address.port);
+        const items = await readInterviewBoard(interviewPaths);
+        send(response, 200, JSON.stringify({ csrf: interviewCsrf, notifications: await pendingNotices(interviewPaths, "website", items),
+          rounds: items.map(item => ({ id: item.entry.interviewId, revision: item.entry.revision, cancelled: item.entry.state === "cancelled",
+            current: item.snapshot?.freshness === "current", proposalId: item.snapshot?.proposal?.proposal_id,
+            proposalStatus: item.snapshot?.proposal?.status, materialReady: Boolean(item.snapshot?.materials), generation: item.snapshot?.generation ?? null })) }), "application/json; charset=utf-8");
+        return;
+      }
+      if (request.method === "POST" && ["/api/interviews/approve-plan", "/api/interviews/dismiss"].includes(url.pathname)) {
+        const address = server.address();
+        if (!address || typeof address === "string") throw new Error("request_failed");
+        assertBrowserMutationAuthority(request, address.port);
+        if (!request.headers.origin || request.headers["x-interview-csrf"] !== interviewCsrf) throw new Error("invalid_request_origin");
+        const body = await readJson(request, true);
+        if (url.pathname === "/api/interviews/dismiss") {
+          exactFields(body, ["notificationId"]);
+          await acknowledgeNotice(interviewPaths, stringField(body, "notificationId"), "website");
+          send(response, 200, JSON.stringify({ ok: true }), "application/json; charset=utf-8");
+        } else send(response, 202, JSON.stringify(await approveWebsitePlan(interviewPaths, body)), "application/json; charset=utf-8");
+        return;
+      }
       if (googleRoutes.has(url.pathname)) {
         const address = server.address();
         if (!address || typeof address === "string") throw new Error("request_failed");
@@ -219,7 +255,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         let interviews: Awaited<ReturnType<typeof readInterviewBoard>> = [];
         try { interviews = await readInterviewBoard({ trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") }); } catch { /* Candidate-free legacy runtimes still expose navigation and account setup. */ }
         send(response, 200, renderHomePage({ applications: applications.length,
-          interviews: interviews.filter(i => ["invited", "scheduled"].includes(i.entry.state)).length,
+          interviews: interviews.filter(i => ["invited", "scheduled"].includes(i.entry.state) && !interviewEnded(i)).length,
           pendingPlans: interviews.filter(i => i.snapshot?.proposal?.status === "awaiting_plan_approval").length,
           practiceReady: interviews.filter(i => i.snapshot?.freshness === "current" && i.snapshot.materials).length }), "text/html; charset=utf-8"); return;
       }

@@ -6,13 +6,15 @@ from pathlib import Path
 
 from interview.agent_runtime import invoke
 from interview.settings import load_settings as config
-from interview.preparation import MaterialNodeResult, ProposalNodeResult, approved_plan, render_material, render_proposal, submit_material, submit_proposal
+from interview.preparation import MaterialNodeResult, ProposalNodeResult, approved_plan, render_material, render_proposal, submit_material, submit_proposal, known_refs, reference_schema, source_catalog, SOURCE_REFERENCE_CONTRACT, SOURCE_REFERENCE_GUIDANCE, SOURCE_REFERENCE_POLICY_REVISION
 from interview.schemas import strict_schema
 from interview.storage import Store, canonical, read_json, write_json
 from interview.freshness import check as check_source
 
 
-def run_node(work, destination, *, approval_id=None, invoke_fn=invoke):
+def run_node(work, destination, *, approval_id=None, invoke_fn=invoke, reference_mode=SOURCE_REFERENCE_CONTRACT):
+    if reference_mode not in {"legacy", SOURCE_REFERENCE_CONTRACT}:
+        raise ValueError("Unknown source-reference contract")
     store = Store(work)
     check_source(store)
     application = read_json(work / "inputs" / "application.json")
@@ -21,13 +23,18 @@ def run_node(work, destination, *, approval_id=None, invoke_fn=invoke):
     record = approved_plan(store, interview_id, approval_id) if approval_id else None
     model = MaterialNodeResult if record else ProposalNodeResult
     schema_path = work / ("materials-v4.schema.json" if record else "proposal-v4.schema.json")
-    write_json(schema_path, strict_schema(model))
+    refs = sorted(known_refs(store)) if reference_mode != "legacy" else None
+    write_json(schema_path, reference_schema(model, refs) if refs else strict_schema(model))
     common = "Read TASK.md and TOOL_GUIDE.md. This is a preparation-only workflow. Use the supplied profile and its provenance; fictional candidate evidence is not the real account owner's resume. Do not write the calendar, send mail, inspect parent folders or credentials, modify source/configuration or SQLite. Use context.get, documents.read and relevant history if available; use memory.search only in group D. Keep user reports/self-assessments distinct from suggested practice, and do not reuse resolved/superseded issues as current weaknesses. When no relevant history exists, say so rather than importing unrelated experience. Questions/exercises you invent are suggested practice, not actual employer questions. Output the requested node result, with status=ready and populated proposal/material only after actually reading the evidence. If tools fail or key user information is unavailable, return blocked/needs_input, null proposal/material and specific questions; never fabricate a placeholder plan to satisfy the schema.\n"
     if record:
         prompt = common + "Generate full preparation materials for this exact approved proposal. Match its IDs, version, hash, sections and minute allocations. Every exercise needs a concrete prompt, steps, substantive answer points and a self-check checklist, with real source IDs for its basis. Keep unknown employer details explicitly unknown. Do not invent achievements, project metrics or a meeting URL.\nAPPROVED PROPOSAL:\n" + canonical(record)
     else:
         prompt = common + "Generate only a short preparation proposal: 3–5 sections, times summing exactly to the profile's preparation_budget_minutes, explicit objectives, source references and unknowns. Match the context's interview ID. Use the profile's requested priorities and supplied project evidence. Do not generate full questions or answer materials yet."
     destination.mkdir(parents=True, exist_ok=False)
+    if refs:
+        catalog = source_catalog(store)
+        prompt += "\n" + SOURCE_REFERENCE_GUIDANCE + "allowed_source_ids: " + canonical(refs) + "\nsource_catalog: " + canonical(catalog)
+        write_json(destination / "source-reference-contract.json", {"contract": reference_mode, "policy_revision": SOURCE_REFERENCE_POLICY_REVISION, "allowed_source_ids": refs, "source_catalog": catalog})
     (destination / "prompt.txt").write_text(prompt, encoding="utf-8")
     settings = config()
     write_json(destination / "settings.json", settings)

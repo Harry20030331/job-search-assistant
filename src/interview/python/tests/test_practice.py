@@ -111,7 +111,7 @@ class PracticeTests(unittest.TestCase):
         approval = read_json(store.workspace.parent / "synthetic-approval.json")["approval_id"]
         invoke = Mock(return_value={"status": "completed", "output": {"status": "ready", "material": material, "questions": []}, "shell_command_count": 0})
         result = run_node(store.workspace, self.root / "direct", approval_id=approval, material_format="simulation-v2", direct_questions=True, invoke_fn=invoke)
-        self.assertEqual(result["protocol"], "context-direct-practice-node-v1")
+        self.assertEqual(result["protocol"], "context-direct-practice-node-v2")
         self.assertEqual(result["status"], "material_ready")
         self.assertEqual(read_json(self.root / "direct/code-checks.json")["questions"], 6)
         self.assertEqual(sum(s["minutes"] for s in result["accepted"]["sections"]), 20)
@@ -135,6 +135,29 @@ class PracticeTests(unittest.TestCase):
         material["question_bank"][0]["plan_section_id"] = "not-in-plan"
         with self.assertRaisesRegex(ValueError, "existing approved plan"):
             submit_material(store, approval, material, material_format="simulation-v2")
+
+    def reject_direct_response(self, store, material):
+        SimulationPack.model_validate(material)  # Historical storage remains compatible.
+        approval = read_json(store.workspace.parent / "synthetic-approval.json")["approval_id"]
+        invoke = Mock(return_value={"status": "completed", "output": {"status": "ready", "material": material, "questions": []}, "shell_command_count": 0})
+        destination = self.root / "invalid-direct"
+        result = run_node(store.workspace, destination, approval_id=approval, material_format="simulation-v2", direct_questions=True, invoke_fn=invoke)
+        self.assertEqual(result["status"], "validation_failed")
+        self.assertFalse((destination / "accepted.json").exists())
+
+    def test_direct_null_problem_details_are_rejected_without_changing_legacy_packs(self):
+        store = self.workspace(); material = self.direct_material(store)
+        material["sections"][0]["exercises"][0]["question_details"] = None
+        self.reject_direct_response(store, material)
+
+    def test_direct_grouped_sections_are_rejected_even_when_minutes_sum_correctly(self):
+        store = self.workspace(); material = self.direct_material(store)
+        section = material["sections"][0]
+        second = copy.deepcopy(section["exercises"][0])
+        second["timebox_minutes"] = section["minutes"] - 1
+        section["exercises"][0]["timebox_minutes"] = 1
+        section["exercises"].append(second)
+        self.reject_direct_response(store, material)
 
 
 if __name__ == "__main__": unittest.main()

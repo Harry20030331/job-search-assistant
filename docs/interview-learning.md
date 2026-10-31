@@ -30,7 +30,7 @@ Scope JSON, chosen from the upcoming interview's actual requirements, has this s
 }
 ```
 
-The last three fields shown are configurable; age and limit default to 180 days and 5 notes. The upcoming role and round come from the selected application snapshot, not free-form retrieval arguments. Historical debriefs must use truthful role/topic labels. Exact normalized role/topic matching is intentionally conservative: the selector does not silently equate job-title variants or infer product-versus-modeling DS from titles. A missed title/topic alias is a recall limitation to measure, not permission to rewrite historical evidence.
+The last three fields shown are configurable; age and limit default to 180 days and 5 notes. The upcoming role and round come from the selected application snapshot, not free-form retrieval arguments. Historical debriefs must use truthful role/topic labels. Role matching remains exact after the existing role normalization; the selector does not silently equate job-title variants or infer product-versus-modeling DS from titles. Topics use the shared `memory-topics-v1` policy described below. A missed title/topic alias is a recall limitation to measure, not permission to rewrite historical evidence.
 
 Attach learning **before** enrichment/context capture, analysis and the first proposal. Then use the existing [enrichment](interview-enrichment.md) or [capture/attach](interview-context-preparation.md) flow. Capture automatically includes the selected `practice` sources; web enrichment preserves them separately from JD/company sources and web usage counts. External enrichment cannot inject practice records. Bound canonical context attachment requires the exact selected practice-source set and contents. Standalone fictional context staging remains a captured-evidence path without live account binding.
 
@@ -54,6 +54,18 @@ Candidates are ordered by topic overlap, exact known round, same company, recenc
 The work directory stores only `inputs/learning/snapshot.json`, plus a host guard in its existing SQLite metadata. It does not import the account's history/memory tables. Snapshot content, retrieval scope, selected interview, binding hash and account learning digest are bound to proposal fingerprints. The usual source check additionally rejects revoked/changed bindings, changed account identity, changed raw or derived learning, altered snapshots, and expired/reordered retrieval results. These checks run even when the canonical stage has no inbox-thread guard. Exact plan approval is therefore invalidated before a material model call when learning changes.
 
 Any account history/memory content change conservatively invalidates the snapshot, including an unrelated new record or an empty retrieval becoming relevant. Restage, select current learning, analyze again and obtain approval of a new proposal. This avoids silently missing newly relevant evidence; a finer invalidation policy is not implemented. Database reads are linear in stored history/observations, so this is not a memory-scaling solution.
+
+## Shared topic policy
+
+Maintenance note, 2026-10-30: `interview/topics.py` supplies `memory-topics-v1` to debrief writes, ordinary memory writes/search and candidate-bound selection. Explicit synonyms such as `A/B testing`, `ab_test` and `experiment_design` normalize to `experimentation`. Role aliases remain a separate policy; an unknown topic is retained rather than guessed from a job title.
+
+A generic stored `evaluation` label is refined only when that selected observation explicitly names a domain: randomization units, A/B testing or network interference support `experimentation`; product/activation/retention metric definitions support `product_metrics`; model evaluation, hallucinations or citation metrics support `ml_evaluation`. Generic evaluation is not a synonym for any of these. New debriefs refine from the exact source quote; historical retrieval uses the selected observation, never suggested practice or unrelated sentences in the raw report. Correctly scoped corrections can supersede an old alias/generic note without erasing it; explicit cross-domain revisions remain rejected.
+
+Historical records and FTS rows are not migrated during retrieval. The returned practice evidence includes a separate `retrieval_topics` view and policy version alongside the unchanged stored note. Ordinary FTS search supplements lexical results with read-only topic matches from the explicitly selected store; this is linear work, not a memory-scaling optimization.
+
+New learning snapshots record the topic-policy version. Snapshots created before this policy, or under a different version, are stale: create a fresh staged run, attach current learning, analyze context and obtain acceptance of a new proposal. Do not rewrite snapshot hashes or reuse an old approval. Runs without account-learning snapshots are unaffected.
+
+The regression reproduces the three-resume DS miss: an old `evaluation` note about a randomization unit and network interference now matches an experimentation scope. Its source databases and original topic remain unchanged. A fresh explicitly bound fictional candidate/account run captures one practice source with zero model or Google calls. The result verifies recall and provenance, not a preparation-quality or interview-outcome improvement.
 
 ## Evaluation boundary
 

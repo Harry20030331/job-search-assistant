@@ -74,6 +74,27 @@ class SimulationNode(Contract):
     questions: list[str]
 
 
+class DirectExercise(SimulationExercise):
+    """Required generation fields; stored historical simulation packs stay compatible."""
+    question_title: str = Field(min_length=1)
+    question_details: list[Artifact] = Field(max_length=4)
+    sample_answer: list[str] = Field(min_length=1, max_length=6)
+
+
+class DirectSection(SimulationSection):
+    # Alternatives belong to question_bank, never inside another plan section.
+    exercises: list[DirectExercise] = Field(min_length=1, max_length=1)
+
+
+class DirectPack(SimulationPack):
+    sections: list[DirectSection]
+    question_bank: list[DirectExercise] = Field(default_factory=list, max_length=12)
+
+
+class DirectSimulationNode(SimulationNode):
+    material: DirectPack | None
+
+
 def render_simulation(data):
     pack = SimulationPack.model_validate({k: v for k, v in data.items() if k != "material_id"})
     lines = ["# Interview questions", "", "Simulated practice, not verified employer questions."]
@@ -151,6 +172,8 @@ Include at least 3 executable tests with arguments_json (JSON positional-argumen
 and expected_error (null for success, ValueError/TypeError for an expected error; use expected_json 'null' then).
 Use list/tuple/int type annotations if helpful. Match the exact question's signature and invalid-input contract.
 Include complexity and boundary tests. Non-coding questions use solution=null.
+If the contract requires validating every input item, validate the entire input before returning an early match.
+Test malformed items after an otherwise valid matching item as well as malformed first items.
 
 Provide about 8 distinct questions TOTAL: one main exercise per approved section plus question_bank alternatives.
 The main sections still allocate exactly the approved minutes. Question-bank alternatives are a MENU to substitute into the

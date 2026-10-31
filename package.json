@@ -6,6 +6,8 @@
   "scripts": {
     "interview": "tsx src/cli/interviewCli.ts",
     "interview:track": "tsx src/cli/interviewTrackCli.ts",
+    "interview:notifications": "tsx src/cli/interviewNotificationsCli.ts",
+    "interview:virtual-tests": "node scripts/interview-python.mjs virtual-tests",
     "interview:demo": "tsx src/interview/preview.ts",
     "interview:practice": "node scripts/interview-python.mjs practice",
     "interview:tools": "node scripts/interview-python.mjs tools",

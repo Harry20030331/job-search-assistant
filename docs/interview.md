@@ -1,6 +1,6 @@
 # Interview Coordination
 
-Owner: Erica Zhao. Integration and packaging maintenance date: 2026-10-26. The module uses a skill entry, business tools/state and a separate evaluator. This branch adds the development implementation, a read-only canonical-input adapter and repeatable checks. Shared opportunity schemas and lifecycle rules retain their existing contracts; verified interview links use the existing lifecycle API. User-requested Home/navigation, Google account connection and direct interview questions follow the controlled UI v4 contract, preserving historical manifests. Shared policy remains [workflow-contract](workflow-contract.md).
+Owner: Erica Zhao. Integration and packaging maintenance date: 2026-10-26. The module uses a skill entry, business tools/state and a separate evaluator. This branch adds the development implementation, a read-only canonical-input adapter and repeatable checks. Shared opportunity schemas and lifecycle rules retain their existing contracts; verified interview links use the existing lifecycle API. User-requested Home/navigation, Google account connection and direct interview questions follow the controlled UI v5 contract, preserving historical manifests. Shared policy remains [workflow-contract](workflow-contract.md).
 
 ## Layout and ownership
 
@@ -31,6 +31,17 @@ npm run interview:test
 ```
 
 On macOS/Linux select `src/interview/python/.venv/bin/python` instead. `INTERVIEW_PYTHON` names one executable; commands are launched without a shell. An existing compatible environment may be selected explicitly for local verification; no machine-specific path is stored in source.
+
+For a self-contained fictional Interview preview after setup, use a new output directory:
+
+```powershell
+$previewDir = Join-Path $PWD ('local/interview-preview-' + [guid]::NewGuid().ToString('N'))
+npm run interview:demo -- --output $previewDir --port 8771
+```
+
+Open the printed `/interviews` URL. This authors three fictional rounds without model calls, Google credentials or an existing candidate runtime. It refuses an existing output directory and leaves ordinary candidate state alone. Stop that process before serving the same runtime elsewhere. Paid practice generation still requires Codex login and exact plan acceptance; the preview's authored packs do not test model quality.
+
+Windows verification note, 2026-10-31: independent source-copy installation and this Interview preview were checked with new Node dependencies and a new Python environment. The full shared `npm run verify` currently fails Windows permission, symlink, lock and path cases (37 failed, 380 passed); the default shared startup also encounters its Unix permission check. Do not report a fully portable clean checkout from the Interview checks alone. See [recovery verification](interview-generation-recovery.md) for scope and results.
 
 For the independent quality judge, configure `OPENROUTER_API_KEY` in the host environment or the module-local ignored `.env` using its blank `.env.example`. Model settings remain in `src/interview/python/configs/midpoint.toml`. Do not change models silently to obtain a successful run. No keys or account tokens are included in this checkout. The current config's endpoint availability must be checked before paid experiments.
 
@@ -92,7 +103,7 @@ Install `requirements-google.lock` alongside the core requirements only for live
 
 Connection saves account-bound local tokens; it does not select or create a test calendar. Before business calls the host must configure a dedicated owned secondary calendar and explicitly selected message IDs, using `configs/google.example.json` as a blank template. The backend rejects `primary` and constrains writes to that calendar; OAuth scopes themselves are broader. Account-level inbox commands expect `.google-local/users/<account-hash>/connection.json` and `demo-config.json` with matching identity. Credential files remain outside agent workspaces. `npm run interview:google -- --help` and `npm run interview:inbox -- --help` expose host commands; setup does not imply a connected account in this new checkout.
 
-The adapter uses Gmail read-only access and owned-calendar event access, exact host confirmations, duplicate checks, conflict checks and read-back verification. It does not send mail or invite attendees. Protected recruiting updates remain unread. A bounded foreground poller is implemented; no continuous service or notification system is installed. The shared-input stage above is local preparation only; the real Google scheduling path remains a separate development entrypoint. Shared lifecycle updates must use existing domain APIs with evidence, never direct JSON rewrites.
+The adapter uses Gmail read-only access and owned-calendar event access, exact host confirmations, duplicate checks, conflict checks and read-back verification. It does not send mail or invite attendees. Protected recruiting updates remain unread. A bounded foreground poller is implemented; no continuous inbox service is installed. The workbench now provides end-time debrief reminders and exact website plan acceptance; see [workbench actions](interview-web-actions.md). The shared-input stage above is local preparation only; the real Google scheduling path remains a separate development entrypoint. Shared lifecycle updates must use existing domain APIs with evidence, never direct JSON rewrites.
 
 ## Verification and limits
 

@@ -10,6 +10,7 @@ from interview.calendar import parse_instant
 from interview.memory import normalized
 from interview.schemas import Contract
 from interview.storage import canonical, digest
+from interview.topics import memory_topics, observation_topics, revision_matches
 
 
 class Subject(Contract):
@@ -93,18 +94,18 @@ def commit(store, record_id, data):
         for i, item in enumerate(draft.items):
             if item.quote not in raw["text"]:
                 raise ValueError("Each observation requires an exact quote from this original debrief")
-            topic = normalized(item.topic)
+            topics = observation_topics([item.topic], item.quote)
             if item.supersedes_id:
                 if item.supersedes_id in parents:
                     raise ValueError("A debrief cannot revise one memory twice")
                 parents.add(item.supersedes_id)
                 old = db.execute("SELECT payload FROM memories WHERE memory_id=?", (item.supersedes_id,)).fetchone()
                 previous = json.loads(old[0]) if old else None
-                if not previous or previous["status"] == "superseded" or topic not in previous["topics"] or normalized(previous["role"]) != normalized(subject["role"]):
+                if not previous or previous["status"] == "superseded" or not revision_matches(topics, memory_topics(previous)) or normalized(previous["role"]) != normalized(subject["role"]):
                     raise ValueError("Revision target must be a current memory of the same role and topic")
             note = {"memory_id": "memory-debrief-" + digest({"record": record_id, "item": i})[:16],
                     "source_id": record_id, "created_at": raw["created_at"], "company": subject["company"],
-                    "role": normalized(subject["role"]), "round": subject["round"], "topics": [topic],
+                    "role": normalized(subject["role"]), "round": subject["round"], "topics": sorted(topics),
                     "observation": "[" + item.attribution + "] " + item.observation,
                     "next_action": "[suggested_practice] " + item.suggested_practice if item.suggested_practice else "",
                     "status": item.status, "supersedes_id": item.supersedes_id}

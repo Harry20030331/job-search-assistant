@@ -7,10 +7,10 @@ from pathlib import Path
 
 from interview.agent_runtime import invoke
 from interview.context_flow import implementation_snapshot, isolated_output, runtime_info
-from interview.context_preparation import ContextProposalNode, current_context, current_policy, render_proposal, submit_material, submit_proposal
-from interview.preparation import MaterialNodeResult, approved_plan, context_fingerprint, latest, render_material
-from interview.schemas import strict_schema
+from interview.context_preparation import ContextProposalNode, current_context, current_policy, render_proposal, submit_material, submit_proposal, available_refs
+from interview.preparation import MaterialNodeResult, approved_plan, context_fingerprint, latest, render_material, reference_schema, SOURCE_REFERENCE_CONTRACT, SOURCE_REFERENCE_GUIDANCE, SOURCE_REFERENCE_POLICY_REVISION
 from interview.settings import load_settings
+from interview.practice_jobs import check_before_model
 from interview.storage import Store, canonical, digest, write_json
 
 METHODS = ("simple-instruction-v1", "context-balanced-v1")
@@ -54,11 +54,11 @@ def run_node(workspace, output, *, method="context-balanced-v1", approval_id=Non
         raise ValueError("Simulation practice requires an exact approved plan")
     if direct_questions and material_format != "simulation-v2":
         raise ValueError("Direct questions require simulation materials")
-    from interview.practice import SimulationNode, GUIDANCE as SIMULATION_GUIDANCE, DIRECT_GUIDANCE, render_simulation
+    from interview.practice import DirectSimulationNode, SimulationNode, GUIDANCE as SIMULATION_GUIDANCE, DIRECT_GUIDANCE, render_simulation
     protocol = "context-practice-node-v2" if material_format == "simulation-v2" else PROTOCOL
     if direct_questions:
-        protocol = "context-direct-practice-node-v1"
-    material_node = SimulationNode if material_format == "simulation-v2" else MaterialNodeResult
+        protocol = "context-direct-practice-node-v2"
+    material_node = (DirectSimulationNode if direct_questions else SimulationNode) if material_format == "simulation-v2" else MaterialNodeResult
     workspace, output = Path(workspace).resolve(), Path(output).resolve()
     store = Store(workspace)
     request, analysis, context_hash = current_context(store)
@@ -74,24 +74,29 @@ def run_node(workspace, output, *, method="context-balanced-v1", approval_id=Non
     hashes = implementation_snapshot(output)
     root = Path(__file__).resolve().parents[1]
     for name in ("interview/context_preparation.py", "interview/context_preparation_flow.py", "interview/preparation.py",
-                 "interview/freshness.py", "interview/team_bridge.py", "interview/candidate_learning.py", "interview/practice.py", "interview/practice_flow.py", "interview/practice_code.py"):
+                 "interview/freshness.py", "interview/team_bridge.py", "interview/candidate_learning.py", "interview/topics.py", "interview/practice.py", "interview/practice_flow.py", "interview/practice_code.py", "interview/practice_jobs.py", "interview/web_workflow.py"):
         raw = (root / name).read_bytes()
         (output / "implementation_snapshot" / name).write_bytes(raw)
         hashes[name] = hashlib.sha256(raw).hexdigest()
     before = context_fingerprint(store)
     phase = "materials" if record else "proposal"
     payload = {"phase": phase, "context_hash": context_hash, "request": request.model_dump(mode="json"),
+               "source_reference_contract": SOURCE_REFERENCE_CONTRACT, "allowed_source_ids": sorted(available_refs(request)),
+               "source_reference_policy_revision": SOURCE_REFERENCE_POLICY_REVISION,
                "preparation_policy": policy.model_dump(), "policy_hash": policy_hash,
                "analysis": analysis.model_dump(mode="json"),
                "approved_proposal": record, "previous_proposal": None if record else latest(store, request.identity.interview_id)}
-    prompt = COMMON + (GUIDANCE if method == "context-balanced-v1" else "")
+    prompt = COMMON + "Copy source_refs and basis_refs exactly from allowed_source_ids; Message-ID headers and labels are not source IDs. All sources are supplied inline in this request; do not run tools.\n" + (GUIDANCE if method == "context-balanced-v1" else "")
     if record:
         prompt += ("\nGenerate the full approved practice materials. Each exercise must be suggested_practice with a concrete prompt, "
                    "steps, substantive answer points/answer structure and self-checks. Do not turn unknown motivation or experience into personal claims.\n")
         if material_format == "simulation-v2":
             prompt += SIMULATION_GUIDANCE
             if direct_questions:
+                from interview.practice_code import BUILTINS, METHODS as CODE_METHODS
                 prompt += DIRECT_GUIDANCE
+                prompt += "\nCoding execution contract: allowed built-in calls are " + ", ".join(sorted(BUILTINS)) + ".\n"
+                prompt += "Allowed attribute calls are " + ", ".join(sorted(CODE_METHODS)) + ". Other built-ins, including type(), are unsupported; validate integer inputs using isinstance(value, int) and reject bool explicitly.\n"
                 prompt += "\nEXACT MAIN SECTION CHECKLIST (one exercise in EACH separate section; never group different sections):\n"
                 prompt += "\n".join(f"- section_id={s['section_id']}; section minutes={s['minutes']}; its sole exercise timebox_minutes={s['minutes']}"
                                     for s in record["draft"]["sections"])
@@ -100,9 +105,11 @@ def run_node(workspace, output, *, method="context-balanced-v1", approval_id=Non
         prompt += "\nGenerate only a proposal awaiting user acceptance. No full questions or answers yet.\n"
     prompt += "\nPUBLIC PREPARATION REQUEST:\n" + canonical(payload)
     write_json(output / "public_request.json", payload)
-    write_json(output / "node.schema.json", strict_schema(material_node if record else ContextProposalNode))
+    write_json(output / "node.schema.json", reference_schema(material_node if record else ContextProposalNode, available_refs(request)))
     (output / "prompt.txt").write_text(prompt, encoding="utf-8")
     write_json(output / "manifest.json", {"protocol": protocol, "phase": phase, "method": method,
+        "source_reference_contract": SOURCE_REFERENCE_CONTRACT,
+        "source_reference_policy_revision": SOURCE_REFERENCE_POLICY_REVISION,
         "context_hash": context_hash, "input_fingerprint": before, "settings": settings, "host_runtime": runtime_info(), "direct_questions": direct_questions,
         "implementation_hashes": hashes, "automatic_retries": 0, "semantic_quality": "pending_unrated",
         "evidence_condition": "same supplied context and original sources; analysis is not recomputed by this planning node"})
@@ -114,6 +121,7 @@ def run_node(workspace, output, *, method="context-balanced-v1", approval_id=Non
               "status": "execution_failed", "mechanical_passed": False, "semantic_quality": "pending_unrated",
               "cli_invocations": 1, "agent_cost_usd": None}
     try:
+        check_before_model(store)
         invocation = invoke_fn(actor_work, prompt, output / "node.schema.json", output / "invocation", settings, smoke=True)
         write_json(output / "invocation-result.json", invocation)
         result["invocation"] = {k: invocation.get(k) for k in ("status", "seconds", "usage", "thread_id", "cli_version", "shell_command_count")}

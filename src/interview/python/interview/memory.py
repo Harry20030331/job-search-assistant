@@ -11,6 +11,7 @@ from pydantic import Field
 from interview.calendar import parse_instant
 from interview.schemas import Contract
 from interview.storage import Store, canonical
+from interview.topics import canonical_topics, memory_topics, observation_topics
 
 
 ALIASES = {"capacity": "capacity_estimation", "capacity estimation": "capacity_estimation", "system design": "system_design", "backend": "backend_swe", "ml": "ml_engineer"}
@@ -40,7 +41,7 @@ def upsert(store: Store, data: dict) -> dict:
         raise ValueError("Invalid memory status")
     if parse_instant(note["created_at"]) > parse_instant(store.meta("clock")):
         raise ValueError("Memory cannot come from the future")
-    note["topics"] = sorted({normalized(t) for t in note["topics"]})
+    note["topics"] = sorted(observation_topics(note["topics"], note["observation"]))
     note["role"] = normalized(note["role"])
     note["memory_id"] = note["memory_id"] or "memory-" + uuid.uuid4().hex[:12]
     with store.connect() as db:
@@ -77,7 +78,7 @@ def upsert(store: Store, data: dict) -> dict:
 
 
 def search(store: Store, query: dict) -> list[dict]:
-    topics = {normalized(t) for t in query.get("topics", [])}
+    topics = canonical_topics(query.get("topics", []))
     role = normalized(query.get("role", ""))
     round_name = (query.get("round") or "").lower()
     tokens = re.findall(r"[a-z0-9_]+", " ".join([query.get("query", ""), role, *topics]).lower())[:30]
@@ -92,12 +93,20 @@ def search(store: Store, query: dict) -> list[dict]:
               AND json_extract(m.payload,'$.status')='active'
             ORDER BY lexical, memory_id
         """, (expression,)).fetchall()
+        # Old FTS rows contain the original broad tag. Supplement matching notes
+        # with a read-only topic view; do not rewrite their evidence or index.
+        by_id = {json.loads(row[0])["memory_id"]: (json.loads(row[0]), row[1]) for row in rows}
+        if topics:
+            for row in db.execute("SELECT payload FROM memories WHERE json_extract(payload,'$.status')='active'"):
+                note = json.loads(row[0])
+                if topics & memory_topics(note):
+                    by_id.setdefault(note["memory_id"], (note, 0.0))
     # Time filtering precedes candidate truncation, including in manually constructed datasets.
     now = parse_instant(store.meta("clock"))
-    candidates = [(json.loads(r[0]), r[1]) for r in rows if parse_instant(json.loads(r[0])["created_at"]) <= now][:20]
+    candidates = [(note, lexical) for note, lexical in by_id.values() if parse_instant(note["created_at"]) <= now]
     scored = []
     for note, lexical in candidates:
-        existing = set(note["topics"])
+        existing = memory_topics(note)
         jaccard = len(topics & existing) / len(topics | existing) if topics | existing else 0
         role_match = int(bool(role) and role == normalized(note["role"]))
         if not jaccard and not role_match:

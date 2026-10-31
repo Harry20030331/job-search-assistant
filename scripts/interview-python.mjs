@@ -16,6 +16,7 @@ const modules = {
   "preparation-controls": ["evaluation.preparation_quality_controls"],
   enrich: ["interview.enrichment"],
   "enrichment-checks": ["evaluation.enrichment_scenarios"],
+  "virtual-tests": ["evaluation.virtual_mailbox"],
   learning: ["interview.candidate_learning"],
   practice: ["interview.practice_flow"],
   eval: ["evaluation.runner"], triage: ["evaluation.mail_triage"], analysis: ["evaluation.analysis"],

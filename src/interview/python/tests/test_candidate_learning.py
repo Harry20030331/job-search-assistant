@@ -113,6 +113,21 @@ class CandidateLearningTests(unittest.TestCase):
         self.attach()
         self.assertIn('"round":null', learning.sources(self.store)[0]["content"])
 
+    def test_legacy_generic_experiment_note_matches_specific_scope_without_rewriting_store(self):
+        note_id, _ = self.note("experiment-legacy", topic="evaluation",
+            text="In a fictional mock, I struggled with the randomization unit and network interference.")
+        # Preserve the shape produced before canonical topic refinement existed.
+        with self.account.connect() as db:
+            row = db.execute("SELECT payload FROM memories WHERE memory_id=?", (note_id,)).fetchone()
+            value = json.loads(row[0]); value["topics"] = ["evaluation"]
+            db.execute("UPDATE memories SET payload=? WHERE memory_id=?", (canonical(value), note_id))
+        original = self.account.path.read_bytes()
+        result = learning.attach(self.store, self.binding,
+            {"topics": ["experimentation", "product_metrics"], "reason": "Fictional upcoming experiment-design practice."})
+        self.assertEqual(result["retrieved_memory_ids"], [note_id])
+        self.assertEqual(self.account.path.read_bytes(), original)
+        self.assertIn("randomization unit", learning.sources(self.store)[0]["content"])
+
     def test_age_expiry_invalidates_snapshot_without_account_write(self):
         self.note("age")
         self.attach()
@@ -150,6 +165,18 @@ class CandidateLearningTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "revised debrief"):
             run_node(self.store.workspace, self.root / "unused", approval_id=approval, invoke_fn=fake)
         fake.assert_not_called()
+
+    def test_changed_topic_policy_invalidates_approval_before_a_model_call(self):
+        record, approval = self.approved()
+        original = self.account.path.read_bytes()
+        with patch.object(learning, "TOPIC_POLICY", "test-future-policy"):
+            with self.assertRaisesRegex(ValueError, "topic policy changed"):
+                approved_plan(self.store, record["interview_id"], approval)
+            fake = Mock()
+            with self.assertRaisesRegex(ValueError, "topic policy changed"):
+                run_node(self.store.workspace, self.root / "policy-stale", approval_id=approval, invoke_fn=fake)
+            fake.assert_not_called()
+        self.assertEqual(self.account.path.read_bytes(), original)
 
     def test_correction_resolves_old_issue_and_new_run_uses_current_version_only(self):
         original, raw = self.note("original")

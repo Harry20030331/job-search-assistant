@@ -2,6 +2,8 @@
 
 Protocol: `interview-workflow-v1`. Method: `simple-instruction-v1`. Maintenance date: 2026-10-25. This is a developer pilot, not a frozen research benchmark or evidence of component effects.
 
+Maintenance 2026-10-30: the optional `--method source-id-catalog-v1` enables a separately recorded source-catalog/schema intervention. The default simple-instruction method explicitly retains its legacy prompt/schema; original failures are preserved. See [source-reference repair](interview-source-reference-fix.md) for changes, policy revisions and verification limits.
+
 ## Scope and cases
 
 The versioned dataset lives in `src/interview/python/benchmark/workflow-v1/`. Its 12 episodes exercise current module contracts:

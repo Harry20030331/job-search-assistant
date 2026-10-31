@@ -1,6 +1,6 @@
 # Shared interview workbench
 
-Maintenance date: 2026-10-26. Interview rounds now link to existing shared applications and appear at `/interviews` on the same local Review server. This is a host-orchestrated business integration with a read-only interview page. No background mail daemon, Google write, shared schema migration or extra AI dependency is installed.
+Maintenance date: 2026-10-30. Interview rounds now link to existing shared applications and appear at `/interviews` on the same local Review server. This is a host-orchestrated business integration with an interview page with exact plan approval and debrief reminders. No background mail daemon, Google write, shared schema migration or extra AI dependency is installed.
 
 ## Ownership and lifecycle
 
@@ -44,7 +44,7 @@ Use `expectedRevision: null` only for a new interview. Updates require the curre
 
 **Advance lifecycle before staging preparation.** A canonical handoff's source guard hashes the opportunity file. Linking after staging changes that file and correctly makes the old run stale. For a batch, complete verified lifecycle updates before freezing the runs. An unrelated later opportunity update currently also invalidates this conservative whole-file guard; use a fresh handoff instead of deleting the guard.
 
-Then run the existing `interview context|stage`, optional explicit learning binding, enrichment/context analysis, proposal, exact chat approval and material flow. Publish the selected fresh work directory:
+Then run the existing `interview context|stage`, optional explicit learning binding, enrichment/context analysis, proposal, exact chat or website approval and material flow. Publish the selected fresh work directory:
 
 ```text
 npm run interview:track -- publish --runtime-dir <selected-candidate-runtime> --interview-id <exact-round-id> --workspace <staged-run>/work --expected-revision <current-revision>
@@ -67,7 +67,7 @@ Open `/` for Home. All pages share Home, Status, Review, Interviews and Google a
 
 For real OAuth, start the service in an execution environment allowed to reach Google. A browser can sign in successfully while a network-restricted backend cannot exchange the code. When launched through Codex's restricted shell, request the normal network-enabled tool execution approval for this explicit local service; do not disable TLS or change OAuth protections. The server remains loopback-only. On 2026-10-26 the restricted launch reproduced Windows network error 10013 against Google's public token endpoint; the approved network-enabled launch reached it and a subsequent human authorization produced Connected with Gmail account verification. See [connection troubleshooting](interview-google-connection-verification.md).
 
-The interview page has no write/approval endpoint and no arbitrary-file download route. Plans display their actual version, budget and status. Full materials are read only from the exact current approved proposal; stale sources/history, a new proposal or an unavailable/changed run suppress material access. Historical outlines can remain visible with a refresh notice. Approval and revisions stay in Codex chat; this page cannot authorize an application, calendar operation or new material generation.
+The interview page has narrowly scoped plan-approval and notification-dismissal endpoints, with strict Origin/CSRF checks; no calendar write or arbitrary-file download route is exposed. See [website actions](interview-web-actions.md). Plans display their actual version, budget and status. Full materials are read only from the exact current approved proposal; stale sources/history, a new proposal or an unavailable/changed run suppress material access. Historical outlines can remain visible with a refresh notice. Users may approve the exact current plan on the Plan tab to queue practice generation. Detailed revisions stay in Codex chat. Interview approval cannot authorize an application or calendar operation.
 
 Debriefs display original reports separately from derived observations and suggested practice. Raw reports can appear before model extraction completes. Retrieval requires this interview ID and compatible historical role/company/round. Account-level reports are read only when an explicit candidate/account binding is present and still active; other interviews/accounts are not discovered or merged. A new account debrief may invalidate the old preparation snapshot while remaining visible as a scoped report. Revocation withholds account reports. Local business reports remain owned by their selected run.
 
