@@ -2,7 +2,7 @@
   "version": 30,
   "establishedAt": "2026-10-31",
   "authorization": "User requested merging current team updates with the Interview module and retesting it; preserve Application v29 and Interview v5 behavior.",
-  "validation": "Pending final integration checks; preserves prior manifests and the unchanged Application renderers/workflow script.",
+  "validation": "274 Python and 155 related TypeScript tests passed; current-source full Windows suite has 52 upstream-reproduced failures. Browser verified Status reminders and one exact-plan approval leading to 8 questions from one actual Codex invocation. See docs/interview-team-merge.md; no live employer or Google action and no independent human review.",
   "files": {
     "src/review/reviewViews.ts": "cc19860ac6bfade89a9886220fd52f78a9ad1f1843016a3dddcd73d164808a8f",
     "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
