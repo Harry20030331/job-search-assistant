@@ -38,7 +38,7 @@ export async function resolveRecoveryInputs(projectRoot: string): Promise<Recove
     if (!metadata.isDirectory() || (metadata.mode & 0o777) !== 0o700) throw new Error("unsafe_recovery_file_permissions");
     for (const name of await readdir(reviewPath)) if (name.endsWith(".json")) await requirePrivateFile(join(reviewPath, name));
     const [review, tracker, jobs] = await Promise.all([readReviewBatch(reviewPath), readApplicationTracker(canonical), readJobLibrary(canonical)]);
-    validateRecoveryCandidate(review, tracker, jobs);
+    validateRecoveryCandidate(review, tracker, jobs, true);
     return { reviewPath, trackerPath: canonical, jobsPath: canonical, chinaJobsPath: "", chinaOutreachPath: "", port: 64441,
       applicationCount: review.applications.length, applicationIds: review.applications.map(item => item.applicationId), liveAtsState: "unverified" };
   }
@@ -120,7 +120,8 @@ export async function resolveRecoveryInputs(projectRoot: string): Promise<Recove
 function validateRecoveryCandidate(
   review: Awaited<ReturnType<typeof readReviewBatch>>,
   tracker: Awaited<ReturnType<typeof readApplicationTracker>>,
-  jobs: Awaited<ReturnType<typeof readJobLibrary>>
+  jobs: Awaited<ReturnType<typeof readJobLibrary>>,
+  separateResumeCategory = false
 ): void {
   for (const reviewItem of review.applications) {
     const trackerMatches = tracker.applications.filter(
@@ -144,7 +145,7 @@ function validateRecoveryCandidate(
     if (jobMatches.length !== 1) throw new Error("recovery_data_mismatch");
     const job = jobMatches[0]!;
     if (
-      job.category !== application.category ||
+      (!separateResumeCategory && job.category !== application.category) ||
       normalizeOfficialUrl(job.officialUrl) !== normalizeOfficialUrl(application.jobUrl)
     ) throw new Error("recovery_data_mismatch");
   }

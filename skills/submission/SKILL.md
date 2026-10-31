@@ -9,7 +9,7 @@ Read `../../docs/workflow-contract.md` for the active preparation, review, submi
 
 ## Preparation
 
-Run bounded preflight using fresh canonical facts, application rules and CV manifest. Every application needs an explicit active category and official HTTPS URL. Upload only its mapped approved PDF and verify the visible filename. Candidate facts override ATS parsing; never infer a missing fact from a blank field or a resume parser.
+Run bounded preflight using fresh canonical facts, application rules and CV manifest. Every application needs an explicit approved resume-profile key from the selected manifest and an official HTTPS URL. The existing preflight/Review/lifecycle `category` means that resume key, while job `category` means direction; read [the shared adapter contract](../../docs/job-directions.md). Never infer the resume key from a PM/other direction or relabel a job to fit a CV. Upload only its mapped approved PDF and verify the visible filename. Candidate facts override ATS parsing; never infer a missing fact from a blank field or a resume parser.
 
 For generated answers, read the full prompt, the explicit category's approved narrative evidence and the resolved current experience. Choose relevant examples for the actual responsibilities. Preserve metric scopes, titles and provenance; do not use a permanent essay template or merge different category variants into new claims. Put the draft into Review.
 
@@ -21,11 +21,17 @@ Reuse a confirmed answer automatically only for an exact semantic match across t
 
 Bind repeated controls to the complete visible question and section. Re-observe after upload, parsing, validation, navigation, conditional fields or rerendering. Verify saved values where the ATS has a save/reopen step. Distinguish an answer drafted locally, applied live, saved by the ATS and finally submitted.
 
-Unknown personal-history, legal, sensitive or exercise facts go to the unified review surface. Simple choices use the existing autosave controls; free-text changes come through chat. Never fabricate an answer to reach the end of a form. Continue other authorized preparation while one application is blocked.
+Unknown personal-history, legal, sensitive or exercise facts go to the unified review surface. Simple choices, short factual inputs and long answers can be edited directly in Review and saved automatically. Never fabricate an answer to reach the end of a form. Continue other authorized preparation while one application is blocked.
+
+## Presenting Review to the user
+
+Before first presenting a batch, call the `review.start` data operation to initialize legacy queue metadata. Preserve that metadata during answers, approvals and recovery. The current Review UI follows Status order and has no sidebar numbers; use the UI contract for display behavior.
+
+When presenting or resetting Review, link to the current page and explain: approve content to add it to the batch, then click **Submit applications (N)** at the bottom when ready. No return to chat is required. The second action issues a distinct, exact-content execution task. Preserve the configured execution mode and no-send boundary; a Submitted label in a demo is not evidence of a real employer submission.
 
 ## Approval and submission
 
-Follow `../../docs/workflow-contract.md` → Final submission control. Explicit user acceptance of the exact current application in chat is valid approval and submission authorization; it does not require an extra website click. Preserve the actual source. An option selection alone is not approval.
+Follow `../../docs/workflow-contract.md` → Final submission control. Approve accepts local content only and leaves it awaiting execution. Chat acceptance of content has the same scope unless the user explicitly asks to execute or submit. Wait for that separate execution instruction for the selected applications; preserve its actual source and exact content revision. A content-only decision alone cannot be consumed as submission authorization. A website task provides the separate execution request; use `consumeWebsiteTask` and its returned provenance as described in the workflow contract.
 
 Apply all accepted edits to the actual form and verify the complete live state and CV before the authorized submit. For website-approved desired revisions, verify their exact live synchronization before consuming approval. Never turn a local publication into approval, impersonate a user website event, or replay an unclear submission. Save actual success evidence and reconcile receipts under the common contract.
 
@@ -47,4 +53,8 @@ Use the contract's three-layer diagnosis: browser connection, local review servi
 
 ## Stable interface
 
-Routine answers and status updates must use the documented data ports. Changing layout or interactions requires an explicit user request; preserve the UI baseline during data updates. For the course demo, read `../../docs/demo.md`; the demo form is the only permitted destination for fictional inputs.
+Treat Review as an existing interface with a stable data contract, not as a page to regenerate for each task. Read `../../docs/ui-contract.md` for the supported ports. Publish or reset local drafts with `npm run data -- --input <command.json>` (`review.publish`) or its domain function, binding stable application IDs and expected snapshot/revision/decision. Change status through the documented job/tracker functions. Read results through `readReviewBatch` and refresh the existing page. User clicks and answer edits use the page's existing API routes; never call approval endpoints to impersonate the user.
+
+Ordinary application preparation, profile answers, review resets and status updates do not authorize editing the renderer, HTML, CSS, client scripts, display rules or the UI baseline. Do not bypass the interface with whole-store rewrites or browser script injection. Candidate-source maintenance follows the candidate-inputs contract. Only an explicit request to change the UI design permits renderer changes; then test, visually verify, preserve the prior manifest and record a reviewed successor baseline. `npm run ui:check` detects renderer drift; it is a repository check, not an OS-level write restriction.
+
+When presenting Review, explain that the agent supplies structured data to this interface while the user reviews there; do not rebuild the screen or repeat all its content in chat. After review, execute only a separate authorized website task or explicit selected-application chat instruction. The default website Demo mode is an offline rehearsal and contacts no employers. For the optional simulated employer exercise, read `../../docs/demo.md`.

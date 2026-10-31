@@ -1,5 +1,5 @@
 import { access, readFile, readdir } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const project = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -13,8 +13,9 @@ pass("dependency surface is minimal");
 
 const required = [
   "AGENTS.md", "CONTEXT.md", "docs/workflow-contract.md", "docs/candidate-inputs.md",
-  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json",
+  "docs/architecture.md", "docs/structure.md", "docs/ui-contract.md", "docs/ui-contract-v1.json", "docs/ui-contract-v2.json", "docs/ui-contract-v3.json", "docs/ui-contract-v4.json", "docs/ui-contract-v5.json", "docs/ui-contract-v6.json", "docs/ui-contract-v7.json", "docs/ui-contract-v8.json", "docs/ui-contract-v9.json", "docs/ui-contract-v10.json", "docs/ui-contract-v11.json", "docs/ui-contract-v12.json", "docs/ui-contract-v13.json", "docs/ui-contract-v14.json", "docs/ui-contract-v15.json", "docs/ui-contract-v16.json", "docs/ui-contract-v17.json", "docs/ui-contract-v18.json", "docs/ui-contract-v19.json", "docs/ui-contract-v20.json", "docs/ui-contract-v21.json", "docs/ui-contract-v22.json", "docs/ui-contract-v23.json", "docs/ui-contract-v24.json", "docs/ui-contract-v25.json", "docs/ui-contract-v26.json", "docs/ui-contract-v27.json", "docs/ui-contract-v28.json", "docs/ui-contract-v29.json", "docs/ui-contract-matching-v2.json", "docs/ui-contract-interview-v2.json", "docs/ui-contract-interview-v3.json", "docs/ui-contract-interview-v4.json",
   "skills/submission/SKILL.md", "skills/matching/SKILL.md",
+  "skills/matching/intake/SKILL.md", "skills/matching/discovery/SKILL.md", "skills/matching/feedback/SKILL.md",
   "skills/submission/greenhouse/SKILL.md", "skills/submission/ashby/SKILL.md", "skills/submission/lever/SKILL.md",
   "skills/submission/workday/SKILL.md", "skills/submission/long-tail/SKILL.md",
   "docs/job-discovery.md", "src/storage/opportunities.ts", "src/storage/drafts.ts"
@@ -36,6 +37,31 @@ for (const term of ["Application", "Batch", "Canonical Input", "Review Snapshot"
   if (!context.includes(`## ${term}`)) fail(`domain_term_missing:${term}`);
 }
 pass("entrypoints defer to the current contract and ATS modules to common policy");
+
+// Check actual local targets and reachability, not particular prose or headings.
+const matchingSkills = ["SKILL.md", "intake/SKILL.md", "discovery/SKILL.md", "feedback/SKILL.md"]
+  .map(path => join(project, "skills/matching", path));
+const matchingLinks = new Map();
+for (const file of matchingSkills) {
+  const content = await readFile(file, "utf8");
+  const links = [];
+  for (const match of content.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(match[1]) || match[1].startsWith("#")) continue;
+    const target = resolve(dirname(file), decodeURIComponent(match[1].split("#")[0]));
+    await access(target).catch(() => fail(`matching_reference_missing:${relative(project, target)}`));
+    if (matchingSkills.includes(target)) links.push(target);
+  }
+  matchingLinks.set(file, links);
+}
+const reachable = new Set(), pending = [matchingSkills[0]];
+while (pending.length) {
+  const file = pending.pop();
+  if (reachable.has(file)) continue;
+  reachable.add(file); pending.push(...matchingLinks.get(file));
+}
+if (matchingSkills.some(file => !reachable.has(file))) fail("matching_stage_unreachable");
+if (matchingSkills.slice(1).some(file => !matchingLinks.get(file).includes(matchingSkills[0]))) fail("matching_parent_reference_missing");
+pass("Matching stage skills and local references are linked and reachable");
 
 // These are scope guards, not an assertion that the agent will follow prose.
 const chinaOutreachSource = await readFile(join(project, "src/china/outreach/chinaOutreachTracker.ts"), "utf8");

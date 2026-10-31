@@ -6,3 +6,5 @@ src/interview/interviewView.ts text eol=lf
 src/interview/practiceText.ts text eol=lf
 src/workbench/views.ts text eol=lf
 src/interview/browserActions.ts text eol=lf
+src/review/workflowViews.ts text eol=lf
+src/review/applicationStyles.ts text eol=lf

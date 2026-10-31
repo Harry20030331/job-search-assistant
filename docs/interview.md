@@ -1,6 +1,6 @@
 # Interview Coordination
 
-Owner: Erica Zhao. Integration and packaging maintenance date: 2026-10-26. The module uses a skill entry, business tools/state and a separate evaluator. This branch adds the development implementation, a read-only canonical-input adapter and repeatable checks. Shared opportunity schemas and lifecycle rules retain their existing contracts; verified interview links use the existing lifecycle API. User-requested Home/navigation, Google account connection and direct interview questions follow the controlled UI v5 contract, preserving historical manifests. Shared policy remains [workflow-contract](workflow-contract.md).
+Owner: Erica Zhao. Integration and packaging maintenance date: 2026-10-26. The module uses a skill entry, business tools/state and a separate evaluator. This branch adds the development implementation, a read-only canonical-input adapter and repeatable checks. Shared opportunity schemas and lifecycle rules retain their existing contracts; verified interview links use the existing lifecycle API. User-requested Home/navigation, Google account connection and direct interview questions follow the controlled UI v30 contract, preserving historical manifests. Shared policy remains [workflow-contract](workflow-contract.md).
 
 ## Layout and ownership
 

@@ -25,10 +25,23 @@ async function copyPrivate(source: string, target: string): Promise<void> {
 }
 
 /** Load a complete fictional case into data, replacing rather than merging states. */
-export async function loadExample(workspace: string, example: string) {
+export async function loadExample(workspace: string, example: string, snapshot?: "shortlist" | "review") {
   const root = resolve(workspace), source = resolve(example), data = join(root, "data");
   if (source === data || source.startsWith(data + "/")) throw new Error("example_cannot_be_current_data");
-  // The UI and writers must be stopped before changing a whole working state.
+  if (snapshot !== undefined && !["shortlist", "review"].includes(snapshot)) throw new Error("invalid_example_snapshot");
+  const selected = snapshot ?? (await exists(join(source, "snapshots/shortlist")) ? "shortlist" : undefined);
+  const progress = selected ? join(source, "snapshots", selected) : source;
+  if (!await exists(progress) || (selected && !await exists(join(progress, "opportunities.json")))) throw new Error("example_snapshot_not_found");
+  if (selected && ((await lstat(join(source, "snapshots"))).isSymbolicLink() || (await lstat(progress)).isSymbolicLink())) throw new Error("example_symlink_not_allowed");
+  // Reject an active website runner before replacing its data directory.
+  const runnerLock = join(data, "application-tasks.json.runner.lock");
+  if (await exists(runnerLock)) {
+    const pid = Number((await readFile(runnerLock, "utf8")).trim());
+    if (!Number.isSafeInteger(pid) || pid <= 0) throw new Error("stop_review_before_loading_example");
+    try { process.kill(pid, 0); throw new Error("stop_review_before_loading_example"); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error; }
+  }
+  // Other writers must also be stopped before changing a whole working state.
   const lock = join(root, ".example-load.lock");
   await mkdir(lock, { mode: 0o700 });
   let staging: string | undefined, backupPath: string | undefined;
@@ -55,8 +68,10 @@ export async function loadExample(workspace: string, example: string) {
       await runPreflight({ category: entry.category, jobUrl: "https://careers.example.com/jobs/example", profilePath: join(stagedData, "candidate.json"), manifestPath: join(stagedData, "resumes.json") });
     }
     for (const name of ["opportunities.json", "discovery-state.json", "drafts"]) {
-      if (await exists(join(source, name))) await copyPrivate(join(source, name), join(stagedData, name));
+      if (await exists(join(progress, name))) await copyPrivate(join(progress, name), join(stagedData, name));
     }
+    // Host-specific chat routing survives resets, but never comes from a shared example.
+    if (await exists(join(data, "chat-runner.json"))) await copyPrivate(join(data, "chat-runner.json"), join(stagedData, "chat-runner.json"));
     await resolveRecoveryInputs(staging);
     await readDiscovery(join(stagedData, "discovery-state.json"));
     if (await exists(data)) {
@@ -68,7 +83,7 @@ export async function loadExample(workspace: string, example: string) {
     }
     try { await rename(stagedData, data); }
     catch (error) { if (backupPath) await rename(backupPath, data); throw error; }
-    return { ...(await resolveRecoveryInputs(root)), backupPath, candidateName: candidate.identity.fullName };
+    return { ...(await resolveRecoveryInputs(root)), backupPath, candidateName: candidate.identity.fullName, snapshot: selected, entryPath: selected === "review" ? "/review" : "/status/us" };
   } finally {
     if (staging) await rm(staging, { recursive: true, force: true });
     await rm(lock, { recursive: true, force: true });

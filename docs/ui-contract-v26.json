@@ -1,0 +1,11 @@
+{
+  "version": 26,
+  "approvedAt": "2026-10-30",
+  "validation": "423 tests passed, including batch-completion navigation, reload persistence and failure/edit guards. In-app Browser verified five Submitted demo rows. No live employer submission.",
+  "files": {
+    "src/review/reviewViews.ts": "886567dafee549bed88551e9a9b33c9707ff85f2d3ec5ec78ca2682bb6792006",
+    "src/review/statusView.ts": "42af6222a4d9a716b28ae7d30f1a41589776cd65c6fa164d614ed7b5d845ee99",
+    "src/review/workflowViews.ts": "64ed311c3029e595c636dd8cbbcfe485faaff30b57a505477ec6c2ae7ac56b6b",
+    "src/review/applicationStyles.ts": "6b698313a8eb9aa999381637ed88c1d3b69f6eecac655003a577508d653a246c"
+  }
+}

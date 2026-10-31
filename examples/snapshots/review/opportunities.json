@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "opportunities": [
+    {
+      "jobId": "alex-nooks-311d6e70",
+      "company": "Nooks",
+      "title": "Software Engineer, New Grad",
+      "location": "San Francisco, CA (hybrid)",
+      "category": "llm",
+      "officialUrl": "https://jobs.ashbyhq.com/nooks/311d6e70-5cfa-4e80-89f6-fe00ac1f9f53",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-10-15",
+      "lastVerified": "2026-10-15",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "availability": "open",
+      "stage": "in_review",
+      "application": {
+        "applicationId": "alex-nooks-311d6e70",
+        "ats": "ashby",
+        "cvFilename": "alex-liu-resume.pdf",
+        "visibleResult": "not_attempted",
+        "gmailConfirmation": "not_checked",
+        "createdAt": "2026-10-30T19:01:41.622Z",
+        "updatedAt": "2026-10-30T19:01:41.622Z",
+        "applicationUrl": "https://jobs.ashbyhq.com/nooks/311d6e70-5cfa-4e80-89f6-fe00ac1f9f53/application"
+      }
+    },
+    {
+      "jobId": "alex-adobe-r172083",
+      "company": "Adobe",
+      "title": "2027 University Graduate - Software Engineer",
+      "location": "Seattle / US multiple locations",
+      "category": "llm",
+      "officialUrl": "https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced/job/XMLNAME-2027-University-Graduate---Software-Engineer_R172083",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-10-15",
+      "lastVerified": "2026-10-15",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "availability": "open",
+      "stage": "in_review",
+      "application": {
+        "applicationId": "alex-adobe-r172083",
+        "ats": "workday",
+        "cvFilename": "alex-liu-resume.pdf",
+        "visibleResult": "not_attempted",
+        "gmailConfirmation": "not_checked",
+        "createdAt": "2026-10-30T19:01:41.628Z",
+        "updatedAt": "2026-10-30T19:01:41.628Z",
+        "applicationUrl": "https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced/job/San-Jose/XMLNAME-2027-University-Graduate---Software-Engineer_R172083/apply/applyManually"
+      }
+    },
+    {
+      "jobId": "alex-wd-744000138717897",
+      "company": "Western Digital",
+      "title": "Software Engineer",
+      "location": "San Jose, CA / US multiple locations",
+      "category": "llm",
+      "officialUrl": "https://jobs.smartrecruiters.com/WesternDigital/744000138717897",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-10-15",
+      "lastVerified": "2026-10-15",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Saved early-career hiring-pool posting, not evidence of a current vacancy.",
+      "availability": "open",
+      "stage": "in_review",
+      "application": {
+        "applicationId": "alex-wd-744000138717897",
+        "ats": "long-tail",
+        "cvFilename": "alex-liu-resume.pdf",
+        "visibleResult": "not_attempted",
+        "gmailConfirmation": "not_checked",
+        "createdAt": "2026-10-30T19:01:41.632Z",
+        "updatedAt": "2026-10-30T19:01:41.632Z",
+        "applicationUrl": "https://jobs.smartrecruiters.com/oneclick-ui/company/WesternDigital/publication/f0f53e97-3d85-4b45-a8d7-e32f767906a6/screening?dcr_ci=WesternDigital"
+      }
+    },
+    {
+      "jobId": "alex-scale-4730836005",
+      "company": "Scale AI",
+      "title": "Software Engineer - New Grad",
+      "location": "San Francisco, CA",
+      "category": "llm",
+      "officialUrl": "https://job-boards.greenhouse.io/scaleai/jobs/4730836005",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-10-15",
+      "lastVerified": "2026-10-15",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Eligibility caveat: listing bachelor graduation dates differ from this candidate; retained for platform coverage.",
+      "availability": "open",
+      "stage": "in_review",
+      "application": {
+        "applicationId": "alex-scale-4730836005",
+        "ats": "greenhouse",
+        "cvFilename": "alex-liu-resume.pdf",
+        "visibleResult": "not_attempted",
+        "gmailConfirmation": "not_checked",
+        "createdAt": "2026-10-30T19:01:53.937Z",
+        "updatedAt": "2026-10-30T19:01:53.937Z",
+        "applicationUrl": "https://job-boards.greenhouse.io/scaleai/jobs/4730836005"
+      }
+    },
+    {
+      "jobId": "alex-palantir-2e6b0ac8",
+      "company": "Palantir",
+      "title": "Forward Deployed Software Engineer, New Grad - Commercial",
+      "location": "New York, NY (hybrid)",
+      "category": "llm",
+      "officialUrl": "https://jobs.lever.co/palantir/2e6b0ac8-83e9-4be5-a3aa-cf319f751728",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-10-15",
+      "lastVerified": "2026-10-15",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "availability": "open",
+      "stage": "in_review",
+      "application": {
+        "applicationId": "alex-palantir-2e6b0ac8",
+        "ats": "lever",
+        "cvFilename": "alex-liu-resume.pdf",
+        "visibleResult": "not_attempted",
+        "gmailConfirmation": "not_checked",
+        "createdAt": "2026-10-30T19:01:53.942Z",
+        "updatedAt": "2026-10-30T19:01:53.942Z",
+        "applicationUrl": "https://jobs.lever.co/palantir/2e6b0ac8-83e9-4be5-a3aa-cf319f751728/apply"
+      }
+    }
+  ]
+}

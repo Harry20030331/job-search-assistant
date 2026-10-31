@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "jobId": "alex-palantir-2e6b0ac8",
+  "identitySha256": "c1506e865e56e17d48c8a2f34fcd7e46f3ad546dac2cac0aabed92118acfa432",
+  "cvVerified": false,
+  "snapshotId": "example:alex-liu:review:alex-palantir-2e6b0ac8:v1",
+  "answers": [],
+  "consents": [],
+  "questions": [
+    {
+      "id": "delta-draft",
+      "prompt": "We have two Software Engineer roles at Palantir for New Grads. Please confirm that you are interested in the Forward Deployed Software Engineer role as opposed to Software Engineer.",
+      "required": true,
+      "draftAnswer": "I am interested in the Forward Deployed Software Engineer role because I want to connect software implementation with a concrete operational problem. My strongest experience is in Python, retrieval evaluation and reliable agent workflows. In my document-search internship prototype, I owned evaluation scripts and citation checks; in Study Search, I own ingestion, evaluation and the local review interface. I would bring that habit of making outputs inspectable and failures reproducible to a customer-facing engineering team. I am completing my MS in June 2027 and would be available from July 2027. This is a fictional candidate response for a pre-submission course test."
+    },
+    {
+      "id": "numbers-draft",
+      "prompt": "Give us three numbers that describe you — and tell us why.",
+      "required": false,
+      "draftAnswer": "180: the synthetic retrieval questions I curated during my internship prototype. Building the questions and reference documents mattered as much as writing the retrieval code.\n\n60: the fixed development questions used to compare retrieval changes. Recall@5 moved from 0.64 to 0.79 on that split; I keep that scope explicit rather than claiming held-out or production performance.\n\n3: the people on my Agent Task Bench course team. I owned tool validation and failure analysis, and learned to describe my contribution separately from my teammates’ work.\n\nAll figures are fictional candidate fixture facts for a pre-submission test, not measured results for this course project."
+    },
+    {
+      "id": "high-school-name",
+      "prompt": "High School Name",
+      "required": true,
+      "inputType": "short-text"
+    },
+    {
+      "id": "high-school-year",
+      "prompt": "Year of High School Graduation",
+      "required": true,
+      "inputType": "short-text"
+    },
+    {
+      "id": "relocation-new-york",
+      "prompt": "Are you willing to relocate to New York for this hybrid role?",
+      "required": true,
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ]
+    },
+    {
+      "id": "travel",
+      "prompt": "Are you willing to travel 25–50% of the time?",
+      "required": true,
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ]
+    },
+    {
+      "id": "changed-mind",
+      "prompt": "Tell us about a time you changed your mind about something. (150 words max)",
+      "required": false
+    }
+  ],
+  "validationErrors": [],
+  "friction": [
+    "Saved fictional review checkpoint; live form values and resume upload are unverified."
+  ],
+  "snapshotCurrent": false,
+  "reviewStage": "questions",
+  "preparedAt": "2026-10-30T00:00:00.000Z",
+  "decision": {
+    "state": "pending"
+  },
+  "desiredState": {
+    "revision": 1,
+    "syncState": "pending"
+  }
+}

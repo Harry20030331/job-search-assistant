@@ -1,0 +1,16 @@
+{
+  "version": 30,
+  "establishedAt": "2026-10-31",
+  "authorization": "User requested merging current team updates with the Interview module and retesting it; preserve Application v29 and Interview v5 behavior.",
+  "validation": "Pending final integration checks; preserves prior manifests and the unchanged Application renderers/workflow script.",
+  "files": {
+    "src/review/reviewViews.ts": "cc19860ac6bfade89a9886220fd52f78a9ad1f1843016a3dddcd73d164808a8f",
+    "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
+    "src/review/workflowViews.ts": "99f4aa47413931f43321bc308e4f051def6505ea0b068af9b6026e32b708bc57",
+    "src/review/applicationStyles.ts": "97cf31b4a9a2e8b9f2869aa76c572897765b155f3c552a85b0d7243672917b40",
+    "src/workbench/views.ts": "7899402c77ee8c0032eb0707f2723334574a1ab60644e3897a5b46329d189523",
+    "src/interview/interviewView.ts": "4e1cc46200ac6f304d78f2da6d3ea0f3fe8fb2fcf24593f9c1163240fbb8b681",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "62b1ae7e3dae6b3c4dd6b497ca55ddf7a35cddeb4961d92e8f6d2c7f7c3e5273"
+  }
+}

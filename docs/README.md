@@ -26,6 +26,10 @@ Maintain shared project documentation in this repository's `docs/` directory. Th
 
 ## Development and operation
 
+- [Welcome and setup](welcome.md): open the project, send Hi, and follow the English candidate setup flow.
+- [LinkedIn profile input](linkedin-import.md): designated-profile observation, source-backed preview, user confirmation and access-failure alternatives.
+- [Saved searches and website startup](workspaces.md): discover existing results and open their local website before browsing sources.
+
 - [Structure](structure.md): files, data ownership and workspace lifecycle.
 - [Commands](commands.md): runnable entrypoints and record updates.
 - [Interview Coordination](interview.md): shared-input handoff, optional Python setup, preparation and Google boundaries.
@@ -41,6 +45,7 @@ Maintain shared project documentation in this repository's `docs/` directory. Th
 - [Interview integration check](interview-integration-check.md): local validation and comparison with an unchanged upstream checkout.
 - [Candidate inputs](candidate-inputs.md): current input formats and factual ownership.
 - [Job discovery](job-discovery.md): sources, screening and opportunity updates.
+- [Job directions and resume routing](job-directions.md): open role labels, explicit approved CV binding, and Submission compatibility.
 - [Matching loop](matching.md): executable recommendation publication, persistent feedback and isolated two-round demo.
 - [Interactive Matching](matching-chat.md): natural-language candidate intake, live search and actual feedback turns through Codex chat.
 - [Workflow contract](workflow-contract.md): preparation, review, execution and recovery.

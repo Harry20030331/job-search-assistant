@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "requestedAt": "2026-10-29",
+  "previousManifest": "docs/ui-contract-v1.json",
+  "reason": "User-requested open job directions and independent application resume routing. Preserve all layout/interactions and legacy labels; display escaped new directions in Status.",
+  "files": {
+    "src/review/reviewViews.ts": "0bafef8431d0381d1a498a0cc3427a6c7d34c643440ffaede9d8287e8465eaa9",
+    "src/review/statusView.ts": "ac50054002dfda761a01d4024459a7c46f673d884e8e503c4d9a574d2081b18d"
+  }
+}

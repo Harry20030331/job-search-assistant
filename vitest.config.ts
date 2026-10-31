@@ -1,0 +1,5 @@
+import { defineConfig } from "vitest/config";
+
+// Private runtimes and verification copies may contain historical source trees.
+// Only the repository's current source is part of its regression suite.
+export default defineConfig({ test: { include: ["src/**/*.test.ts"] } });

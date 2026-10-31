@@ -13,8 +13,8 @@ test('fictional form preserves review gates, rejects drift, records one result a
  const review=new URL(demo.reviewUrl).origin,form=new URL(demo.formUrl).origin;
  const post=(origin:string,path:string,body:object)=>fetch(origin+path,{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
  try {
-  const pdf=await readFile(join(dirname(fileURLToPath(import.meta.url)),'../../examples/alex-morgan-resume.pdf'));
-  const values={name:'Alex Morgan',email:'alex.morgan@example.com',summary:'I built Study Search with source citations and regression checks.',relocation:'',resumeName:'alex-morgan-resume.pdf',resumeBase64:pdf.toString('base64')};
+  const pdf=await readFile(join(dirname(fileURLToPath(import.meta.url)),'../../examples/alex-liu-resume.pdf'));
+  const values={name:'Alex Liu',email:'alex.liu@example.com',summary:'I built Study Search with source citations and regression checks.',relocation:'',resumeName:'alex-liu-resume.pdf',resumeBase64:pdf.toString('base64')};
   expect((await post(form,'/submit',values)).status).toBe(409);
   expect((await post(form,'/prepare',{...values,email:'other@example.com'})).status).toBe(409);
   expect((await post(form,'/prepare',values)).status).toBe(200);

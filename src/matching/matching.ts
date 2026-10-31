@@ -6,9 +6,11 @@ import { loadCandidateProfile } from "../profile.js";
 import { acquireFileLock } from "../recordLock.js";
 import { normalizeOfficialUrl, upsertRecord } from "../jobs/jobLibrary.js";
 import { mergeJobs, projectJobs, transactOpportunities } from "../storage/opportunities.js";
+import { jobDirectionSchema } from "../classification.js";
+import { jobSources } from "../jobs/sources.js";
 
 const text = z.string().trim().min(1).max(2000).refine(s => !/[\r\n]/.test(s));
-const category = z.enum(["llm", "recommendation"]);
+const category = jobDirectionSchema;
 const mode = z.enum(["remote", "hybrid", "onsite"]);
 const rulesSchema = z.object({
   categories: z.array(category).min(1),
@@ -51,9 +53,8 @@ export async function matchingContext(paths: MatchingPaths) {
   ]);
   const manifest = z.array(z.object({ category: z.string(), path: z.string(), sha256: z.string() })).parse(JSON.parse(manifestText));
   const policy = readPolicy(preferences);
-  const categoriesWithoutResume = policy?.rules.categories.filter(c => !manifest.some(m => m.category === c)) ?? [];
   return { token: hash(JSON.stringify({ candidate, preferences, manifestText })), candidate, preferences, manifest, policy,
-    categoriesWithoutResume, resumeMappingConfigured: policy !== null && categoriesWithoutResume.length === 0 };
+    availableResumeCategories: manifest.map(entry => entry.category) };
 }
 
 const queues = new Map<string, Promise<unknown>>();
@@ -99,7 +100,7 @@ export async function saveMatchingPreferences(paths: MatchingPaths, input: unkno
 const assessmentSchema = z.object({
   jobId: text, company: text, title: text, location: text, category,
   officialUrl: z.string().url().startsWith("https://"),
-  sources: z.array(z.enum(["simplify-new-grad", "speedyapply-2027-ai", "speedyapply-2027-swe", "user-provided"])).min(1),
+  sources: z.array(z.enum(jobSources)).min(1),
   firstSeen: z.string().date(), lastVerified: z.string().date(),
   workMode: mode.nullable(),
   eligibleLocations: z.array(text),
@@ -132,7 +133,7 @@ export async function publishMatchingRound(paths: MatchingPaths, input: unknown)
         ids.add(a.jobId); urls.add(url);
         if (a.firstSeen > a.lastVerified) throw new Error("invalid_matching_dates");
         const reasons: string[] = [];
-        if (!rules.categories.includes(a.category)) reasons.push("Category excluded by preferences");
+        if (!rules.categories.some(direction => equal(direction, a.category))) reasons.push("Direction excluded by preferences");
         if (rules.excludedJobIds.includes(a.jobId)) reasons.push("Job excluded by user");
         if (rules.excludedCompanies.some(c => equal(c, a.company))) reasons.push("Company excluded by user");
         if (a.workMode && !rules.workModes.includes(a.workMode)) reasons.push("Work mode excluded by preferences");

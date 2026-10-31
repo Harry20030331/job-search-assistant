@@ -1,0 +1,11 @@
+{
+  "version": 27,
+  "approvedAt": "2026-10-30",
+  "validation": "428 tests passed. In-app Browser verified actual Apply-to-Review navigation in an isolated local runtime. Tests cover first-ready navigation, reload persistence, unrelated tasks, failures and pending selections. Current application data and chat dispatch preserved.",
+  "files": {
+    "src/review/reviewViews.ts": "886567dafee549bed88551e9a9b33c9707ff85f2d3ec5ec78ca2682bb6792006",
+    "src/review/statusView.ts": "42af6222a4d9a716b28ae7d30f1a41589776cd65c6fa164d614ed7b5d845ee99",
+    "src/review/workflowViews.ts": "99f4aa47413931f43321bc308e4f051def6505ea0b068af9b6026e32b708bc57",
+    "src/review/applicationStyles.ts": "6b698313a8eb9aa999381637ed88c1d3b69f6eecac655003a577508d653a246c"
+  }
+}

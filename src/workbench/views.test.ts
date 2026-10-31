@@ -44,3 +44,13 @@ test("developer Google configuration remains an explicit server option", () => {
   const parsed = parseReviewServerArgs(["--review", "fixture/drafts", "--tracker", "fixture/opportunities.json", "--jobs", "fixture/opportunities.json", "--port", "8767", "--google-root", "private-google-root"]);
   expect(parsed.googleRoot).toBe("private-google-root");
 });
+
+test("application header variants retain interview reminders without replacing their layout class", () => {
+  for (const style of ["status-top", "review-top"] as const) {
+    const header = workspaceHeader(style === "status-top" ? "status" : "review", style);
+    expect(header).toContain(`<header class="${style}">`);
+    expect(header).toContain('id="interview-notifications"');
+    expect(header).toContain('src="/assets/interview-actions.js"');
+    expect(header.match(/aria-current="page"/g)).toHaveLength(1);
+  }
+});

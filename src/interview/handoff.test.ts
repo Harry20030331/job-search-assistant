@@ -78,3 +78,19 @@ test("retains an existing Submission application ID without updating its lifecyc
   expect((await interviewHandoff(paths, "fictional-job")).application.application_id).toBe("fictional-submission-id");
   expect(await readFile(paths.opportunities, "utf8")).toBe(before);
 });
+
+test("accepts open job directions and a separately bound resume profile without rewriting the handoff", async () => {
+  const { paths } = await setup();
+  const document = JSON.parse(await readFile(paths.opportunities, "utf8"));
+  Object.assign(document.opportunities[0], { category: "Product Analytics", title: "Graduate Product Analyst", stage: "submitted",
+    application: { applicationId: "product-application", resumeCategory: "analytics_general", ats: "ashby",
+      applicationUrl: "https://example.invalid/jobs/ml/apply", cvFilename: "analytics.pdf", visibleResult: "submitted",
+      gmailConfirmation: "not_checked", createdAt: "2026-10-20T10:00:00Z", updatedAt: "2026-10-20T12:00:00Z",
+      submittedAt: "2026-10-20T11:00:00Z" } });
+  await writeFile(paths.opportunities, JSON.stringify(document));
+  const before = await readFile(paths.opportunities, "utf8");
+  const handoff = await interviewHandoff(paths, "fictional-job");
+  expect(handoff.application).toMatchObject({ application_id: "product-application", category: "Product Analytics", role: "Graduate Product Analyst" });
+  expect(await readFile(paths.opportunities, "utf8")).toBe(before);
+  expect(JSON.parse(before).opportunities[0].application.resumeCategory).toBe("analytics_general");
+});

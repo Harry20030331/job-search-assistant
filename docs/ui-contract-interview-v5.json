@@ -1,0 +1,16 @@
+{
+  "version": 5,
+  "establishedAt": "2026-10-30",
+  "authorization": "Explicit user request: notify after an interview ends and allow exact website plan approval before generating full practice; detailed revisions stay in chat.",
+  "reviewStatus": "Implemented and inspected in the in-app Browser: end-time reminder, pending approval, actual button-to-Codex generation, ready practice and another pending plan retained for user review. Python 239 tests and 62 related TypeScript tests passed. User/team review pending.",
+  "supersedes": "ui-contract-v4.json",
+  "files": {
+    "src/review/reviewViews.ts": "51de1f8159a9a45ba6e849664f3419c2b70dec1de0a00ee67269cc6ba2e564b1",
+    "src/review/statusView.ts": "d608f168d91d302b3714a30448403d7fe4e875fb4ab76c8ed85b9c796c98b4bd",
+    "src/workbench/views.ts": "55e407dffee12a93b5d4c848904a25d4a4384a7ce3a55c383f76e776ae26654a",
+    "src/interview/interviewView.ts": "4e1cc46200ac6f304d78f2da6d3ea0f3fe8fb2fcf24593f9c1163240fbb8b681",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "62b1ae7e3dae6b3c4dd6b497ca55ddf7a35cddeb4961d92e8f6d2c7f7c3e5273"
+  },
+  "normalization": "Frozen source bytes use canonical LF; historical manifests are preserved."
+}

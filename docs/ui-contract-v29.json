@@ -1,0 +1,15 @@
+{
+  "version": 29,
+  "establishedAt": "2026-10-30",
+  "authorization": "User-requested integration of Matching, Application and Interview into main, preserving their page behavior and connecting shared navigation.",
+  "validation": "TypeScript and Python integration checks; HTTP route and interaction tests. Visual browser inspection unavailable because local browser access is disabled. No live employer or Google account action.",
+  "files": {
+    "src/review/reviewViews.ts": "cc19860ac6bfade89a9886220fd52f78a9ad1f1843016a3dddcd73d164808a8f",
+    "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
+    "src/review/workflowViews.ts": "99f4aa47413931f43321bc308e4f051def6505ea0b068af9b6026e32b708bc57",
+    "src/review/applicationStyles.ts": "6b698313a8eb9aa999381637ed88c1d3b69f6eecac655003a577508d653a246c",
+    "src/workbench/views.ts": "be74c6343474e5fe7809f66936cd4677b11255e707a720d36ae58da105a6335e",
+    "src/interview/interviewView.ts": "7660a4634b6438fb779f2487467d80fcb28d168b39f09646880ade99460d05e3",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d"
+  }
+}

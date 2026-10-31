@@ -1,12 +1,16 @@
+import { createHash } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import {
   decideReview,
+  approveReviewContent,
   markFullContentsViewed,
   markOpened,
   readReviewBatch,
   selectQuestionOption,
-  saveQuestionText
+  saveQuestionText,
+  saveGeneratedAnswer,
+  reopenReviewContent
 } from "./reviewStore.js";
 import { readApplicationTracker } from "../tracker.js";
 import { readJobLibrary } from "../jobs/jobLibrary.js";
@@ -21,6 +25,8 @@ import { randomBytes } from "node:crypto";
 import { approveWebsitePlan } from "../interview/webActions.js";
 import { acknowledgeNotice, pendingNotices } from "../interview/notifications.js";
 import { interviewBrowserScript } from "../interview/browserActions.js";
+import type { ApplicationTaskService } from "./applicationTasks.js";
+import { withWorkflowControls } from "./workflowViews.js";
 
 export interface ReviewServerOptions {
   reviewPath: string;
@@ -31,6 +37,7 @@ export interface ReviewServerOptions {
   port: number;
   profilePath?: string;
   googleRoot?: string;
+  tasks?: ApplicationTaskService;
 }
 
 export interface RunningReviewServer {
@@ -40,6 +47,10 @@ export interface RunningReviewServer {
 
 const maximumJsonBodyBytes = 65_536;
 const browserMutationPaths = new Set([
+  "/api/tasks",
+  "/api/review/generated-answer",
+  "/api/review/reopen",
+  "/api/review/content-approval",
   "/api/review/answer",
   "/api/review/text",
   "/api/review/open",
@@ -180,10 +191,15 @@ function assertBrowserMutationAuthority(request: IncomingMessage, port: number):
 function publicError(error: unknown): { status: number; code: string } {
   const message = error instanceof Error ? error.message : "";
   const expected = new Map<string, { status: number; code: string }>([
+    ["task_target_unavailable", { status: 409, code: "task_target_unavailable" }],
+    ["task_already_active", { status: 409, code: "task_already_active" }],
+    ["submission_outcome_unresolved", { status: 409, code: "submission_outcome_unresolved" }],
+    ["runner_unavailable", { status: 503, code: "runner_unavailable" }],
     ["unsupported_media_type", { status: 415, code: "unsupported_media_type" }],
     ["body_too_large", { status: 413, code: "body_too_large" }],
     ["invalid_json", { status: 400, code: "invalid_json" }],
     ["invalid_request", { status: 400, code: "invalid_request" }],
+    ["invalid_question_resolution", { status: 400, code: "invalid_review_answer" }],
     ["invalid_request_authority", { status: 403, code: "invalid_request_authority" }],
     ["invalid_request_origin", { status: 403, code: "invalid_request_origin" }],
     ["interview_plan_conflict", { status: 409, code: "interview_plan_conflict" }],
@@ -211,6 +227,21 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
   const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
   const interviewPaths = { trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
   const interviewCsrf = randomBytes(32).toString("hex");
+  const decorate = (html: string, version = "") => withWorkflowControls(html, options.tasks?.mode, version);
+  const workflow = async () => {
+    const [review, tracker, jobs, tasks] = await Promise.all([
+      readReviewBatch(options.reviewPath), readApplicationTracker(options.trackerPath), readJobLibrary(options.jobsPath), options.tasks?.list() ?? []
+    ]);
+    const status = buildStatusView(tracker.applications, jobs, { review, tasks, mode: options.tasks?.mode });
+    const states = new Map(status.filter(item => item.applicationId).map(item => [item.applicationId!, item.status]));
+    const activeReview = { ...review, applications: review.applications.filter(item => {
+      const state = states.get(item.applicationId);
+      // Untracked legacy review batches remain readable; known records must be ready and active.
+      return !tracker.applications.some(record => record.applicationId === item.applicationId) || (state !== undefined && ["in_review", "submitting", "submission_failed"].includes(state));
+    }) };
+    const version = createHash("sha256").update(JSON.stringify({ status: status.map(item => [item.jobId, item.status, item.preparationNeedsRetry === true]), review: activeReview.applications.map(item => [item.applicationId, item.snapshotId, item.decision.state]) })).digest("hex");
+    return { review: activeReview, tracker, tasks, status, states, version };
+  };
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
     try {
@@ -267,7 +298,8 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         return;
       }
       if (request.method === "GET" && url.pathname === "/review") {
-        send(response, 200, renderReviewPage(await readReviewBatch(options.reviewPath), url.searchParams.get("application") ?? undefined, (await readApplicationTracker(options.trackerPath)).applications.filter((item) => ["submitted", "confirmed", "interviewing", "offer"].includes(item.status)).map((item) => item.applicationId)), "text/html; charset=utf-8");
+        const view = await workflow();
+        send(response, 200, decorate(renderReviewPage(view.review, url.searchParams.get("application") ?? undefined, [], view.states, view.status.flatMap(item => item.applicationId ? [item.applicationId] : [])), view.version), "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/status") {
@@ -276,11 +308,8 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       }
       if (request.method === "GET" && url.pathname === "/status/us") {
         try {
-          const [tracker, jobs] = await Promise.all([
-            readApplicationTracker(options.trackerPath),
-            readJobLibrary(options.jobsPath)
-          ]);
-          send(response, 200, renderUsStatusPage(buildStatusView(tracker.applications, jobs)), "text/html; charset=utf-8");
+          const view = await workflow();
+          send(response, 200, decorate(renderUsStatusPage(view.status), view.version), "text/html; charset=utf-8");
         } catch {
           send(response, 500, JSON.stringify({ ok: false, error: "request_failed" }), "application/json; charset=utf-8");
         }
@@ -295,20 +324,69 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         if (!address || typeof address === "string") throw new Error("request_failed");
         assertBrowserMutationAuthority(request, address.port);
       }
+      if (request.method === "GET" && url.pathname === "/api/tasks") {
+        const { tasks, review, tracker, version } = await workflow();
+        const approvals = review.applications.filter(item => {
+          const record = tracker.applications.find(a => a.applicationId === item.applicationId);
+          return item.decision.state === "approved" && item.decision.scope === "content-only" &&
+            record?.status === "in_review" && !record.hiddenFromStatus && !tasks.some(task =>
+              task.target.jobId === record.jobId && (
+                ["queued", "running"].includes(task.state) ||
+                (task.action === "submit" && task.mode === options.tasks?.mode && (
+                  (task.target.snapshotId === item.snapshotId && ["completed", "demo_complete"].includes(task.state)) ||
+                  (task.mode === "codex" && (task.attemptedAt || task.state === "interrupted"))
+                ))
+              ));
+        }).map(item => ({ applicationId: item.applicationId, snapshotId: item.snapshotId, revision: item.desiredState?.revision ?? 0 }));
+        const reviewCount = review.applications.filter(item => {
+          const record = tracker.applications.find(a => a.applicationId === item.applicationId);
+          return record?.status === "in_review" && !record.hiddenFromStatus &&
+            (item.decision.state === "pending" || (item.decision.state === "stale" && item.reviewStage === "questions"));
+        }).length;
+        send(response, 200, JSON.stringify({ mode: options.tasks?.mode ?? "unavailable", tasks, approvals, reviewCount, viewVersion: version }), "application/json; charset=utf-8");
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/tasks") {
+        if (!options.tasks) throw new Error("runner_unavailable");
+        const tasks = await options.tasks.enqueue(await readJson(request, true));
+        send(response, 202, JSON.stringify({ tasks }), "application/json; charset=utf-8");
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/review/reopen") {
+        const body = await readJson(request, true);
+        exactFields(body, ["applicationId", "snapshotId"]);
+        const applicationId = stringField(body, "applicationId");
+        const active = await options.tasks?.list();
+        if (active?.some(t => t.target.applicationId === applicationId && ["queued", "running"].includes(t.state))) throw new Error("task_already_active");
+        const item = await reopenReviewContent(options.reviewPath, applicationId, stringField(body, "snapshotId"));
+        send(response, 200, JSON.stringify({ applicationId: item.applicationId }), "application/json; charset=utf-8");
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/review/generated-answer") {
+        const body = await readJson(request, true);
+        exactFields(body, ["applicationId", "snapshotId", "answerIndex", "value", "expectedRevision"]);
+        if (typeof body.value !== "string" || !Number.isSafeInteger(body.answerIndex) || !Number.isSafeInteger(body.expectedRevision)) throw new Error("invalid_request");
+        const item = await saveGeneratedAnswer(options.reviewPath, stringField(body, "applicationId"), stringField(body, "snapshotId"), body.answerIndex as number, body.value, body.expectedRevision as number);
+        send(response, 200, JSON.stringify({ applicationId: item.applicationId, snapshotId: item.snapshotId, answerIndex: body.answerIndex, value: item.answers[body.answerIndex as number]!.value, desiredState: item.desiredState }), "application/json; charset=utf-8");
+        return;
+      }
       if (request.method === "POST" && url.pathname === "/api/review/text") {
         const body = await readJson(request, true);
-        exactFields(body, ["applicationId", "snapshotId", "questionId", "value"]);
+        exactFields(body, ["applicationId", "snapshotId", "questionId", "value", ...(body.expectedRevision === undefined ? [] : ["expectedRevision"])]);
+        if (body.expectedRevision !== undefined && (!Number.isSafeInteger(body.expectedRevision) || (body.expectedRevision as number) < 0)) throw new Error("invalid_request");
         if (typeof body.value !== "string") throw new Error("invalid_request");
-        const item = await saveQuestionText(options.reviewPath, stringField(body, "applicationId"), stringField(body, "snapshotId"), stringField(body, "questionId"), body.value);
+        const item = await saveQuestionText(options.reviewPath, stringField(body, "applicationId"), stringField(body, "snapshotId"), stringField(body, "questionId"), body.value, body.expectedRevision as number | undefined);
         const question = item.questions.find((candidate) => candidate.id === body.questionId)!;
         send(response, 200, JSON.stringify({ applicationId: item.applicationId, snapshotId: item.snapshotId, questionId: question.id, value: question.draftAnswer,
+          missingText: item.questions.some(q => q.required && !q.options && !(q.draftAnswer?.trim() || q.resolution)),
           desiredState: item.desiredState, reviewReady: item.decision.state === "pending" && item.cv.verified && item.snapshotCurrent && item.validationErrors.length === 0 && item.questions.every((q) => !q.required || Boolean(q.options ? q.selectedOptionId : (q.draftAnswer?.trim() || q.resolution)))
         }), "application/json; charset=utf-8");
         return;
       }
       if (request.method === "POST" && url.pathname === "/api/review/answer") {
         const body = await readJson(request, true);
-        exactFields(body, ["applicationId", "snapshotId", "questionId", "optionId"]);
+        exactFields(body, ["applicationId", "snapshotId", "questionId", "optionId", ...(body.expectedRevision === undefined ? [] : ["expectedRevision"])]);
+        if (body.expectedRevision !== undefined && (!Number.isSafeInteger(body.expectedRevision) || (body.expectedRevision as number) < 0)) throw new Error("invalid_request");
         const applicationId = stringField(body, "applicationId");
         const snapshotId = stringField(body, "snapshotId");
         const questionId = stringField(body, "questionId");
@@ -318,7 +396,8 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
           applicationId,
           snapshotId,
           questionId,
-          optionId
+          optionId,
+          body.expectedRevision as number | undefined
         );
         const question = item.questions.find((candidate) => candidate.id === questionId);
         if (!question?.selectedOptionId || !item.desiredState) throw new Error("request_failed");
@@ -333,6 +412,15 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
             syncState: item.desiredState.syncState
           }
         }), "application/json; charset=utf-8");
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/review/content-approval") {
+        const body = await readJson(request);
+        exactFields(body, body.expectedDesiredRevision === undefined
+          ? ["applicationId", "snapshotId"] : ["applicationId", "snapshotId", "expectedDesiredRevision"]);
+        if (body.expectedDesiredRevision !== undefined && (!Number.isSafeInteger(body.expectedDesiredRevision) || (body.expectedDesiredRevision as number) < 1)) throw new Error("invalid_request");
+        const item = await approveReviewContent(options.reviewPath, stringField(body, "applicationId"), stringField(body, "snapshotId"), body.expectedDesiredRevision as number | undefined);
+        send(response, 200, JSON.stringify({ ok: true, applicationId: item.applicationId, snapshotId: item.snapshotId, decision: item.decision }), "application/json; charset=utf-8");
         return;
       }
       if (request.method === "POST" && browserMutationPaths.has(url.pathname)) {
