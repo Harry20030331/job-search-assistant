@@ -1,3 +1,6 @@
+import { makePrivate } from "../storage/privateFiles.js";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { chmod, mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -38,6 +41,7 @@ function batch(applicationId = "notion-1"): ReviewBatch {
 
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "review-recovery-"));
+  await makePrivate(root);
   await mkdir(join(root, "reviews"));
   await mkdir(join(root, "data"));
   await mkdir(join(root, "data/china"));
@@ -329,10 +333,12 @@ describe("review recovery inputs", () => {
     const { root, trackerPath } = await fixture();
     const reviewPath = join(root, "reviews/2026-08-07.local.json");
     await createReviewBatch(reviewPath, batch());
-    await chmod(reviewPath, 0o644);
+    if (process.platform === "win32") await promisify(execFile)("icacls.exe", [reviewPath, "/grant", "*S-1-1-0:(R)"]);
+    else await chmod(reviewPath, 0o644);
     await expect(resolveRecoveryInputs(root)).rejects.toThrow("unsafe_recovery_file_permissions");
 
-    await chmod(reviewPath, 0o600);
+    if (process.platform === "win32") await promisify(execFile)("icacls.exe", [reviewPath, "/remove:g", "*S-1-1-0"]);
+    await makePrivate(reviewPath);
     await writeFile(trackerPath, "{}\n", { mode: 0o600 });
     await expect(resolveRecoveryInputs(root)).rejects.toThrow("invalid_application_tracker");
   });

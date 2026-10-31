@@ -167,7 +167,7 @@ An answer may truthfully state that a business-impact example is unavailable and
 Technical open questions may use 2-3 short named subquestions inside question_details, with all coverage guidance in the answer.
 
 For EVERY coding exercise, solution MUST contain a complete runnable Python function, not pseudocode or an explanation alone.
-No imports, I/O, filesystem, environment, network, reflection or external dependencies. Use Python built-ins and normal list/dict methods.
+No imports, I/O, filesystem, environment, network, reflection or external dependencies. Use only the explicitly allowed built-ins/methods below.
 Include at least 3 executable tests with arguments_json (JSON positional-argument array), expected_json (JSON expected result),
 and expected_error (null for success, ValueError/TypeError for an expected error; use expected_json 'null' then).
 Use list/tuple/int type annotations if helpful. Match the exact question's signature and invalid-input contract.
@@ -185,3 +185,11 @@ Technical rounds can add bounded problem variants within the approved scope, wit
 Use 2-4 follow-ups that deepen the question rather than repeat it. Prefer short paragraphs and bullets. Avoid repeating data
 across prompt, question_details and follow-ups. Unknown employer questions remain unknown; generated questions are practice only.
 """
+
+# Share the execution contract with the actor instead of relying on a vague Python subset.
+from interview.practice_code import BUILTINS as CODE_BUILTINS, METHODS as CODE_METHODS
+
+DIRECT_GUIDANCE += ("\nAllowed callable built-ins (exact names): " + ", ".join(sorted(CODE_BUILTINS)) +
+                    ".\nAllowed attribute methods (exact names): " + ", ".join(sorted(CODE_METHODS)) +
+                    ". No other attributes, even ordinary string methods such as startswith, are accepted. "
+                    "Use slicing/comparisons/loops for unsupported operations.\n")

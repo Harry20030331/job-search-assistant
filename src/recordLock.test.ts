@@ -1,9 +1,14 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, open, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
-import { afterEach, expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { acquireWindowsFileLock } from "./recordLock.js";
+
+vi.mock("node:fs/promises", async importOriginal => {
+  const actual = await importOriginal<typeof import("node:fs/promises")>();
+  return { ...actual, open: vi.fn(actual.open) };
+});
 
 const roots: string[] = [];
 afterEach(async () => { await Promise.all(roots.splice(0).map(path => rm(path, { recursive: true, force: true }))); });
@@ -34,6 +39,16 @@ test("an abandoned or replaced owner is never silently removed", async () => {
   await writeFile(file + ".lock", "different owner");
   await expect(release()).rejects.toThrow("application_tracker_lock_owner_changed");
   expect(await readFile(file + ".lock", "utf8")).toBe("different owner");
+});
+
+test("a transient Windows sharing error retries exclusive creation without deleting another owner", async () => {
+  const file = await path();
+  vi.mocked(open).mockRejectedValueOnce(Object.assign(new Error("fixture delete-pending sharing violation"), { code: "EPERM" }));
+  const release = await acquireWindowsFileLock(file, 500);
+  const owner = JSON.parse(await readFile(file + ".lock", "utf8"));
+  expect(owner.pid).toBe(process.pid);
+  await release();
+  await expect(readFile(file + ".lock")).rejects.toMatchObject({ code: "ENOENT" });
 });
 
 test("independent Windows processes preserve concurrent read-modify-write updates", async () => {

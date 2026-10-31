@@ -1,7 +1,8 @@
+import { assertPrivate } from "./storage/privateFiles.js";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { initializeRuntime } from "./runtime.js";
 import { runBatchPreflight, runPreflight } from "./preflight.js";
@@ -29,9 +30,9 @@ describe("independent candidate inputs and runtime", () => {
     expect(inputs.liveAtsState).toBe("unverified");
     expect((await readdir(join(root, "data"))).sort()).toEqual(["discovery-state.json", "drafts", "opportunities.json"]);
     for (const path of [inputs.reviewPath, inputs.trackerPath, inputs.jobsPath]) {
-      expect((await stat(path)).mode & 0o777).toBe(path === inputs.reviewPath ? 0o700 : 0o600);
+      await assertPrivate(path, path === inputs.reviewPath);
     }
-    expect((await stat(root)).mode & 0o777).toBe(0o700);
+    await assertPrivate(root, true);
     const before = await readdir(inputs.reviewPath);
     const server = await startReviewServer({ ...inputs, port: 0 });
     try {
@@ -53,7 +54,7 @@ describe("independent candidate inputs and runtime", () => {
     const before = await readFile(inputs.trackerPath, "utf8");
     await expect(initializeRuntime(root)).rejects.toMatchObject({ code: "EEXIST" });
     const link = join(parent, "linked");
-    await symlink(root, link);
+    await symlink(root, link, process.platform === "win32" ? "junction" : "dir");
     await expect(initializeRuntime(link)).rejects.toMatchObject({ code: "EEXIST" });
     expect(await readFile(inputs.trackerPath, "utf8")).toBe(before);
   });
@@ -78,10 +79,10 @@ describe("independent candidate inputs and runtime", () => {
   });
 
   test("accepts explicit input paths while rejecting ambiguous or malformed CLI combinations", () => {
-    expect(parseProfileArgs(["--profile", "/example/profile.json", "--check"])).toEqual({ check: true, profilePath: "/example/profile.json" });
+    expect(parseProfileArgs(["--profile", "/example/profile.json", "--check"])).toEqual({ check: true, profilePath: resolve("/example/profile.json") });
     expect(parsePreflightArgs(["--batch", "batch.json", "--profile", "profile.json", "--manifest", "cvs.json"])).toEqual({ batchPath: "batch.json", profilePath: "profile.json", manifestPath: "cvs.json" });
     expect(parseReviewServerArgs(["--review", "r", "--tracker", "t", "--jobs", "j", "--port", "64440"])).toMatchObject({ reviewPath: "r", trackerPath: "t", jobsPath: "j", port: 64440 });
-    expect(parseRuntimeInitArgs(["--dir", "/example/runtime"])).toBe("/example/runtime");
+    expect(parseRuntimeInitArgs(["--dir", "/example/runtime"])).toBe(resolve("/example/runtime"));
     for (const args of [["--check", "--check"], ["--profile"], ["--profile", "--check"], ["--unknown"]]) expect(() => parseProfileArgs(args)).toThrow();
     for (const args of [["--batch", "b", "--url", "https://example.com"], ["--batch", "b", "--profile", "p", "--profile", "q"], ["--url", "--category", "llm"]]) expect(() => parsePreflightArgs(args)).toThrow();
     expect(() => parseRuntimeInitArgs(["--dir", "--check"])).toThrow();

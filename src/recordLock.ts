@@ -49,7 +49,7 @@ export async function acquireFileLock(path: string): Promise<() => Promise<void>
 }
 
 /** Atomic exclusive creation on Windows; abandoned locks fail closed for manual recovery. */
-export async function acquireWindowsFileLock(path: string, waitMilliseconds = lockWaitMilliseconds): Promise<() => Promise<void>> {
+export async function acquireWindowsFileLock(path: string, waitMilliseconds = 15_000): Promise<() => Promise<void>> {
   const lockPath = `${path}.lock`;
   const owner = JSON.stringify({ pid: process.pid, token: randomUUID(), createdAt: new Date().toISOString() }) + "\n";
   const deadline = Date.now() + waitMilliseconds;
@@ -58,8 +58,11 @@ export async function acquireWindowsFileLock(path: string, waitMilliseconds = lo
     try {
       handle = await open(lockPath, "wx", 0o600);
     } catch (error) {
-      if (errorCode(error) !== "EEXIST") throw new Error("application_tracker_lock_failed");
-      if (Date.now() >= deadline) throw new Error("application_tracker_locked");
+      const code = errorCode(error);
+      // Windows can briefly report sharing/access errors while a just-deleted
+      // lock is still closing. Wait without removing or replacing any owner.
+      if (!["EEXIST", "EPERM", "EACCES", "EBUSY"].includes(code ?? "")) throw new Error("application_tracker_lock_failed");
+      if (Date.now() >= deadline) throw new Error(code === "EEXIST" ? "application_tracker_locked" : "application_tracker_lock_failed");
       await delay(10 + Math.floor(Math.random() * 16));
       continue;
     }
@@ -75,13 +78,17 @@ export async function acquireWindowsFileLock(path: string, waitMilliseconds = lo
     let released = false;
     return async () => {
       if (released) return;
-      try {
-        if (await readFile(lockPath, "utf8") !== owner) throw new Error("application_tracker_lock_owner_changed");
-        await unlink(lockPath);
-        released = true;
-      } catch (error) {
-        if (errorCode(error) !== "ENOENT") throw error;
-        released = true;
+      const releaseDeadline = Date.now() + waitMilliseconds;
+      while (!released) {
+        try {
+          if (await readFile(lockPath, "utf8") !== owner) throw new Error("application_tracker_lock_owner_changed");
+          await unlink(lockPath);
+          released = true;
+        } catch (error) {
+          if (errorCode(error) === "ENOENT") { released = true; break; }
+          if (!["EPERM", "EACCES", "EBUSY"].includes(errorCode(error) ?? "") || Date.now() >= releaseDeadline) throw error;
+          await delay(10 + Math.floor(Math.random() * 16));
+        }
       }
     };
   }

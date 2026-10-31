@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { normalizeOfficialUrl, readJobLibrary } from "../jobs/jobLibrary.js";
 import { readApplicationTracker } from "../tracker.js";
 import { readReviewBatch } from "./reviewStore.js";
+import { assertPrivate } from "../storage/privateFiles.js";
 
 export interface RecoveryInputs {
   reviewPath: string;
@@ -24,7 +25,7 @@ async function requirePrivateFile(path: string): Promise<void> {
     throw new Error("recovery_file_not_found");
   }
   if (!metadata.isFile()) throw new Error("recovery_file_not_found");
-  if ((metadata.mode & 0o777) !== 0o600) throw new Error("unsafe_recovery_file_permissions");
+  await assertPrivate(path);
 }
 
 export async function resolveRecoveryInputs(projectRoot: string): Promise<RecoveryInputs> {
@@ -35,7 +36,8 @@ export async function resolveRecoveryInputs(projectRoot: string): Promise<Recove
     await requirePrivateFile(canonical);
     const reviewPath = join(projectRoot, "data/drafts");
     const metadata = await stat(reviewPath);
-    if (!metadata.isDirectory() || (metadata.mode & 0o777) !== 0o700) throw new Error("unsafe_recovery_file_permissions");
+    if (!metadata.isDirectory()) throw new Error("unsafe_recovery_file_permissions");
+    await assertPrivate(reviewPath, true);
     for (const name of await readdir(reviewPath)) if (name.endsWith(".json")) await requirePrivateFile(join(reviewPath, name));
     const [review, tracker, jobs] = await Promise.all([readReviewBatch(reviewPath), readApplicationTracker(canonical), readJobLibrary(canonical)]);
     validateRecoveryCandidate(review, tracker, jobs, true);

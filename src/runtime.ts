@@ -1,12 +1,14 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { resolveRecoveryInputs, type RecoveryInputs } from "./review/reviewRecovery.js";
+import { makePrivate, writePrivateFile } from "./storage/privateFiles.js";
 
 /** Initialize new storage only. Existing storage is never repaired or overwritten here. */
 export async function initializeRuntime(directory: string, _now = new Date()): Promise<RecoveryInputs> {
   const root = resolve(directory);
   // Exclusive mkdir rejects existing directories, files and symlinks.
   await mkdir(root, { mode: 0o700 });
+  await makePrivate(root);
   return initializeRuntimeData(root);
 }
 
@@ -14,13 +16,15 @@ export async function initializeRuntime(directory: string, _now = new Date()): P
 export async function initializeRuntimeData(directory: string): Promise<RecoveryInputs> {
   const root = resolve(directory);
   await mkdir(join(root, "data"), { mode: 0o700 });
+  await makePrivate(join(root, "data"));
   await mkdir(join(root, "data/drafts"), { mode: 0o700 });
+  await makePrivate(join(root, "data/drafts"));
   const files = [
     ["data/opportunities.json", JSON.stringify({ schemaVersion: 1, opportunities: [] }, null, 2)],
     ["data/discovery-state.json", JSON.stringify({ version: 1, sources: {} }, null, 2)]
   ] as const;
   for (const [path, content] of files) {
-    await writeFile(join(root, path), content + "\n", { flag: "wx", mode: 0o600 });
+    await writePrivateFile(join(root, path), content + "\n", { flag: "wx" });
   }
   return resolveRecoveryInputs(root);
 }

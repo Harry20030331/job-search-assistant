@@ -50,7 +50,7 @@ test("distinguishes no search results, missing workspaces and corrupt data", asy
 test("does not recurse into unrelated folders or follow discovered symlinks", async () => {
   const { root, project, temporary } = await setup();
   const external = join(root, "external"); await workspace(external);
-  await symlink(external, join(temporary, "matching-link"));
+  await symlink(external, join(temporary, "matching-link"), process.platform === "win32" ? "junction" : "dir");
   await mkdir(join(temporary, "unrelated")); await workspace(join(temporary, "unrelated/matching-hidden"));
   expect((await listMatchingWorkspaces({ project, temporaryRoots: [temporary] })).searches).toEqual([]);
 });

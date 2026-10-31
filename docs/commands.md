@@ -3,6 +3,7 @@
 Run these commands from the repository root. For directory ownership see [structure](structure.md); for authorization see [workflow-contract](workflow-contract.md). These commands manage local records unless the description explicitly says otherwise. Browser filling is performed by Codex in response to website tasks when its optional runner is configured.
 
 - `npm run example:shortlist` / `npm run example:review`: restore one of the two checkpoints for the shared Alex case, then start Review and open `/status/us` or `/review`. Stop the website first; current data is backed up and the private chat connection is retained.
+- `npm run demo:alex -- --dir <new-directory> --snapshot shortlist|review --port <port>`: serve an isolated copy of the original Alex Liu five-role checkpoint. `demo:alex:interviews -- --runtime-dir <same-directory>` adds explicitly fictional staged rounds only after the two required local demo tasks; see [Alex demo](alex-case-demo.md).
 - `npm run example:load`: default to Shortlist; use `--snapshot shortlist|review` to select. Replace the working state from the default fictional example. Add `-- --from <example-directory> --dir <existing-workspace>` to select source and destination. Stop Review and other writers first. The prior data is backed up locally; the command prints its path.
 - `npm run data -- --input <local-command.json>`: versioned Status visibility and Review publication; see the UI contract for schemas.
 - `npm run ui:check`: verify the current integrated UI baseline.

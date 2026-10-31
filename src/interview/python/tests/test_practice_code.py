@@ -31,5 +31,14 @@ class PracticeCodeTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_code(code, "double")
 
+    def test_actor_contract_lists_the_same_bounded_execution_operations(self):
+        from interview.practice import DIRECT_GUIDANCE
+        from interview.practice_code import BUILTINS, METHODS
+        self.assertIn("Allowed callable built-ins (exact names): " + ", ".join(sorted(BUILTINS)), DIRECT_GUIDANCE)
+        self.assertIn("Allowed attribute methods (exact names): " + ", ".join(sorted(METHODS)), DIRECT_GUIDANCE)
+        # Preserve the boundary that rejected the first Alex demo attempt.
+        with self.assertRaisesRegex(ValueError, "unsupported attribute"):
+            validate_code("def prefix(word): return word.startswith('a')", "prefix")
+
 
 if __name__ == "__main__": unittest.main()

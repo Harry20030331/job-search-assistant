@@ -1,5 +1,6 @@
+import { writePrivateFile as writeFile } from "./privateFiles.js";
 import { createHash, randomUUID } from "node:crypto";
-import { chmod, readdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { chmod, readdir, readFile, rename, unlink } from "node:fs/promises";
 import { dirname, join, basename } from "node:path";
 import { readOpportunities, projectApplications, transactOpportunities } from "./opportunities.js";
 import type { ApplicationRecord } from "../tracker.js";

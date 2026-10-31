@@ -1,6 +1,7 @@
+import { assertPrivate } from "./storage/privateFiles.js";
 import { chmod, lstat, mkdtemp, readFile, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { describe, expect, test } from "vitest";
 import {
   applicationStatuses,
@@ -167,13 +168,14 @@ describe("application tracker", () => {
 
     expect((await readApplicationTracker(path)).applications.map(({ applicationId }) => applicationId).sort())
       .toEqual(records.map(({ applicationId }) => applicationId).sort());
-    expect((await stat(path)).mode & 0o777).toBe(0o600);
+    await assertPrivate(path);
   });
 
   test("uses the canonical real path for alias transactions without replacing the symlink", async () => {
     const path = await trackerPath();
-    const alias = join(dirname(path), "tracker-alias.json");
-    await symlink(path, alias);
+    const aliasRoot = join(dirname(path), "alias-directory");
+    const alias = process.platform === "win32" ? join(aliasRoot, basename(path)) : join(dirname(path), "tracker-alias.json");
+    await symlink(process.platform === "win32" ? dirname(path) : path, process.platform === "win32" ? aliasRoot : alias, process.platform === "win32" ? "junction" : "file");
     const second = {
       ...input,
       jobId: "linear-job",
@@ -185,7 +187,7 @@ describe("application tracker", () => {
     await Promise.all([createApplication(path, input), createApplication(alias, second)]);
 
     expect((await readApplicationTracker(path)).applications).toHaveLength(2);
-    expect((await lstat(alias)).isSymbolicLink()).toBe(true);
+    expect((await lstat(process.platform === "win32" ? aliasRoot : alias)).isSymbolicLink()).toBe(true);
   });
 
   test("retains snapshot-bound approval safety before visible submission", async () => {
@@ -292,7 +294,7 @@ describe("application tracker", () => {
         updatedAt: "2026-08-17T17:00:00.000Z"
       })
     ]));
-    expect((await stat(path)).mode & 0o777).toBe(0o600);
+    await assertPrivate(path);
   });
 
   test.each([
@@ -641,7 +643,7 @@ describe("application tracker", () => {
       applications: [{ status: "in_review", applicationUrl: input.applicationUrl }]
     });
     expect(JSON.parse(await readFile(path, "utf8"))).toEqual(document);
-    expect((await stat(path)).mode & 0o777).toBe(0o600);
+    await assertPrivate(path);
   });
 
   test("does not rewrite an already-current tracker when migration changes nothing", async () => {

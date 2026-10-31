@@ -72,7 +72,12 @@ test("invalid snapshots and escaping resume paths leave current data unchanged",
 test("rejects symlink inputs and does not silently replace existing malformed data on startup", async () => {
   const root = await directory(), invalid = await directory();
   await cp(examples, invalid, {recursive:true});
-  await rm(join(invalid,"candidate.json"));await symlink(join(examples,"candidate.json"),join(invalid,"candidate.json"));
+  if (process.platform === "win32") {
+    await symlink(examples, join(invalid,"linked-resumes"), "junction");
+    const manifest=JSON.parse(await readFile(join(invalid,"resumes.json"),"utf8"));
+    manifest[0].path="linked-resumes/alex-liu-resume.pdf";
+    await writeFile(join(invalid,"resumes.json"),JSON.stringify(manifest));
+  } else { await rm(join(invalid,"candidate.json"));await symlink(join(examples,"candidate.json"),join(invalid,"candidate.json")); }
   await expect(loadExample(root, invalid)).rejects.toThrow("example_symlink_not_allowed");
   await loadExample(root, examples);
   await writeFile(join(root,"data/candidate.json"),"invalid");
@@ -111,7 +116,7 @@ test("both checkpoints share one candidate and five jobs; switching resets appro
   const reset=await loadExample(root,examples,"review");
   const resetNooks=(await readReviewBatch(reset.reviewPath)).applications.find(item=>item.company==="Nooks")!;
   expect(resetNooks.decision.state).toBe("pending");expect(resetNooks.questions[0]!.selectedOptionId).toBeUndefined();
-});
+}, process.platform === "win32" ? 60_000 : 20_000);
 
 test("snapshot loading refuses an active runner and an unknown checkpoint without replacing data", async () => {
   const root=await directory();await loadExample(root,examples);

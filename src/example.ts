@@ -1,10 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { copyFile, lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, chmod } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, readdir, rename, rm } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { initializeRuntimeData } from "./runtime.js";
 import { runPreflight } from "./preflight.js";
 import { resolveRecoveryInputs } from "./review/reviewRecovery.js";
 import { readDiscovery } from "./storage/discovery.js";
+import { makePrivate, writePrivateFile } from "./storage/privateFiles.js";
 
 async function exists(path: string) {
   try { await lstat(path); return true; } catch (error) {
@@ -17,10 +18,11 @@ async function copyPrivate(source: string, target: string): Promise<void> {
   if (metadata.isSymbolicLink()) throw new Error("example_symlink_not_allowed");
   if (metadata.isDirectory()) {
     await mkdir(target, { recursive: true, mode: 0o700 });
+    await makePrivate(target);
     for (const name of await readdir(source)) await copyPrivate(join(source, name), join(target, name));
   } else if (metadata.isFile()) {
     await mkdir(dirname(target), { recursive: true, mode: 0o700 });
-    await copyFile(source, target); await chmod(target, 0o600);
+    await writePrivateFile(target, await readFile(source));
   } else throw new Error("invalid_example_file");
 }
 

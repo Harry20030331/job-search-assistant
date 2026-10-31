@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
+import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadExample } from "../example.js";

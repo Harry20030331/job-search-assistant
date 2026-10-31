@@ -1,6 +1,7 @@
+import { assertPrivate } from "../storage/privateFiles.js";
 import { lstat, mkdtemp, readFile, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { describe, expect, test } from "vitest";
 import {
   consumeApproval,
@@ -1052,13 +1053,14 @@ describe("review store", () => {
 
   test("updates the canonical target through a symlink without replacing the alias", async () => {
     const path = await reviewPath();
-    const alias = join(dirname(path), "review.alias.json");
+    const aliasRoot = join(dirname(path), "alias-directory");
+    const alias = process.platform === "win32" ? join(aliasRoot, basename(path)) : join(dirname(path), "review.alias.json");
     await createReviewBatch(path, validBatch());
-    await symlink(path, alias);
+    await symlink(process.platform === "win32" ? dirname(path) : path, process.platform === "win32" ? aliasRoot : alias, process.platform === "win32" ? "junction" : "file");
 
     await markOpened(alias, "notion-85947779", "sha256:current", "2026-08-07T18:01:00.000Z");
 
-    expect((await lstat(alias)).isSymbolicLink()).toBe(true);
+    expect((await lstat(process.platform === "win32" ? aliasRoot : alias)).isSymbolicLink()).toBe(true);
     expect((await readReviewBatch(path)).applications[0]?.openedAt).toBe("2026-08-07T18:01:00.000Z");
   });
 
@@ -1175,7 +1177,7 @@ describe("review store", () => {
   test("writes a strict batch atomically with private permissions", async () => {
     const path = await reviewPath();
     await createReviewBatch(path, validBatch());
-    expect((await stat(path)).mode & 0o777).toBe(0o600);
+    await assertPrivate(path);
     expect((await readReviewBatch(path)).applications[0]?.company).toBe("Notion");
   });
 

@@ -1,3 +1,5 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,14 +13,14 @@ afterEach(async () => { await Promise.all(directories.splice(0).map(path => rm(p
 async function fixture() {
   const root = await mkdtemp(join(tmpdir(), "chat-bridge-")); directories.push(root);
   const threadId = randomUUID(), messageId = randomUUID();
-  const executable = join(root, "fake-codex"), argsPath = join(root, "arguments.json");
+  const executable = join(root, "fake-codex.cjs"), argsPath = join(root, "arguments.json");
   await writeFile(executable, `#!${process.execPath}\nconst fs = require('node:fs'); fs.writeFileSync(${JSON.stringify(argsPath)}, JSON.stringify(process.argv.slice(2))); console.log(${JSON.stringify(`Queued message ${messageId} for thread ${threadId}.`)});\n`, { mode: 0o700 });
   return { root, threadId, messageId, executable, argsPath };
 }
 test("uses the configured existing chat and passes the whole prompt as one literal CLI argument", async () => {
   const f = await fixture();
   const task = { id: randomUUID(), action: "prepare", mode: "demo" } as ApplicationTask;
-  const bridge = createChatTaskDispatcher(f.root, { version: 1, threadId: f.threadId, executable: f.executable });
+  const bridge = createChatTaskDispatcher(f.root, { version: 1, threadId: f.threadId, executable: f.executable }, (_exe, args, options) => promisify(execFile)(process.execPath, [f.executable, ...args], options));
   expect(await bridge.send([task])).toBe(f.messageId);
   const args = JSON.parse(await readFile(f.argsPath, "utf8"));
   expect(args.slice(0, 4)).toEqual(["queue", "--thread", f.threadId, "--message"]);
@@ -28,7 +30,7 @@ test("uses the configured existing chat and passes the whole prompt as one liter
 });
 test("does not confirm delivery when the CLI acknowledges a different chat", async () => {
   const f = await fixture();
-  const bridge = createChatTaskDispatcher(f.root, { version: 1, threadId: randomUUID(), executable: f.executable });
+  const bridge = createChatTaskDispatcher(f.root, { version: 1, threadId: randomUUID(), executable: f.executable }, (_exe, args, options) => promisify(execFile)(process.execPath, [f.executable, ...args], options));
   await expect(bridge.send([])).rejects.toThrow("chat_delivery_unconfirmed");
 });
 test("private runtime config is optional but malformed config fails closed", async () => {

@@ -140,9 +140,9 @@ describe("application lifecycle CLI", () => {
     expect((await readApplicationTracker(tracker)).applications.map(({ status }) => status))
       .toEqual(applications.map(() => "interviewing"));
     await expect(readFile(`${tracker}.lock`, "utf8")).rejects.toMatchObject({ code: "ENOENT" });
-  }, 20_000);
+  }, process.platform === "win32" ? 60_000 : 20_000);
 
-  test("reclaims a killed process owner and preserves every concurrent mutation", async () => {
+  test.skipIf(process.platform === "win32")("reclaims a killed process owner and preserves every concurrent mutation", async () => {
     for (let round = 0; round < 4; round += 1) {
       const directory = await mkdtemp(join(tmpdir(), "lifecycle-stale-race-"));
       const tracker = join(directory, "tracker.json");
@@ -190,7 +190,7 @@ describe("application lifecycle CLI", () => {
     }
   }, 30_000);
 
-  test("waits for a live shlock owner and continues after that owner exits", async () => {
+  test.skipIf(process.platform === "win32")("waits for a live shlock owner and continues after that owner exits", async () => {
     const { tracker } = await setupTracker();
     await markConfirmed(tracker, application.applicationId, "confirmed", "2026-08-17T17:00:00.000Z");
     const lockPath = `${tracker}.lock`;

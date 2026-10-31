@@ -30,10 +30,11 @@ export function chatTaskPrompt(projectRoot: string, tasks: ApplicationTask[]): s
   ].join("\n\n");
 }
 
-export function createChatTaskDispatcher(projectRoot: string, config: ChatTaskConfig): ChatTaskDispatcher {
+type Execute = (executable: string, args: string[], options: { cwd: string; timeout: number; maxBuffer: number }) => Promise<{ stdout: string }>;
+export function createChatTaskDispatcher(projectRoot: string, config: ChatTaskConfig, execute: Execute = executeFile): ChatTaskDispatcher {
   return { threadId: config.threadId, async send(tasks) {
     // execFile passes fixed arguments directly; no shell or browser-provided command is evaluated.
-    const { stdout } = await executeFile(config.executable, ["queue", "--thread", config.threadId, "--message", chatTaskPrompt(projectRoot, tasks)], {
+    const { stdout } = await execute(config.executable, ["queue", "--thread", config.threadId, "--message", chatTaskPrompt(projectRoot, tasks)], {
       cwd: projectRoot, timeout: 15_000, maxBuffer: 64_000
     });
     const match = /Queued message ([0-9a-f-]{36}) for thread ([0-9a-f-]{36})\./i.exec(stdout);

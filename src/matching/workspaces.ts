@@ -1,5 +1,6 @@
+import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { randomUUID } from "node:crypto";
-import { lstat, mkdir, readFile, readdir, realpath, rename, writeFile } from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir, realpath, rename } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";

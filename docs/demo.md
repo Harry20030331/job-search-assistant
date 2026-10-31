@@ -1,5 +1,7 @@
 # Local fictional walkthrough
 
+For the original Alex Liu profile and five saved candidate roles, use the separate [five-role demo](alex-case-demo.md). The walkthrough below is the optional single-form submission fixture.
+
 Run `npm run demo -- --dir /tmp/job-search-demo` after installation. Use a new path for each reset. The command prints two loopback origins: the unchanged Review/Status server and a separate fictional employer form. Ports are allocated automatically, so this can coexist with an existing personal installation.
 
 1. Open the printed form URL in Codex's in-app Browser. Read `examples/candidate.json` and the supplied resume; fill Alex Liu's name and email, attach `examples/alex-liu-resume.pdf`, and draft a short answer grounded in Study Search or the Example Labs internship. Leave relocation unknown.

@@ -28,6 +28,8 @@ The default working case is Alex Liu, a fictional MS student seeking an entry-le
 
 For recording and teammate reproduction, use the [two saved checkpoints](examples/README.md): Shortlist contains the five original jobs; Review contains their captured role-specific questions and saved drafts. The generic demo Apply runner does not restore those drafts. Load `example:review` explicitly to reproduce the recorded Review sample.
 
+For an isolated five-role recording with Interview handoff, use [the Alex Liu demo](docs/alex-case-demo.md): `npm run demo:alex -- --dir <new-directory> --snapshot review --port 8774`. It preserves the original examples and never submits fictional applications to employers.
+
 To reset to the saved Alex state or switch cases, stop Review and other writers, then load an example:
 
 ```sh

@@ -170,7 +170,7 @@ describe("preflight CLI", () => {
       const target = join(directory, "target.json");
       const link = join(directory, "batch-link.json");
       await writeFile(target, JSON.stringify([{ applicationId: "a", jobUrl: "https://jobs.example.com/a", category: "llm" }]));
-      await symlink(target, link);
+      await symlink(process.platform === "win32" ? directory : target, link, process.platform === "win32" ? "junction" : "file");
       return link;
     } }
   ])("rejects a non-regular $name batch path", async ({ pathFor }) => {
@@ -190,7 +190,7 @@ describe("preflight CLI", () => {
     expect(writes).toEqual([`${JSON.stringify({ ok: false, error: "preflight_failed" })}\n`]);
   });
 
-  test("rejects a FIFO promptly without waiting for a writer", async () => {
+  test.skipIf(process.platform === "win32")("rejects a FIFO promptly without waiting for a writer", async () => {
     const directory = await mkdtemp(join(tmpdir(), "preflight-cli-fifo-"));
     const fifoPath = join(directory, "batch.fifo");
     await execFileAsync("/usr/bin/mkfifo", [fifoPath]);

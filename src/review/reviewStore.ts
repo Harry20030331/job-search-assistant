@@ -1,6 +1,7 @@
+import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { isDraftDirectory, readDrafts, saveDrafts, withDraftLock } from "../storage/drafts.js";
 import { randomUUID } from "node:crypto";
-import { chmod, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { chmod, readFile, realpath, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { acquireFileLock } from "../recordLock.js";

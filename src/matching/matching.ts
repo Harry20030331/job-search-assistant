@@ -1,5 +1,6 @@
+import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { createHash, randomUUID } from "node:crypto";
-import { readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { readFile, realpath, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { loadCandidateProfile } from "../profile.js";

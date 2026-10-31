@@ -1,6 +1,7 @@
+import { writePrivateFile as writeFile } from "./privateFiles.js";
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
-import { chmod, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { chmod, readFile, realpath, rename } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { acquireFileLock } from "../recordLock.js";

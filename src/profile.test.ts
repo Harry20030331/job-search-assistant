@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 import { loadCandidateProfile } from "./profile.js";
 
@@ -6,9 +7,10 @@ function fixture() {
   const evidence = {schemaVersion:1,experiences:[],skills:["Python"],projects:[],publications:[],_meta:{sections:{}} as Record<string,unknown>};
   const config = {schemaVersion:3,shared:{profile:"facts.json",experience:"evidence.json"},job:{availability:{earliestStartDate:"2027-07-01"}} as Record<string,unknown>};
   const read = async (path:string) => {
-    if(path==="/data/config.json") return JSON.stringify(config);
-    if(path==="/data/facts.json") return JSON.stringify(facts);
-    if(path==="/data/evidence.json") return JSON.stringify(evidence);
+    path = resolve(path);
+    if(path===resolve("/data/config.json")) return JSON.stringify(config);
+    if(path===resolve("/data/facts.json")) return JSON.stringify(facts);
+    if(path===resolve("/data/evidence.json")) return JSON.stringify(evidence);
     throw Error("missing");
   };
   return {facts,evidence,config,read};
