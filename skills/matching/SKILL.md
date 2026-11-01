@@ -13,7 +13,7 @@ Read [workflow-contract](../../docs/workflow-contract.md) and [candidate-inputs]
 
 Use Codex's in-app Browser for page actions. Discovery and feedback do not authorize an application, account registration, CV upload to an employer or submission. Submission begins separately through `../submission/SKILL.md` with its applicable ATS module. Keep existing UI rendering and interactions behind [ui-contract](../../docs/ui-contract.md); data changes use domain interfaces and stable IDs.
 
-Keep job-seeker guidance and explanations in English unless explicitly asked otherwise. Users provide ordinary language, links or files; the agent constructs command inputs. Explicit development requests retain their normal workflow rather than triggering setup.
+Keep job-seeker guidance and explanations in English unless explicitly asked otherwise. The website is the primary input surface; use confirmed canonical inputs and saved website requests. Users may also supply ordinary language, links or files; the agent constructs command inputs. Explicit development requests retain their normal workflow rather than triggering setup.
 
 ## Route the current request
 
@@ -23,7 +23,7 @@ Keep job-seeker guidance and explanations in English unless explicitly asked oth
 | Find jobs, expand the pool, verify a lead, or refresh current postings | [Job discovery](discovery/SKILL.md) | Source-backed official-role observations and verification failures for assessment |
 | Analyze/rank supplied jobs, publish a shortlist, or process user feedback | [Matching and feedback](feedback/SKILL.md) | Current-context assessments, saved feedback, validated job updates and a before/after explanation |
 
-A fresh `Hi` or `Start` follows [welcome](../../docs/welcome.md): show `npm run matching -- welcome`, then route the user's choice. Do not repeat welcome on an ongoing feedback turn. A greeting alone selects no candidate and triggers no intake or browsing.
+A fresh `Hi` or `Start` follows [welcome](../../docs/welcome.md): run `npm start`, visibly open its `welcome_url`, and let the user choose and confirm inputs on the website. Do not repeat welcome on an ongoing feedback turn. A greeting alone selects no candidate and triggers no intake or browsing.
 
 For a resume request without a selected workspace, run `npm run matching -- workspaces` first. Present discovered searches as numbered choices with names, locations and counts; distinguish empty results, missing workspaces and read failures. Ask for a path only as a recovery option. Use existing selected inputs directly without re-confirming known facts. For a fresh fictional live exercise, use `npm run matching -- example --workspace <new-directory>`; the scripted offline demo is a distinct choice. Details: [workspaces](../../docs/workspaces.md).
 

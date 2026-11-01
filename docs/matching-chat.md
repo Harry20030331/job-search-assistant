@@ -1,10 +1,10 @@
 # Interactive Matching in Codex
 
-2026-10-25. The supported interaction surface is this project's Codex chat. Codex reads user messages, performs current browsing through the in-app Browser, writes validated records and explains results. Status is the saved shortlist view. There is no web button that launches an independent agent.
+The default interaction surface changed to the website on 2026-10-31; follow [Welcome](welcome.md). Start opens candidate-free setup, Profile & preferences saves confirmed inputs, and the New Grad matching button dispatches a saved request to the connected existing Codex chat. The current discovery scope is SimplifyJobs/New-Grad-Positions only; see [job discovery](job-discovery.md). The steps below describe the retained chat/source-reading compatibility workflow, not the default setup UI. No website button launches an independent agent.
 
 ## Candidate information
 
-For first-time users, the [English welcome](welcome.md) starts when they send `Hi` or `Start` in a fresh project chat. Codex is instructed to guide setup without requiring the detailed technical prompts used in the meeting walkthrough below.
+For first-time users, the [English welcome](welcome.md) starts when they send `Hi` or `Start` in a fresh project chat. Codex opens the Welcome website without requiring the detailed technical prompts used in the meeting walkthrough below.
 
 The user can provide a designated LinkedIn profile URL, attach a PDF/DOCX/TXT/Markdown resume or background document, paste text, or combine these sources. Show the English invitation with `npm run matching -- sources` when nothing was supplied; a resume is optional. Follow [LinkedIn import](linkedin-import.md) for browser observation, preview and confirmation. Do not re-ask for a resume after the user selected LinkedIn. They do not need to edit JSON or know the CLI. Collect only information needed for the initial search: a name/alias, education or experience, skills, an explicit user-confirmed role direction, seniority, locations and work modes, start timing, and desired batch size/company limit. Retain unknown work-authorization, relocation and other facts as unknown. Ask about them only when needed to determine eligibility. Contact details and an approved PDF are not prerequisites for discovery.
 

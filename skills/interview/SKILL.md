@@ -5,7 +5,7 @@ description: Coordinate interview invitations, schedule proposals, preparation a
 
 # Interview Coordination
 
-Follow `../../docs/workflow-contract.md` and `../../docs/candidate-inputs.md`. Use this chat for user input and confirmation; construct tool payloads for the user. Candidate facts belong in the selected canonical sources. Read `../../docs/interview-storage.md` when choosing or recovering a workspace.
+Follow `../../docs/workflow-contract.md` and `../../docs/candidate-inputs.md`. Use the Interview preparation website request form for user input, follow-up questions, availability, plan changes and debriefs. A saved website request is processed in the connected existing Codex chat; claim it once with `interview:request`, then return a plain-text result or missing-information question through its finish command. Construct tool payloads for the user. Calendar writes still require explicit confirmation of the exact displayed action, and practice generation still requires approval of the current plan/version. The chat-input route remains a compatibility option. Candidate facts belong in the selected canonical sources. Read `../../docs/interview-storage.md` when choosing or recovering a workspace.
 
 Read the selected candidate workspace and use stable job/application IDs. The host's explicit job selection supports a handoff, but does not prove that incoming mail concerns that role or round. Verify the evidence; ambiguous identity, timezone, duration or availability requires clarification. Do not silently create another application or job list.
 

@@ -1,3 +1,7 @@
+import { interviewRequestHistory, requestInterviewWork, withInterviewRequests } from "../workbench/interviewRequests.js";
+import { readProfileEditor, saveProfileEditor, saveWebsitePreferences, saveWebsiteResume } from "../workbench/profileStore.js";
+import { renderProfilePage } from "../workbench/profileView.js";
+import { requestWebsiteSearch, latestSearchStatus } from "../workbench/searchRequests.js";
 import { createHash } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -38,6 +42,9 @@ export interface ReviewServerOptions {
   profilePath?: string;
   googleRoot?: string;
   tasks?: ApplicationTaskService;
+  workspaceRoot?: string;
+  repositoryRoot?: string;
+  welcomeUrl?: string;
 }
 
 export interface RunningReviewServer {
@@ -47,6 +54,7 @@ export interface RunningReviewServer {
 
 const maximumJsonBodyBytes = 65_536;
 const browserMutationPaths = new Set([
+  "/api/interview/requests", "/api/profile", "/api/preferences", "/api/resumes", "/api/search",
   "/api/tasks",
   "/api/review/generated-answer",
   "/api/review/reopen",
@@ -58,7 +66,7 @@ const browserMutationPaths = new Set([
   "/api/review/decision"
 ]);
 
-function send(response: ServerResponse, status: number, body: string, contentType = "text/plain; charset=utf-8") {
+function sendResponse(response: ServerResponse, status: number, body: string, contentType = "text/plain; charset=utf-8") {
   response.writeHead(status, {
     "content-type": contentType,
     "cache-control": "no-store",
@@ -84,14 +92,15 @@ function discardRequestBody(request: IncomingMessage): void {
 
 async function readJson(
   request: IncomingMessage,
-  strictContentType = false
+  strictContentType = false,
+  maximumBytes = maximumJsonBodyBytes
 ): Promise<Record<string, unknown>> {
   const contentLength = request.headers["content-length"];
   if (contentLength !== undefined) {
     if (Array.isArray(contentLength) || !/^(0|[1-9][0-9]*)$/.test(contentLength)) {
       throw new Error("invalid_request");
     }
-    if (BigInt(contentLength) > BigInt(maximumJsonBodyBytes)) {
+    if (BigInt(contentLength) > BigInt(maximumBytes)) {
       discardRequestBody(request);
       throw new Error("body_too_large");
     }
@@ -121,7 +130,7 @@ async function readJson(
     const onData = (chunk: Buffer | string) => {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       size += bytes.length;
-      if (size > maximumJsonBodyBytes) {
+      if (size > maximumBytes) {
         fail(new Error("body_too_large"), true);
         return;
       }
@@ -189,8 +198,12 @@ function assertBrowserMutationAuthority(request: IncomingMessage, port: number):
 }
 
 function publicError(error: unknown): { status: number; code: string } {
+  if (error instanceof Error && error.name === "ZodError") return { status: 400, code: "invalid_request" };
   const message = error instanceof Error ? error.message : "";
   const expected = new Map<string, { status: number; code: string }>([
+    ...["profile_changed", "matching_context_changed", "resume_profile_exists", "shared_profile_read_only"].map(code => [code, { status: 409, code }] as [string, { status: number; code: string }]),
+    ["invalid_resume", { status: 400, code: "invalid_resume" }],
+    ["matching_initial_rules_required", { status: 422, code: "matching_initial_rules_required" }],
     ["task_target_unavailable", { status: 409, code: "task_target_unavailable" }],
     ["task_already_active", { status: 409, code: "task_already_active" }],
     ["submission_outcome_unresolved", { status: 409, code: "submission_outcome_unresolved" }],
@@ -224,10 +237,19 @@ function publicError(error: unknown): { status: number; code: string } {
 }
 
 export async function startReviewServer(options: ReviewServerOptions): Promise<RunningReviewServer> {
+  const send = (response: ServerResponse, status: number, body: string, contentType = "text/plain; charset=utf-8") => {
+    if (options.welcomeUrl && contentType.startsWith("text/html")) body = body.replaceAll('href="/"', `href="${options.welcomeUrl}"`);
+    sendResponse(response, status, body, contentType);
+  };
+  const workspaceRoot = options.workspaceRoot ?? dirname(dirname(options.trackerPath));
   const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
   const interviewPaths = { trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
   const interviewCsrf = randomBytes(32).toString("hex");
-  const decorate = (html: string, version = "") => withWorkflowControls(html, options.tasks?.mode, version);
+  const decorate = async (html: string, version = "") => {
+    let resumes: string[] | undefined;
+    if (options.workspaceRoot) resumes = (await readProfileEditor(workspaceRoot)).availableResumeCategories;
+    return withWorkflowControls(html, options.tasks?.mode, version, resumes);
+  };
   const workflow = async () => {
     const [review, tracker, jobs, tasks] = await Promise.all([
       readReviewBatch(options.reviewPath), readApplicationTracker(options.trackerPath), readJobLibrary(options.jobsPath), options.tasks?.list() ?? []
@@ -278,6 +300,15 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         await google.proxy(request, response, `http://127.0.0.1:${address.port}`);
         return;
       }
+      if (request.method === "GET" && url.pathname === "/api/interview/requests") {
+        send(response, 200, JSON.stringify(await interviewRequestHistory(workspaceRoot)), "application/json; charset=utf-8"); return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/search") {
+        send(response, 200, JSON.stringify(await latestSearchStatus(workspaceRoot)), "application/json; charset=utf-8"); return;
+      }
+      if (request.method === "GET" && url.pathname === "/profile") {
+        send(response, 200, renderProfilePage(await readProfileEditor(workspaceRoot)), "text/html; charset=utf-8"); return;
+      }
       if (request.method === "GET" && url.pathname === "/settings/accounts") {
         send(response, 200, renderAccountPage(), "text/html; charset=utf-8"); return;
       }
@@ -293,13 +324,13 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "GET" && url.pathname === "/interviews") {
         const items = await readInterviewBoard({ trackerPath: options.trackerPath,
           profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") });
-        send(response, 200, renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
-          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all"), "text/html; charset=utf-8");
+        send(response, 200, withInterviewRequests(renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
+          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all"), (await readApplicationTracker(options.trackerPath)).applications, url.searchParams.get("interview") ?? ""), "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/review") {
         const view = await workflow();
-        send(response, 200, decorate(renderReviewPage(view.review, url.searchParams.get("application") ?? undefined, [], view.states, view.status.flatMap(item => item.applicationId ? [item.applicationId] : [])), view.version), "text/html; charset=utf-8");
+        send(response, 200, await decorate(renderReviewPage(view.review, url.searchParams.get("application") ?? undefined, [], view.states, view.status.flatMap(item => item.applicationId ? [item.applicationId] : [])), view.version), "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/status") {
@@ -309,7 +340,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "GET" && url.pathname === "/status/us") {
         try {
           const view = await workflow();
-          send(response, 200, decorate(renderUsStatusPage(view.status), view.version), "text/html; charset=utf-8");
+          send(response, 200, await decorate(renderUsStatusPage(view.status), view.version), "text/html; charset=utf-8");
         } catch {
           send(response, 500, JSON.stringify({ ok: false, error: "request_failed" }), "application/json; charset=utf-8");
         }
@@ -323,6 +354,18 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         const address = server.address();
         if (!address || typeof address === "string") throw new Error("request_failed");
         assertBrowserMutationAuthority(request, address.port);
+      }
+      if (request.method === "POST" && url.pathname === "/api/interview/requests") {
+        const result = await requestInterviewWork(workspaceRoot, options.repositoryRoot ?? workspaceRoot, await readJson(request, true));
+        send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
+      }
+      if (request.method === "POST" && ["/api/profile", "/api/preferences", "/api/resumes", "/api/search"].includes(url.pathname)) {
+        const body = await readJson(request, true, url.pathname === "/api/resumes" ? 14_100_000 : url.pathname === "/api/profile" ? 1_100_000 : maximumJsonBodyBytes);
+        const result = url.pathname === "/api/profile" ? await saveProfileEditor(workspaceRoot, body)
+          : url.pathname === "/api/preferences" ? await saveWebsitePreferences(workspaceRoot, body)
+          : url.pathname === "/api/resumes" ? await saveWebsiteResume(workspaceRoot, body)
+          : await requestWebsiteSearch(workspaceRoot, options.repositoryRoot ?? workspaceRoot, body);
+        send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
       }
       if (request.method === "GET" && url.pathname === "/api/tasks") {
         const { tasks, review, tracker, version } = await workflow();
@@ -348,7 +391,12 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       }
       if (request.method === "POST" && url.pathname === "/api/tasks") {
         if (!options.tasks) throw new Error("runner_unavailable");
-        const tasks = await options.tasks.enqueue(await readJson(request, true));
+        const body = await readJson(request, true);
+        if (options.workspaceRoot && options.tasks.mode === "codex" && body.action === "prepare") {
+          const context = await readProfileEditor(workspaceRoot);
+          if (typeof body.resumeCategory !== "string" || !context.availableResumeCategories.includes(body.resumeCategory)) throw new Error("invalid_request");
+        }
+        const tasks = await options.tasks.enqueue(body);
         send(response, 202, JSON.stringify({ tasks }), "application/json; charset=utf-8");
         return;
       }

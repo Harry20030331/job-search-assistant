@@ -253,3 +253,13 @@ test("chat submission rehearsal completes only once and preserves employer lifec
   await expect(runDemoChatTask(f.paths, task!.id, threadId)).rejects.toThrow("chat_task_unavailable");
   expect((await readApplicationTracker(f.paths.trackerPath)).applications[0]!.status).toBe("in_review");
 });
+
+test("an explicit resume profile remains bound to a preparation request across retries", async () => {
+  const chat = {threadId: randomUUID(), send: async () => randomUUID()};
+  const f = await fixture("codex", demoTaskExecutor, chat);
+  const request = {action: "prepare", mode: "codex", requestId: randomUUID(), jobIds: ["example-1"], resumeCategory: "pm_general"};
+  const [task] = await f.service.enqueue(request);
+  expect(task?.target.resumeCategory).toBe("pm_general");
+  expect((await f.service.enqueue(request))[0]?.id).toBe(task?.id);
+  await expect(f.service.enqueue({...request, resumeCategory: "another_profile"})).rejects.toThrow("invalid_request");
+});

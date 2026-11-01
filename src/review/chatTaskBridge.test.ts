@@ -24,7 +24,8 @@ test("uses the configured existing chat and passes the whole prompt as one liter
   expect(await bridge.send([task])).toBe(f.messageId);
   const args = JSON.parse(await readFile(f.argsPath, "utf8"));
   expect(args.slice(0, 4)).toEqual(["queue", "--thread", f.threadId, "--message"]);
-  expect(args).toHaveLength(5);
+  expect(args).toHaveLength(6);
+  expect(args[5]).toBe("--resume");
   expect(args[4]).toContain(task.id);
   expect(args[4]).toContain("Never open employer forms or submit fictional data");
 });

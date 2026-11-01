@@ -7,6 +7,8 @@ description: Read candidate background sources, collect missing search inputs an
 
 Read [the Matching entry point](../SKILL.md) for shared boundaries and routing. Use this stage for candidate facts and preferences, not job discovery or employer-form filling. Follow [candidate inputs](../../../docs/candidate-inputs.md) and the runnable [chat intake](../../../docs/matching-chat.md).
 
+The default user surface is now the [Welcome website](../../../docs/welcome.md). Reuse its confirmed canonical profile and saved preference feedback; do not require users to repeat those answers in chat. The source-reading/chat steps remain compatibility routes for unsupported inputs, not a replacement for the website.
+
 ## Read supplied material first
 
 If nothing was supplied, show `npm run matching -- sources`, inviting a designated LinkedIn URL, PDF/DOCX/TXT/Markdown background document, pasted text or combined sources. Do not require a resume, another numbered source choice, or user-authored JSON.

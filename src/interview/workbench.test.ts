@@ -98,7 +98,7 @@ test("website plan approval binds the version and disables stale, cancelled and 
   const page = renderInterviewPage([item], "interview-1", "preparation");
   expect(page).toContain("Approve plan & generate practice"); expect(page).toContain("data-plan-decision=");
   expect(page).toContain("&quot;proposalId&quot;:&quot;plan-1&quot;");
-  expect(page).toContain("Describe revisions in Codex chat");
+  expect(page).toContain("Describe revisions in the request form below");
   data.freshness = "stale"; expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");
   data.freshness = "current"; item.entry.state = "cancelled";
   expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");

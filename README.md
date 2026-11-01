@@ -1,6 +1,8 @@
 # Job Search Assistant
 
-A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents Status and Review.
+Send **Start** in a Codex project chat to open Welcome. Continue on the website through **Profile & preferences → Status / Shortlist → Review → Interview preparation**. See [website setup](docs/welcome.md).
+
+A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents the shared profile, shortlist, application review and interview workflow.
 
 See the [project documentation index](docs/README.md) for evaluation, team handoffs and operating contracts.
 
@@ -12,7 +14,7 @@ committed to Git               local, persistent
 
 ## Start developing
 
-For the job-seeker experience, open this repository as the primary folder of a local Codex project, start a new chat inside it, and send **Hi**. Codex is instructed to show an English welcome and guide setup. Opening the folder alone does not start a conversation. See [the welcome walkthrough](docs/welcome.md); development instructions follow below.
+For the job-seeker experience, open this repository as the primary folder of a local Codex project, start a new chat inside it, and send **Start** (or **Hi**). Codex starts the local service and visibly opens the English Welcome website for setup. Opening the folder alone does not start a conversation. See [the welcome walkthrough](docs/welcome.md); development instructions follow below.
 
 Requires Node.js 22 or later and npm. macOS uses `/usr/bin/shlock`; Windows uses the native lock adapter. The website can be viewed in a browser on other devices.
 

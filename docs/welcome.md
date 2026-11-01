@@ -1,37 +1,30 @@
-# Start the English setup conversation
+# Start the website
 
-## Open the project in Codex
+Open this repository as the primary folder in a Codex project and send `Start` (or `Hi` / `Get started`). Codex reads `AGENTS.md`, starts `npm start` in a persistent terminal session, and visibly opens the printed `welcome_url` in the in-app Browser. Users do not need to type terminal commands or supply JSON.
 
-Use a local project with this repository as its primary folder. If the project is already in the sidebar, select it and start a new chat within that project. Otherwise create/add a local project and select the `job-search-assistant` folder through the folder picker. In clients exposing Edit project, use Edit project > Add folder and make this repository the primary folder. Do not rely on dropping a folder into a message as an attachment: an attachment is not a documented substitute for selecting the primary working directory.
+The first message is the trigger. Opening a folder alone does not run a model turn, select a candidate, save facts or authorize research. Explicit development requests are not onboarding.
 
-Codex discovers `AGENTS.md` from the primary folder. That entry file routes the first greeting to the setup flow. Merely opening the project does not create an assistant response. Send:
+## Welcome and four shared pages
 
-```text
-Hi
-```
+Welcome is candidate-free. Choose **New candidate**, **Continue an existing search**, or **Try the fictional example** on the website. Existing searches show names, locations, counts and missing-data diagnostics. New setup creates a fresh private workspace only after the user confirms the form. The example creates a separate fictional copy and remains a local rehearsal.
 
-`Start` or `Get started` works too. No technical activation prompt is needed. This routing is a project instruction executed by Codex on the first message; its live behavior depends on the client loading the project instructions. It is not a separate always-running onboarding service. If the welcome does not appear, check that the repository is the primary folder, then send `Start job-search setup using AGENTS.md`.
+The selected workspace has four main pages:
 
-## First response
+1. **Profile & preferences:** confirm background, skills, education and experience; save search feedback; upload and explicitly approve a PDF under a new resume-profile key; request New Grad matching from SimplifyJobs/New-Grad-Positions, followed by official-page verification. Open web search is outside the current scope.
+2. **Status / Shortlist:** inspect saved matches, select an approved resume profile for live preparation, select jobs and click Apply.
+3. **Review:** edit drafts, resolve missing facts, approve content, then separately click Submit applications for the exact approved batch.
+4. **Interview preparation:** paste invitations, give availability, request plan changes and share debriefs through the webpage request form; read results or follow-up questions there. Existing exact-plan approval and practice views remain in place. Calendar writes require confirmation of the exact proposed action in a subsequent request.
 
-Read the canonical message with `npm run matching -- welcome` and show its English text in chat, without CLI output framing. This command is read-only and works before candidate data exists. Do not run intake, initialize storage, start a search or switch cases just because the user greeted the assistant.
+All four use the same canonical candidate, preference, resume and opportunity records. Google account connection remains a supporting settings page. Existing application/interview authorization and evidence gates still apply. Resume approval is optional for search and required before application preparation. Uploading a new PDF never replaces an existing approved mapping.
 
-After the user chooses:
+## Agent connection and recovery
 
-- **New candidate:** if no background source was supplied, show the English invitation from `npm run matching -- sources`: LinkedIn URL, a resume/background document (PDF, DOCX, TXT or Markdown), pasted text, or a combination. Do not require a second numbered menu choice; accept the material directly. A resume is optional. If a URL, document or pasted background is already supplied, read it first without forcing another selection. Use appropriate available document-reading tools and ask for a readable alternative if the format cannot be read. For a designated LinkedIn URL, read `docs/linkedin-import.md`, open it in the in-app Browser, build a source-backed preview and ask the user to confirm before saving. If inaccessible, explain what happened and offer pasted profile text/export, resume or manual entry. Then ask only for missing facts and search preferences. Do not reduce setup to a resume request.
-- **Existing search:** first run `npm run matching -- workspaces`. Present the discovered searches as a numbered English list with candidate name, saved folder, total/active job counts and last recorded job activity. Ask the user to choose a number; do not first demand a name or path. Identify empty workspaces as "No search results yet". If there are no results, say "No saved search results were found" and offer new setup or the fictional example. Surface scan errors and missing registered folders separately; they are not proof that no records exist. A path is an optional fallback for a workspace outside the bounded discovery scope. Do not silently choose an identity. After selection, read its current context and constraints.
-- **Fictional example:** clearly identify the repository's Alex fixture, ask whether to run a real public search or the scripted offline mechanics demonstration. For live research, first run `npm run matching -- example --workspace <new-directory>` to copy and register the fictional inputs, then start and open its website BEFORE browsing any sources. Do not defer workspace creation or web startup until after research. Never submit fictional data to an employer.
+When launched from Codex with `CODEX_THREAD_ID`, startup binds selected workspaces to that existing chat using the installed `codex queue --resume` command. `CODEX_CLI_PATH` can explicitly select its executable. Application tasks use the existing claim/finish protocol, with `--workspace <selected-directory>` for isolated workspaces. Search requests send only a fixed workflow instruction and a reference to saved canonical inputs. Failed or uncertain delivery is shown honestly and is never silently replayed.
 
-Then follow [Interactive Matching](matching-chat.md). Explain the product surfaces once: "Share your background and feedback here; the webpage shows your saved shortlist." Before browsing job sources, run `npm run matching -- serve --workspace <selected-workspace>` in a persistent terminal session, open the returned `statusUrl` in a visible in-app Browser tab, and keep it available as the results tab. This starts the fixed website even when the selected workspace has no jobs yet. Reuse that session/URL during the conversation; do not start another server for each feedback turn. Research external sources in background tabs. After each publication, reload the results tab and return focus to it. Do not use a different workspace's old localhost URL or replace the results tab with a source listing. Report a startup failure explicitly instead of silently continuing chat-only. Keep presentation interactions in English, including feedback explanations and pending conditions, unless explicitly asked otherwise.
+Keep the website process and the owning Codex chat available. The user works on the website; Codex performs research and employer-page work through its in-app Browser. A saved or delivered request does not establish completed research, live-form continuity or employer submission. Live application controls stay offline without the connected chat; they do not start a substitute agent. When the connection is unavailable, restore it in Codex and report the blocker instead of substituting a separate agent.
 
-## Startup-hook boundary
+A linked schema-version-3 profile remains read-only in the basic editor to preserve its independently owned shared sources. Such sources need a scoped Codex update. The initial form supports manual background entry; document extraction and LinkedIn observation continue to require the existing source-reading workflow and explicit fact confirmation. Do not claim that a URL or uploaded PDF has been parsed just because it was supplied.
 
-Codex's official `SessionStart` hook can add model context. Its `systemMessage` is surfaced as a warning, not a normal assistant welcome. It does not establish that opening an empty desktop chat will run a model turn. This implementation intentionally uses the first user message as the trigger and does not install hooks or change global Codex settings.
+## Maintenance — 2026-10-31
 
-References: [Projects and primary folders](https://learn.chatgpt.com/docs/projects), [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [SessionStart hooks](https://learn.chatgpt.com/docs/hooks).
-
-## Maintenance note — 2026-10-29
-
-Added English greeting routing through `AGENTS.md` and a read-only canonical welcome command. No zero-message startup, default candidate selection, candidate-data writes, browsing or submission occurs at welcome time. Development requests continue to use the normal repository workflow. The existing Status/Review interface is unchanged.
-
-Saved-search discovery and selected-workspace web startup were added on 2026-10-29. See [workspace discovery](workspaces.md) for scan scope, the private index and recovery behavior.
+The user requested website interaction, a Welcome entry on `Start`, four main pages and direct collaboration on main without a PR. This replaces the chat-first onboarding default. The historical `matching -- welcome`, intake and workspace commands remain compatible utilities. No global Codex settings or zero-message hooks are installed.

@@ -24,7 +24,7 @@ export const interviewBrowserScript = String.raw`
         for (const notice of state.notifications) {
           const row = text(notices, 'div', ''); row.className = 'interview-notice';
           text(row, 'strong', notice.company + ' · ' + notice.role);
-          text(row, 'p', 'Your scheduled interview has ended. How did it go? Share the questions, your answers and any feedback in Codex chat.');
+          text(row, 'p', 'Your scheduled interview has ended. How did it go? Share the questions, your answers and feedback using the debrief request form on Interview preparation.');
           const link = text(row, 'a', 'Review this interview ↗'); link.href = notice.href;
           const dismiss = text(row, 'button', 'Dismiss'); dismiss.type = 'button';
           dismiss.addEventListener('click', async () => { dismiss.disabled = true; try { await post('/api/interviews/dismiss', {notificationId:notice.id}); await refresh(); } catch { dismiss.disabled = false; } });

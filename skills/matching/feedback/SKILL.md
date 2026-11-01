@@ -7,6 +7,8 @@ description: Assess and rank job leads, publish a shortlist and apply actual use
 
 Read [the Matching entry point](../SKILL.md) for shared scope and website handling. Use the existing schemas/commands in [Matching](../../../docs/matching.md) and the actual interaction steps in [chat intake](../../../docs/matching-chat.md). This stage evaluates observations and updates recommendations; it does not independently operate employer applications.
 
+The default user surface is now the [Welcome website](../../../docs/welcome.md). Reuse its confirmed canonical profile and saved preference feedback; do not require users to repeat those answers in chat. The source-reading/chat steps remain compatibility routes for unsupported inputs, not a replacement for the website.
+
 ## Assess current evidence
 
 Read fresh `matching context`, canonical jobs and the complete preference prose, including saved structured constraints and text feedback. Compare observed requirements with canonical candidate facts: experience scope, degree/equivalence, skill depth, locations, employment type, timing, authorization conditions and application limits. Preserve explicit exceptions and distinguish required from preferred qualifications. Select a direction consistent with the current search scope. Job `category` is an open direction label, not an approved resume profile; do not infer an application resume from it.

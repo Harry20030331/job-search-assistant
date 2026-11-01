@@ -250,3 +250,13 @@ test("integrated navigation preserves the separate Apply and Submit controls", (
   expect(status).toContain('id="run-selected"');
   expect(status).not.toContain('id="submit-applications"');
 });
+
+test("live website preparation requires explicit resume selection and escapes configured profile labels", () => {
+  const html = withWorkflowControls('<html><head></head><body><header></header><main></main></body></html>', "codex", "", ["pm_general", '<script>bad</script>']);
+  expect(html).toContain('id="application-resume"');
+  expect(html).toContain("Choose an approved resume");
+  expect(html).toContain('&lt;script>bad&lt;/script>');
+  expect(html).not.toContain('<script>bad</script>');
+  expect(html).toContain('resumeCategory:resumePicker.value');
+  expect(withWorkflowControls('<main></main>', "demo", "", ["pm_general"])).not.toContain('id="application-resume"');
+});

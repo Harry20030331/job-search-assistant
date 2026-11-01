@@ -58,7 +58,10 @@
     "demo:alex:interviews": "tsx src/demo/alexInterviewFixture.ts",
     "example:load": "tsx src/cli/exampleLoadCli.ts",
     "example:shortlist": "tsx src/cli/exampleLoadCli.ts --snapshot shortlist",
-    "example:review": "tsx src/cli/exampleLoadCli.ts --snapshot review"
+    "example:review": "tsx src/cli/exampleLoadCli.ts --snapshot review",
+    "start": "tsx src/cli/startCli.ts",
+    "search:request": "tsx src/cli/searchRequestCli.ts",
+    "interview:request": "tsx src/cli/interviewRequestCli.ts"
   },
   "dependencies": {
     "zod": "^3.23.8"

@@ -59,7 +59,7 @@ export async function matchingContext(paths: MatchingPaths) {
 }
 
 const queues = new Map<string, Promise<unknown>>();
-async function withPreferences<T>(path: string, task: () => Promise<T>): Promise<T> {
+export async function withPreferences<T>(path: string, task: () => Promise<T>): Promise<T> {
   const key = await realpath(path);
   const result = (queues.get(key) ?? Promise.resolve()).catch(() => undefined).then(async () => {
     const unlock = await acquireFileLock(key);

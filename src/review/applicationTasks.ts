@@ -12,11 +12,11 @@ const selectionSchema = z.object({
   applicationId: z.string().min(1), snapshotId: z.string().min(1), revision: z.number().int().nonnegative()
 }).strict();
 export const taskRequestSchema = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("prepare"), requestId: z.string().uuid(), mode: z.enum(["demo", "codex"]), jobIds: z.array(z.string().min(1)).min(1).max(25) }).strict(),
+  z.object({ action: z.literal("prepare"), requestId: z.string().uuid(), mode: z.enum(["demo", "codex"]), jobIds: z.array(z.string().min(1)).min(1).max(25), resumeCategory: z.string().min(1).optional() }).strict(),
   z.object({ action: z.literal("submit"), requestId: z.string().uuid(), mode: z.enum(["demo", "codex"]), selections: z.array(selectionSchema).min(1).max(25) }).strict()
 ]);
 export type TaskRequest = z.infer<typeof taskRequestSchema>;
-const targetSchema = selectionSchema.extend({ applicationId: z.string(), snapshotId: z.string(), jobId: z.string(), company: z.string(), title: z.string(), contentHash: z.string() });
+const targetSchema = selectionSchema.extend({ applicationId: z.string(), snapshotId: z.string(), jobId: z.string(), company: z.string(), title: z.string(), contentHash: z.string(), resumeCategory: z.string().min(1).optional() });
 const taskSchema = z.object({
   id: z.string().uuid(), requestId: z.string().uuid(), action: z.enum(["prepare", "submit"]),
   mode: z.enum(["demo", "codex"]), target: targetSchema,
@@ -127,7 +127,7 @@ export class ApplicationTaskService {
       if (duplicate.length) {
         const expected = request.action === "prepare" ? request.jobIds : request.selections.map(s => JSON.stringify(s));
         const actual = duplicate.map(t => request.action === "prepare" ? t.target.jobId : JSON.stringify({ applicationId: t.target.applicationId, snapshotId: t.target.snapshotId, revision: t.target.revision }));
-        if (duplicate.some(t => t.action !== request.action || t.mode !== request.mode) || JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("invalid_request");
+        if (duplicate.some(t => t.action !== request.action || t.mode !== request.mode || (request.action === "prepare" && t.target.resumeCategory !== request.resumeCategory)) || JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("invalid_request");
         return duplicate;
       }
       const [jobs, tracker, review] = await Promise.all([readJobLibrary(this.paths.jobsPath), readApplicationTracker(this.paths.trackerPath), readReviewBatch(this.paths.reviewPath)]);
@@ -137,9 +137,10 @@ export class ApplicationTaskService {
           const record = tracker.applications.find(a => a.jobId === jobId);
           const job = jobs.find(j => j.jobId === jobId && !["closed", "submitted"].includes(j.status) && (record || ["ready", "new"].includes(j.status)) && !j.note.startsWith("user-excluded:"));
           if (!job || (record && (record.hiddenFromStatus || record.status !== "in_review"))) throw new Error("task_target_unavailable");
+          if (record && request.resumeCategory && record.category !== request.resumeCategory) throw new Error("task_target_unavailable");
           const existing = review.applications.find(i => i.applicationId === record?.applicationId);
           if (existing && ["approved", "consumed"].includes(existing.decision.state)) throw new Error("task_target_unavailable");
-          targets.push({ jobId, applicationId: record?.applicationId ?? "", snapshotId: "", revision: 0, contentHash: "", company: job.company, title: job.title });
+          targets.push({ ...(request.resumeCategory ? { resumeCategory: request.resumeCategory } : {}), jobId, applicationId: record?.applicationId ?? "", snapshotId: "", revision: 0, contentHash: "", company: job.company, title: job.title });
         }
       } else {
         for (const selection of request.selections) {

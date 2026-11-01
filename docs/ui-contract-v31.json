@@ -1,0 +1,19 @@
+{
+  "version": 31,
+  "establishedAt": "2026-10-31",
+  "authorization": "User requested Start opening Welcome, website input across four shared pages, direct main collaboration without PRs, and New Grad-only matching from SimplifyJobs/New-Grad-Positions.",
+  "validation": "TypeScript, isolated fictional workflow/security/source-boundary tests and actual in-app Browser checks of Welcome, new intake, saved workspace selection, profile/preference saving, Status, Review and Interview requests. Existing exact-plan/content approval and submission boundaries remain. No live employer submission, Google calendar write, or completed live matching round is claimed.",
+  "files": {
+    "src/review/reviewViews.ts": "cc19860ac6bfade89a9886220fd52f78a9ad1f1843016a3dddcd73d164808a8f",
+    "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
+    "src/review/workflowViews.ts": "7d4266756cb8dd8cacc3603bf6db7226705c4238bfc5d98cd79998c4f4df3f43",
+    "src/review/applicationStyles.ts": "97cf31b4a9a2e8b9f2869aa76c572897765b155f3c552a85b0d7243672917b40",
+    "src/workbench/views.ts": "46caf67b8e26004dcf43d71054b45596d7f372caf19265c702d3717a86094efb",
+    "src/interview/interviewView.ts": "3f364876619fabaa8ba239bdfdd9882f8aebcd8382754be70fc1c80840805866",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "2b88e098ac470f4c0136c1811aa8774b798ae3473d8fb98fe853a642fedfba18",
+    "src/workbench/start.ts": "1f5356a9759c8e8d9c96ac2f47f8269fb3340ddb5cd658c20d945e68a3d989cf",
+    "src/workbench/interviewRequests.ts": "2ef6a631e64f0d7486353e03ab9b6abbff6048e75bf95b81500f3f3c38e3e72d"
+  }
+}

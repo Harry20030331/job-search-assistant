@@ -8,6 +8,12 @@ import { assertLiveCandidate } from "../review/liveCandidate.js";
 
 const modulePath = fileURLToPath(import.meta.url);
 export async function runChatTaskCli(argv: readonly string[], root = resolve(dirname(modulePath), "../.."), threadId = process.env.CODEX_THREAD_ID): Promise<void> {
+  const workspaceIndex = argv.indexOf("--workspace");
+  if (workspaceIndex !== -1) {
+    if (!argv[workspaceIndex + 1] || argv.indexOf("--workspace", workspaceIndex + 1) !== -1) throw new Error("invalid_arguments");
+    root = resolve(argv[workspaceIndex + 1]!);
+    argv = [...argv.slice(0, workspaceIndex), ...argv.slice(workspaceIndex + 2)];
+  }
   const [command, ...args] = argv;
   if (!["claim", "finish", "run-demo"].includes(command ?? "") || args.length % 2) throw new Error("invalid_arguments");
   const values = new Map<string, string>();

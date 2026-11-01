@@ -26,7 +26,7 @@ test("a live task delivered before fixture validation is blocked in the bound ch
   await expect(runChatTaskCli(["claim", "--task", task!.id], root, randomUUID())).rejects.toThrow("wrong_chat_thread");
   expect((await readTasks(taskPath))[0]!.state).toBe("queued");
   const output = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-  await runChatTaskCli(["claim", "--task", task!.id], root, threadId);
+  await runChatTaskCli(["claim", "--task", task!.id, "--workspace", root], "/unused/fictional-repository", threadId);
   expect((await readTasks(taskPath))[0]).toMatchObject({state: "blocked", message: expect.stringContaining("fictional")});
   await runChatTaskCli(["claim", "--task", task!.id], root, threadId);
   expect(String(output.mock.calls.at(-1)![0])).toContain("already_handled");

@@ -4,7 +4,11 @@ Active discovery structure. Candidate-specific screening is owned by `../data/pr
 
 ## Sources and verification
 
-The supplied technology-oriented sources are `SimplifyJobs/New-Grad-Positions`, `speedyapply/2027-AI-College-Jobs`, and `speedyapply/2027-SWE-College-Jobs`. Explicit task instructions may add sources such as career-fair companies, referrals or Frontier Lab careers pages. Use sources appropriate to the selected direction instead of forcing every search through technology lists. Direct official-career observations use `official-careers`, with actual URL/evidence; a user-supplied lead retains `user-provided`. Listings supply leads; the specific official employer page establishes availability and requirements.
+Current scope (2026-10-31): **New Grad only**, using [SimplifyJobs/New-Grad-Positions](https://github.com/SimplifyJobs/New-Grad-Positions) as the sole lead repository. The user specifically provided its [Product Management section](https://github.com/SimplifyJobs/New-Grad-Positions#-product-management-new-grad-roles); use that section for PM, and the appropriate section of the same repository for other confirmed directions. Match the bounded list against current candidate inputs rather than running open-ended web searches. Do not use search engines, other aggregators, unrelated official-careers discovery, internships or experienced-role expansion by default. If a direction is absent, the repository is inaccessible, or too few jobs qualify, show the limitation instead of expanding sources.
+
+Follow each listed official employer/application link to verify the exact requisition. Preserve `simplify-new-grad` provenance; official-page evidence supports verification rather than becoming an independent discovery source. The `speedyapply-*`, `user-provided` and `official-careers` IDs remain readable for historical records and explicit future scope changes; they are not active website discovery sources. A request's saved scope records this boundary. The Simplify repository is a lead list, not an execution tool: never install its extension or use its autofill.
+
+Do not assume every listed role is New Grad or suitable for the candidate's graduation year. Verify full-time/entry-level eligibility, graduation window and start timing against the official role, including for repositories titled for another cohort. No graduation year or location is inferred from the repository title.
 
 Check requisition identity, employer, role, location, full-time status, qualifications, cohort/start timing, sponsorship/citizenship constraints and application limits. Event registration or referral links can expire independently from a public job. Do not mark an employer role closed from a failed browser connection or an expired event link alone.
 
@@ -27,3 +31,7 @@ Discovery may create `new` or `ready` rows; it cannot fabricate `in_progress`, `
 Use the candidate's target batch size and per-employer limit in preferences. Stop before application execution unless separately authorized. Incremental scanning uses source-specific completed checkpoints; incomplete scans retain the prior checkpoint. A missing delta falls back to a deduplicated current-list scan, with reduced precision stated honestly.
 
 Validate the library after narrow writes. Report meaningful additions, closures/changes and operational failures. Routine rejected leads and internal screening notes do not create new approval chores.
+
+## Maintenance — 2026-10-31
+
+The user restricted current discovery to New Grad roles from SimplifyJobs. This replaces the previous multi-source default without removing historical source records or changing candidate-owned directions, geography and timing.
