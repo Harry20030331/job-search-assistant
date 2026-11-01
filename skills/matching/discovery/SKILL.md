@@ -15,6 +15,8 @@ Use only SimplifyJobs/New-Grad-Positions for new leads under the current [discov
 
 For incremental work, read each source's own completed checkpoint. If a complete delta is unavailable, inspect a deduplicated current listing and state the reduced precision. Advance a checkpoint only after the full scan and every inspected disposition are complete, including downstream assessment/publication where needed. An unfinished handoff leaves the prior checkpoint intact.
 
+Website daily/catch-up requests use the same scope and checkpoint rules as manual discovery. Claim the exact saved request once; do not start another round while one is active. Complete it only after actual assessment/publication or a verified zero-change round, and attach the short actual completion receipt required by [daily updates](../../../docs/job-refresh.md). Incomplete or inaccessible work is blocked, not a successful timestamp. Routine unchanged automatic results stay on the website without extra chat status messages.
+
 ## Observe each official role
 
 Verify requisition identity, employer, title, actual permitted work locations, employment type, responsibilities, required versus preferred qualifications, cohort/start timing, authorization restrictions and application limits. Capture short evidence references and actual observation dates. A generic careers-page redirect does not establish an open role. Avoid counting overlapping part-time research as additional full-time employment.

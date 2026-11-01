@@ -88,7 +88,7 @@ test("interview rendering escapes source text, distinguishes approvals, and pres
   const page = renderInterviewPage(await readInterviewBoard(paths, async () => data), "interview-1", "preparation");
   expect(page).toContain("&lt;img"); expect(page).not.toContain('<img src=x'); expect(page).toContain("Awaiting your approval");
   expect(page).not.toContain("<form"); expect(page).toContain("30-minute plan");
-  expect(renderInterviewPage([])).toContain("Room for your next conversation");
+  expect(renderInterviewPage([])).toContain("No interviews");
 });
 
 test("website plan approval binds the version and disables stale, cancelled and ready plans", async () => {
@@ -98,7 +98,7 @@ test("website plan approval binds the version and disables stale, cancelled and 
   const page = renderInterviewPage([item], "interview-1", "preparation");
   expect(page).toContain("Approve plan & generate practice"); expect(page).toContain("data-plan-decision=");
   expect(page).toContain("&quot;proposalId&quot;:&quot;plan-1&quot;");
-  expect(page).toContain("Describe revisions in the request form below");
+  expect(page).toContain("request changes below");
   data.freshness = "stale"; expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");
   data.freshness = "current"; item.entry.state = "cancelled";
   expect(renderInterviewPage([item], "interview-1", "preparation")).not.toContain("data-plan-decision=");

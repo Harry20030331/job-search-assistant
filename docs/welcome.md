@@ -6,11 +6,11 @@ The first message is the trigger. Opening a folder alone does not run a model tu
 
 ## Welcome and four shared pages
 
-Welcome is candidate-free. Choose **New candidate**, **Continue an existing search**, or **Try the fictional example** on the website. Existing searches show names, locations, counts and missing-data diagnostics. New setup creates a fresh private workspace only after the user confirms the form. The example creates a separate fictional copy and remains a local rehearsal.
+Welcome is candidate-free. Choose **New candidate**, **Continue an existing search**, or **Try the fictional example** on the website. Existing searches show names, locations, counts and missing-data diagnostics. New setup offers three source methods: a designated LinkedIn profile link, freely pasted background text, or a PDF upload. Codex reads the source and publishes a profile preview; corrections stay on the website. Only after the user reviews the preview and confirms search preferences does setup create a fresh private candidate workspace. The example creates a separate fictional copy and remains a local rehearsal.
 
 The selected workspace has four main pages:
 
-1. **Profile & preferences:** confirm background, skills, education and experience; save search feedback; upload and explicitly approve a PDF under a new resume-profile key; request New Grad matching from SimplifyJobs/New-Grad-Positions, followed by official-page verification. Open web search is outside the current scope.
+1. **Profile & preferences:** confirm background, skills, education and experience; save search feedback; upload and explicitly approve a PDF under a new resume-profile key; see daily New Grad update status or refresh manually; all matching uses SimplifyJobs/New-Grad-Positions followed by official-page verification. Open web search is outside the current scope.
 2. **Status / Shortlist:** inspect saved matches, select an approved resume profile for live preparation, select jobs and click Apply.
 3. **Review:** edit drafts, resolve missing facts, approve content, then separately click Submit applications for the exact approved batch.
 4. **Interview preparation:** paste invitations, give availability, request plan changes and share debriefs through the webpage request form; read results or follow-up questions there. Existing exact-plan approval and practice views remain in place. Calendar writes require confirmation of the exact proposed action in a subsequent request.
@@ -23,8 +23,16 @@ When launched from Codex with `CODEX_THREAD_ID`, startup binds selected workspac
 
 Keep the website process and the owning Codex chat available. The user works on the website; Codex performs research and employer-page work through its in-app Browser. A saved or delivered request does not establish completed research, live-form continuity or employer submission. Live application controls stay offline without the connected chat; they do not start a substitute agent. When the connection is unavailable, restore it in Codex and report the blocker instead of substituting a separate agent.
 
-A linked schema-version-3 profile remains read-only in the basic editor to preserve its independently owned shared sources. Such sources need a scoped Codex update. The initial form supports manual background entry; document extraction and LinkedIn observation continue to require the existing source-reading workflow and explicit fact confirmation. Do not claim that a URL or uploaded PDF has been parsed just because it was supplied.
+A linked schema-version-3 profile remains read-only in the basic editor to preserve its independently owned shared sources. Such sources need a scoped Codex update. The three source methods use the connected existing Codex chat for reading and extraction, with single-claim, revision-bound preview requests staged under ignored `local/intakes/`. LinkedIn requires visible source observations; PDF content must actually be read. Inaccessible or incomplete sources produce an honest webpage message and a correction/alternative-source option. Uploading or supplying a source does not establish extraction success, candidate confirmation or resume approval.
 
 ## Maintenance — 2026-10-31
 
 The user requested website interaction, a Welcome entry on `Start`, four main pages and direct collaboration on main without a PR. This replaces the chat-first onboarding default. The historical `matching -- welcome`, intake and workspace commands remain compatible utilities. No global Codex settings or zero-message hooks are installed.
+
+## Source-first intake — 2026-10-31
+
+The user rejected the long upfront candidate form and requested LinkedIn link, pasted text or PDF as the three initial choices. UI v32 replaces the initial form with one selected source input, then a readable extracted preview and a short preference confirmation. Candidate records are not initialized while source reading or correction is pending. Changes stay uncommitted for the user's own review.
+
+## Daily updates — 2026-10-31
+
+After selection, a confirmed real workspace checks for an initial/overdue matching round in the background and then every 24 hours while the local service runs. Reopening catches up; manual Refresh jobs stays available on Status and Profile. All triggers share one durable active request. Failed or uncertain work cannot advance the successful timestamp. Fictional examples pause automatic research. Source scope, details and local-process limitations are in [daily updates](job-refresh.md). Welcome and unconfirmed intake still run no matching.

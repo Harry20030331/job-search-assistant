@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "./pythonRuntime.mjs";
 import { spawn } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,7 +11,7 @@ const decisionSchema = z.object({ interviewId: z.string().min(1), expectedRevisi
 export type PlanDecision = z.infer<typeof decisionSchema>;
 export async function pythonAction(action: "decide" | "run" | "fail", workspace: string, input?: unknown, jobId?: string): Promise<Record<string, unknown>> {
   return new Promise((accept, reject) => {
-    const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", "interview.web_workflow", action, "--workspace", workspace,
+    const child = spawn(resolveInterviewPython(), ["-m", "interview.web_workflow", action, "--workspace", workspace,
       ...(jobId ? ["--job-id", jobId] : [])], { cwd: root, shell: false, windowsHide: true,
       stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" } });
     let output = "";

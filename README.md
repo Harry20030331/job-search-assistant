@@ -1,6 +1,6 @@
 # Job Search Assistant
 
-Send **Start** in a Codex project chat to open Welcome. Continue on the website through **Profile & preferences → Status / Shortlist → Review → Interview preparation**. See [website setup](docs/welcome.md).
+Send **Start** in a Codex project chat to open Welcome. Continue on the website through **Profile & preferences → Status / Shortlist → Review → Interview preparation**. New candidate starts with a LinkedIn link, pasted text or PDF, followed by a profile preview for confirmation. Selected real workspaces check New Grad listings daily, catch up when overdue, and offer manual refresh. See [website setup](docs/welcome.md) and [daily updates](docs/job-refresh.md).
 
 A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents the shared profile, shortlist, application review and interview workflow.
 
@@ -100,3 +100,7 @@ The [current-workflow baseline pipeline](docs/interview-workflow-benchmark.md) r
 `npm run demo -- --dir /tmp/job-search-demo` creates a separate, fresh runtime with one fictional job and a loopback employer form. Follow [the walkthrough](docs/demo.md). This tests review and submission control flow; normal workbench startup does not depend on it.
 
 The candidate is synthetic and must never be submitted to a real employer. Tests and the local exercise do not establish real-world agent accuracy. The [evaluation framework](docs/evaluation.md) defines the planned candidate-by-form matrix, quality and cost metrics, and severe-error reporting; datasets and measured results remain future work. This course repository is maintained independently from the original personal system. See [extraction notes](docs/extraction.md) for scope and validation.
+
+## Interview environment
+
+Run `npm run interview:setup` once, then `npm run interview:check`. Normal `npm start` automatically uses the project-local Python environment for Interview; no per-launch override is needed. Model generation requires Codex login. Google account connection remains separate. For the existing fictional example and the verified local demo path, see [Alex demo](docs/alex-case-demo.md) and [current integration](docs/interview-current-integration.md).

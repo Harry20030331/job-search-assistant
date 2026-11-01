@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "../src/interview/pythonRuntime.mjs";
 import { spawn } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,7 +27,7 @@ const modules = {
   inbox: ["interview.inbox_cli"], connect: ["interview.onboarding"], google: ["interview.google_cli"]
 };
 if (!Object.hasOwn(modules, entry)) throw new Error("invalid_interview_entrypoint");
-const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", ...modules[entry], ...args], {
+const child = spawn(resolveInterviewPython(), ["-m", ...modules[entry], ...args], {
   cwd: root, shell: false, stdio: "inherit",
   env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" }
 });

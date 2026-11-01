@@ -287,11 +287,11 @@ describe("local review server", () => {
     const { server } = await fixture({ schemaVersion: 2, applications: [trackerRecord()] });
     const response = await fetch(`${server.address}/status`);
     const html = await response.text();
-    const row = html.match(/<article class="status-row"[\s\S]*?<\/article>/)?.[0] ?? "";
+    const row = html.match(/<tr class="status-row"[\s\S]*?<\/tr>/)?.[0] ?? "";
 
     expect(response.status).toBe(200);
     expect(row).toContain("Legacy Co · Washington");
-    expect(row).toContain('<span class="row-status">Shortlisted</span>');
+    expect(row).toContain('data-status="shortlisted"');
     expect(row).not.toContain("final_review");
   });
 
@@ -327,7 +327,7 @@ describe("local review server", () => {
     const html = await response.text();
     expect(response.status).toBe(200);
     expect(html).toContain("Shortlist Co · New York");
-    expect(html).toContain('<span class="row-status">Shortlisted</span>');
+    expect(html).toContain('data-status="shortlisted"');
     expect(html.indexOf("Shortlist Co")).toBeLessThan(html.indexOf("Legacy Co"));
     expect(html).toContain("New Co");
     expect(html).not.toContain("\u5f85\u4f60\u5ba1\u9605");

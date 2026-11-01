@@ -1,0 +1,24 @@
+{
+  "version": 35,
+  "establishedAt": "2026-10-31",
+  "authorization": "User requested a minimal professional productivity UI matching the attached reference and Status as the default landing page for existing searches. No commit, push or PR is authorized.",
+  "validation": "533 TypeScript tests and type checks, UI v35, boundaries and distribution passed. In-app Browser verified existing-search landing, All/Shortlisted, selection count, source tabs, Review and Interview with fictional data. Inter loaded locally. Desktop rendering verified; viewport override did not take effect, so phone-width rendering remains unverified. See docs/productivity-ui.md. User review pending; no commit/push.",
+  "files": {
+    "src/review/reviewViews.ts": "0060e2a6de122f6cb4f72e5e6ac7ec1c84075148ff96d2b41c2a0d02ad8d9ce3",
+    "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
+    "src/review/workflowViews.ts": "a0696d4ef74c2044af79e6019fe03105cfafa415f09c7a72af94f03a017d1228",
+    "src/review/applicationStyles.ts": "4af161f78cdf761fa8c7e286c5099b4564cd36c89a95644208ba7ac2114a1254",
+    "src/workbench/views.ts": "96e4e23451fe933171efeaadef4d4d891a8b1791b849fb68a38d0a3488db0b2f",
+    "src/interview/interviewView.ts": "08e81c3c08a77ebb443315330b21294a7a6c9ab83c14bc0c18ebc49b843371e4",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "31a92772ec62f3b6a5cb98bba6b7077e0ccbd72ae6cfa2064236c4f3efc08d04",
+    "src/workbench/start.ts": "44607ed598ffb83a9c9f4c7380a5bc9655c1314c2013333e515d4e9a6a09fca4",
+    "src/workbench/interviewRequests.ts": "e1f0659f747866dd6c0d9874282f4fc625368e50c7c072179168d3d2f98009a3",
+    "src/workbench/intakeView.ts": "eacccc6c4aeaaf09af4887adffab7562db0f4076e61eb170c65f70166ab12afe",
+    "src/workbench/searchRefreshView.ts": "dfcc742100591ce4cf427c1728bf105292f7d4dafaf22eeff9bfc0ebd6136d5c",
+    "src/workbench/designSystem.ts": "32687c0dcc3cb0419e0cdd40ab179925b0d1dfb908fdd509897dab49538902ba",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3"
+  }
+}

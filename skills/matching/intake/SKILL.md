@@ -7,7 +7,7 @@ description: Read candidate background sources, collect missing search inputs an
 
 Read [the Matching entry point](../SKILL.md) for shared boundaries and routing. Use this stage for candidate facts and preferences, not job discovery or employer-form filling. Follow [candidate inputs](../../../docs/candidate-inputs.md) and the runnable [chat intake](../../../docs/matching-chat.md).
 
-The default user surface is now the [Welcome website](../../../docs/welcome.md). Reuse its confirmed canonical profile and saved preference feedback; do not require users to repeat those answers in chat. The source-reading/chat steps remain compatibility routes for unsupported inputs, not a replacement for the website.
+The default user surface is now the [Welcome website](../../../docs/welcome.md). Reuse its confirmed canonical profile and saved preference feedback; do not require users to repeat those answers in chat. The website now accepts a LinkedIn link, pasted text or PDF and queues an `intake:request`. Claim that exact request/revision once, read the actual source using the workflow below, and publish a preview or missing-information explanation back to the webpage. User corrections produce a new revision; never publish an older claimed result over it. Do not initialize a candidate during source reading: the webpage creates the fresh workspace only after explicit preview confirmation and supplied preferences. The chat route remains compatible for explicitly supplied chat input.
 
 ## Read supplied material first
 

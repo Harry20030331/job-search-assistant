@@ -61,7 +61,10 @@
     "example:review": "tsx src/cli/exampleLoadCli.ts --snapshot review",
     "start": "tsx src/cli/startCli.ts",
     "search:request": "tsx src/cli/searchRequestCli.ts",
-    "interview:request": "tsx src/cli/interviewRequestCli.ts"
+    "interview:request": "tsx src/cli/interviewRequestCli.ts",
+    "intake:request": "tsx src/cli/intakeRequestCli.ts",
+    "interview:setup": "node scripts/interview-setup.mjs",
+    "interview:check": "node scripts/interview-setup.mjs --check"
   },
   "dependencies": {
     "zod": "^3.23.8"

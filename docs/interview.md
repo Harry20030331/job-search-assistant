@@ -18,19 +18,18 @@ Owner: Erica Zhao. Integration and packaging maintenance date: 2026-10-26. The m
 
 See [storage ownership and placement](interview-storage.md) before selecting or recovering business output. New ordinary candidate work may use `<candidate-workspace>/interviews/<opaque-key>/<new-run-id>/` through explicit output flags. Evaluation remains in independent ignored runs. No private state is automatically moved. See [the implementation map](../src/interview/README.md) for code ownership.
 
-## Optional setup
+## Project environment setup
 
-The existing TypeScript workbench does not require Python. Interview requires Python 3.12 with SQLite FTS5; real model runs also require a logged-in Codex CLI. From the repository root in PowerShell:
+Interview requires Python 3.12 or newer with SQLite FTS5. From the repository root:
 
-```powershell
+```text
 npm ci
-python -m venv src/interview/python/.venv
-$env:INTERVIEW_PYTHON = (Resolve-Path src/interview/python/.venv/Scripts/python.exe).Path
-& $env:INTERVIEW_PYTHON -m pip install -r src/interview/python/requirements.lock
-npm run interview:test
+npm run interview:setup
+npm run interview:check
+npm start
 ```
 
-On macOS/Linux select `src/interview/python/.venv/bin/python` instead. `INTERVIEW_PYTHON` names one executable; commands are launched without a shell. An existing compatible environment may be selected explicitly for local verification; no machine-specific path is stored in source.
+Setup installs the pinned core and Google adapter libraries into the ignored project environment `src/interview/python/.venv`. It uses uv when available, otherwise Python venv/pip. It does not install globally or connect an account. All Interview commands and website bridges automatically use this environment, independent of the selected candidate directory. No per-launch environment variable is needed. `INTERVIEW_PYTHON` remains an explicit override for an existing configured environment. Normal startup reports readiness and prints the setup command if dependencies are unavailable. Model-backed operations also require a logged-in Codex CLI; runtime readiness does not assert model login or Google authorization. See [current integration verification](interview-current-integration.md).
 
 For a self-contained fictional Interview preview after setup, use a new output directory:
 
@@ -99,7 +98,7 @@ The account-level development coordinator supports explicit `profile`, `prepare`
 
 ## Google connection boundary
 
-Install `requirements-google.lock` alongside the core requirements only for live testing. A developer configures the application once: enable Gmail and Calendar APIs, configure consent/test users and obtain a Desktop OAuth client. Store it only at the module-local ignored `.google-local/client.json`. End users then use `npm run interview:connect -- --port 8766` and open the printed loopback URL; it redirects directly to Google's account selection and consent. Never copy platform-connector tokens or another installation's credentials. OAuth state, PKCE and one-time callback checks are retained.
+`interview:setup` installs the optional Google SDK alongside the core requirements; installing libraries does not grant Google access. A developer configures the application once: enable Gmail and Calendar APIs, configure consent/test users and obtain a Desktop OAuth client. Store it only at the module-local ignored `.google-local/client.json`. End users then use `npm run interview:connect -- --port 8766` and open the printed loopback URL; it redirects directly to Google's account selection and consent. Never copy platform-connector tokens or another installation's credentials. OAuth state, PKCE and one-time callback checks are retained.
 
 Connection saves account-bound local tokens; it does not select or create a test calendar. Before business calls the host must configure a dedicated owned secondary calendar and explicitly selected message IDs, using `configs/google.example.json` as a blank template. The backend rejects `primary` and constrains writes to that calendar; OAuth scopes themselves are broader. Account-level inbox commands expect `.google-local/users/<account-hash>/connection.json` and `demo-config.json` with matching identity. Credential files remain outside agent workspaces. `npm run interview:google -- --help` and `npm run interview:inbox -- --help` expose host commands; setup does not imply a connected account in this new checkout.
 

@@ -506,13 +506,14 @@ describe("review console views", () => {
     expect(renderReviewPage(document, first.applicationId, [first.applicationId])).not.toContain('data-application="application-1"');
   });
 
-  test("renders the active five-stage lifecycle above one neutral line", () => {
+  test("renders the lifecycle as compact tabs with an explicit All view", () => {
     const html = renderStatusPage(buildStatusView(tracker, []));
     const guide = html.match(/<section class="lifecycle-guide"[\s\S]*?<\/section>/)?.[0] ?? "";
 
     expect(guide).not.toBe("");
     expect(guide).toContain("Shortlisted → In Review → Submitted → Interviewing → Offer");
-    expect(guide.match(/class="lifecycle-line"/g)).toHaveLength(1);
+    expect(guide).toContain('data-status-filter="all" aria-pressed="true"');
+    expect(guide).not.toContain('class="lifecycle-line"');
     expect(guide).not.toMatch(/\b0[1-7]\b/);
     expect(guide).not.toMatch(/active|current|partial|underline|red|warn/i);
     expect(html).not.toMatch(/\.lifecycle[^}]*var\(--warn\)/);
@@ -547,10 +548,10 @@ describe("review console views", () => {
 
     expect(html).toContain('href="https://example.com/jobs/gm-ml-validation?view=official"');
     expect(html).toContain("General Motors · Sunnyvale");
-    expect(html).toContain('<span class="row-status">Shortlisted</span>');
+    expect(html).toContain('data-status="shortlisted"');
     expect(html).toContain('class="job-select"');
     expect(html).toContain('<time datetime="2026-08-07T00:00:00.000Z" aria-label="Updated 08-07">08-07</time>');
-    const row = html.match(/<article class="status-row"[\s\S]*?<\/article>/)?.[0] ?? "";
+    const row = html.match(/<tr class="status-row"[\s\S]*?<\/tr>/)?.[0] ?? "";
     expect(row).not.toContain("<button");
   });
 
@@ -576,7 +577,6 @@ describe("review console views", () => {
 
   test("shows active tracker states and omits closed applications without altering records", () => {
     const statuses = ["in_review", "submitted", "confirmed", "interviewing", "offer", "closed"] as const;
-    const labels = ["In Review", "Submitted", "Submitted", "Interviewing", "Offer", "Closed"];
     const applications = statuses.map((status, index) => ({
       ...tracker[0]!,
       jobId: `job-${index}`,
@@ -587,7 +587,7 @@ describe("review console views", () => {
       status
     }));
     const html = renderStatusPage(buildStatusView(applications, []));
-    const rows = [...html.matchAll(/<article class="status-row"[\s\S]*?<\/article>/g)].map((match) => match[0]);
+    const rows = [...html.matchAll(/<tr class="status-row"[\s\S]*?<\/tr>/g)].map((match) => match[0]);
 
     expect(rows).toHaveLength(5);
     expect(html).not.toContain('data-status="closed"');
@@ -597,12 +597,10 @@ describe("review console views", () => {
     expect(applications[2]?.status).toBe("confirmed");
     expect(html).not.toContain("Confirmed");
     expect(rows.filter(row => row.includes('data-status="submitted"'))).toHaveLength(2);
+    expect(html).not.toContain('<th scope="col">Status</th>');
     rows.forEach((row, index) => {
-      expect(row.match(/class="row-status"/g)).toHaveLength(1);
-      expect(row).toContain(`>${labels[index]}</span>`);
-      for (const otherLabel of labels.filter((label) => label !== labels[index])) {
-        expect(row).not.toContain(`>${otherLabel}</span>`);
-      }
+      expect(row).not.toContain('class="row-status"');
+      expect(row).toContain(`data-status="${statuses[index] === "confirmed" ? "submitted" : statuses[index]}"`);
     });
   });
 
@@ -649,7 +647,7 @@ describe("review console views", () => {
 
   test("keeps tracked rows read-only without repeated review links", () => {
     const html = renderStatusPage(buildStatusView(tracker, []));
-    const row = html.match(/<article class="status-row"[\s\S]*?<\/article>/)?.[0] ?? "";
+    const row = html.match(/<tr class="status-row"[\s\S]*?<\/tr>/)?.[0] ?? "";
     expect(html).not.toContain("CV");
     expect(html).not.toContain("Visible result");
     expect(html).not.toContain("Gmail confirmation");
@@ -664,16 +662,16 @@ describe("review console views", () => {
     expect(html).not.toContain('data-status="all"');
   });
 
-  test("filters by the five active lifecycle states and restores rows via Status ledger", () => {
+  test("filters by lifecycle and restores all rows through the All tab", () => {
     const html = renderStatusPage(buildStatusView(tracker, []));
     const filters = [...html.matchAll(/<button class="status-filter"/g)];
 
-    expect(filters).toHaveLength(5);
+    expect(filters).toHaveLength(6);
     expect(html).toContain('data-status-filter="shortlisted"');
     expect(html).toContain('data-status-filter="in_review"');
-    expect(html).not.toContain('data-status-filter="all"');
+    expect(html).toContain('data-status-filter="all"');
     expect(html).toContain('href="/status" aria-current="page"');
-    expect(html).toContain("const show=row.dataset.status===selected");
+    expect(html).toContain("const show=selected==='all'||row.dataset.status===selected");
     expect(html).toContain("row.hidden=!show");
   });
 
@@ -708,7 +706,7 @@ describe("review console views", () => {
     expect(html).toContain("Awaiting Review");
     expect(html).not.toContain("Gmail confirmation");
     expect(html).not.toContain("Submitted");
-    const row = html.match(/<article class="status-row china-row"[\s\S]*?<\/article>/)?.[0] ?? "";
+    const row = html.match(/<article class="status-row china-row"[\s\S]*?<\/tr>/)?.[0] ?? "";
     expect(row).not.toContain("<button");
   });
 

@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "./pythonRuntime.mjs";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { mkdir } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -41,7 +42,7 @@ export async function createInterviewPreview(output: string) {
     const bundle = await interviewHandoff({ profile: profilePath, preferences: join(output, "preferences.md"), opportunities: trackerPath, settings: join(root, "settings.json"), invitation: join(root, "invitation.txt") }, c.id);
     const staged = await stageInterview(bundle, join(root, "run")) as { workspace: string };
     await new Promise<void>((accept, reject) => {
-      const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", "interview.preview", "--workspace", staged.workspace, "--case", c.recipe], {
+      const child = spawn(resolveInterviewPython(), ["-m", "interview.preview", "--workspace", staged.workspace, "--case", c.recipe], {
         cwd: pythonRoot, shell: false, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" }
       });
       let errors = ""; child.stdout.resume(); child.stderr.on("data", chunk => { errors += chunk; });

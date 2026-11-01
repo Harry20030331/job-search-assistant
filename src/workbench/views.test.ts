@@ -31,7 +31,7 @@ test("server exposes home/account pages and fails safely without configured Goog
   await writeFile(tracker, JSON.stringify({ schemaVersion: 1, opportunities: [] }));
   await writeFile(join(root, "candidate.json"), JSON.stringify({ schemaVersion: 2, identity: { fullName: "Fictional Candidate" } }));
   const server = await startReviewServer({ trackerPath: tracker, jobsPath: tracker, reviewPath: join(root, "drafts"), port: 0 }); servers.push(server);
-  expect(await (await fetch(server.address + "/")).text()).toContain("Keep your next step in view");
+  expect(await (await fetch(server.address + "/")).text()).toContain("<h1>Workspace</h1>");
   expect(await (await fetch(server.address + "/settings/accounts")).text()).toContain("Connect Google");
   const status = await (await fetch(server.address + "/google/status")).json();
   expect(status).toMatchObject({ connected: false, configured: false, account: null });

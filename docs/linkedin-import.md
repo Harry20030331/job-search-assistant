@@ -4,7 +4,7 @@ The handoff's LinkedIn input is an explicit supported choice alongside resume an
 
 ## English interaction
 
-When no source was supplied, display `npm run matching -- sources`, inviting a LinkedIn profile URL, a PDF/DOCX/TXT/Markdown resume or background document, pasted text, or combined sources. Accept the source directly rather than requiring another numbered choice. Already supplied documents are read before requesting more material.
+The default New candidate website offers LinkedIn link, pasted text and PDF upload. A saved source request is claimed once through `intake:request`; publish the source-backed preview to that same webpage, or block with the actual access problem. No candidate is created before the user confirms the displayed preview and preferences. For explicitly supplied chat input, the `matching -- sources` compatibility invitation still accepts links, documents, pasted text or combined sources. Read already supplied material before asking for more.
 
 If the user selects LinkedIn, ask "Please share the LinkedIn profile URL you would like me to use. I will import the visible information and ask you to confirm it before saving." A user-provided profile URL is the designated source; do not search for a different person with the same name. The initial search needs no resume PDF. An approved PDF remains necessary before employer-form preparation.
 
@@ -47,3 +47,5 @@ Set `access` to `login_required` or `unavailable` with an empty `sections` objec
 ## Maintenance note — 2026-10-29
 
 Added the LinkedIn source choice, URL-bound source-backed read-only preview and confirmed new-candidate provenance under existing `_meta`. Search intake preserves omitted unknown history fields. No candidate schema version, opportunity source enum, ATS behavior or fixed UI renderer changed. Full application completeness validation and a live LinkedIn import evaluation remain pending. Profile import is separate from discovering jobs on LinkedIn.
+
+Maintenance, 2026-10-31: LinkedIn intake is now connected to the website source chooser and revision-bound preview flow. Initial LinkedIn candidate facts must match the validated visible observation. A blocked import cannot publish purported extracted facts. Corrections remain user-supplied information, separate from observations.

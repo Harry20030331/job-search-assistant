@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "./pythonRuntime.mjs";
 import { spawn, type ChildProcess } from "node:child_process";
 import { access } from "node:fs/promises";
 import { request as httpRequest, type IncomingMessage, type ServerResponse } from "node:http";
@@ -20,7 +21,7 @@ export class GoogleBridge {
     this.pending = (async () => {
       await access(join(this.root, "client.json"));
       return new Promise<number>((accept, reject) => {
-        const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", "interview.onboarding", "--root", resolve(this.root),
+        const child = spawn(resolveInterviewPython(), ["-m", "interview.onboarding", "--root", resolve(this.root),
           "--port", "0", "--workbench", "--parent-stdin", "--public-origin", origin], { cwd: pythonRoot, shell: false, windowsHide: true,
           stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" } });
         this.child = child;

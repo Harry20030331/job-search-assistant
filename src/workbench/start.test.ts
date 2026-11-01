@@ -19,17 +19,22 @@ async function candidate(){const base=await temporary(),root=join(base,"candidat
 const post=(url:string,body:unknown,origin=new URL(url).origin)=>fetch(url,{method:"POST",headers:{"content-type":"application/json",origin},body:JSON.stringify(body)});
 test("welcome starts without selecting or writing candidate data; new setup is isolated and idempotent",async()=>{
  const root=await temporary();const s=await startWorkbench(root,{temporaryRoots:[]});servers.push(s);const base=new URL(s.address).origin;
- expect(await(await fetch(s.address)).text()).toContain("Welcome. Let's get started.");expect(await readdir(root)).toEqual([]);
+ expect(await(await fetch(s.address)).text()).toContain("Application<br>workspace");expect(await readdir(root)).toEqual([]);
  expect(await(await fetch(base+"/existing")).text()).toContain("No saved search results");
  const input={requestId:randomUUID(),fullName:fields.fullName,email:fields.email,summary:fields.summary,skills:"Research",institution:"Example School",degree:"BS",company:"",title:"",directions:"Research",locations:"",preferences:"Remote roles",confirmed:true};
  expect((await post(base+"/api/start/new",input,"https://attacker.invalid")).status).toBe(403);
  const r=await post(base+"/api/start/new",input);expect(r.status).toBe(200);const result=await r.json();
  const repeat=await post(base+"/api/start/new",input);expect((await repeat.json()).url).toBe(result.url);
- const html=await(await fetch(result.url)).text();expect(html).toContain("Background & skills");expect(html).toContain("Interview preparation");
+ const html=await(await fetch(result.url)).text();expect(html).toContain("Background & skills");expect(html).toContain('href="/interviews"');
  const selected=new URL(result.url).origin;
  for(const path of ["/status/us","/review","/interviews"]){expect((await fetch(selected+path)).status).toBe(200)}
  expect(await readdir(join(root,"local/workspaces"))).toHaveLength(1);
  const existing=await(await fetch(base+"/existing")).text();expect(existing).toContain(fields.fullName);expect(existing).toContain("No search results yet");
+ const selection=existing.match(/name="selection" value="([^"]+)"/)![1]!;
+ const resume=()=>fetch(base+"/api/start/existing",{method:"POST",headers:{origin:base},body:new URLSearchParams({selection})});
+ const resumed=await(await resume()).json();expect(new URL(resumed.url).pathname).toBe("/status");expect(new URL(resumed.url).origin).toBe(selected);
+ expect((await(await resume()).json()).url).toBe(resumed.url);
+ const font=await fetch(selected+"/assets/InterVariable.woff2");expect(font.headers.get("content-type")).toBe("font/woff2");expect(Buffer.from(await font.arrayBuffer()).subarray(0,4).toString()).toBe("wOF2");
 });
 test("profile saves preserve hidden facts and reject a stale concurrent editor",async()=>{
  const root=await candidate();const before=await readProfileEditor(root);
@@ -57,9 +62,11 @@ test("profile endpoints enforce origin, strict JSON, consent, body limits and di
  expect((await post(s.address+"/api/profile",{revision:state.profileRevision,confirmed:true,fields},"https://attacker.invalid")).status).toBe(403);
  expect((await post(s.address+"/api/profile",{revision:state.profileRevision,confirmed:false,fields})).status).toBe(400);
  expect((await post(s.address+"/api/profile",{revision:state.profileRevision,confirmed:true,fields})).status).toBe(200);
- expect((await post(s.address+"/api/search",{token:state.token,requestId:randomUUID()})).status).toBe(503);
+ expect((await post(s.address+"/api/search",{token:(await readProfileEditor(root)).token,requestId:randomUUID()})).status).toBe(503);
  const oversizedStatus = await new Promise<number | undefined>((resolve,reject)=>{const request=httpRequest(s.address+"/api/profile",{method:"POST",headers:{"content-type":"application/json","content-length":"1100001",origin:s.address}},response=>{response.resume();resolve(response.statusCode)});request.on("error",reject);request.end()});
  expect(oversizedStatus).toBe(413);
 });
 
 test("profile scripts remain valid and escape untrusted candidate content",async()=>{const root=await candidate();const state=await readProfileEditor(root);state.candidate.summary="</script><script>untrusted()</script>";const html=renderProfilePage(state);for(const match of html.matchAll(/<script>([\s\S]*?)<\/script>/g))expect(()=>new Script(match[1]!)).not.toThrow();expect(html).not.toContain("<script>untrusted()</script>")});
+
+test("fictional examples execute local Apply tasks without dispatching to the connected chat",async()=>{const root=await temporary();const server=await startWorkbench(root,{temporaryRoots:[],chat:{version:1,threadId:randomUUID(),executable:"missing-fictional-chat-executable"}});servers.push(server);const base=new URL(server.address).origin;const response=await fetch(base+"/api/start/example",{method:"POST",headers:{origin:base}});const selected=await response.json();const address=new URL(selected.url).origin;const request=await post(address+"/api/tasks",{action:"prepare",mode:"demo",requestId:randomUUID(),jobIds:["alex-nooks-311d6e70"]});expect(request.status).toBe(202);await expect.poll(async()=>{const state=await(await fetch(address+"/api/tasks")).json();return state.tasks[0]?.state},{interval:10,timeout:2000}).toBe("needs_review");const state=await(await fetch(address+"/api/tasks")).json();expect(state.tasks[0].chatDelivery).toBeUndefined()});

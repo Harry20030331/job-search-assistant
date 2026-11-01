@@ -103,7 +103,7 @@ test("approval stays in Review; submission locks edits; completed rehearsal leav
   await expect(f.service.enqueue({ action: "submit", mode: "demo", requestId: randomUUID(), selections: [{ applicationId: draft.applicationId, snapshotId: draft.snapshotId, revision: 2 }] })).rejects.toThrow("task_target_unavailable");
   const completed = await f.get("/review");
   expect(completed).not.toContain(`data-application="${draft.applicationId}"`); expect(completed).toContain("No applications pending review");
-  expect(await f.get("/status/us")).toContain('<span class="row-status">Submitted</span>');
+  expect(await f.get("/status/us")).not.toContain('class="row-status"');
   expect(await f.get("/status/us")).toContain('data-status="submitted"');
   expect(JSON.parse(await f.get("/api/tasks")).viewVersion).not.toBe(before.viewVersion);
   expect((await readApplicationTracker(f.path)).applications[0]!.submissionEvidence).toBeUndefined();

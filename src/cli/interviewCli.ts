@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "../interview/pythonRuntime.mjs";
 import { spawn } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,7 +8,7 @@ export const interviewPythonRoot = resolve(dirname(fileURLToPath(import.meta.url
 export async function stageInterview(bundle: Awaited<ReturnType<typeof interviewHandoff>>, output: string) {
   await checkInterviewSources(bundle.sourceVersions);
   return new Promise<object>((accept, reject) => {
-    const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", "interview.team_bridge", "--output", resolve(output)], {
+    const child = spawn(resolveInterviewPython(), ["-m", "interview.team_bridge", "--output", resolve(output)], {
       cwd: interviewPythonRoot, shell: false, stdio: ["pipe", "pipe", "pipe"],
       env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" }
     });

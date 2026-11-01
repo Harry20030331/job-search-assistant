@@ -1,0 +1,21 @@
+{
+  "version": 33,
+  "establishedAt": "2026-10-31",
+  "authorization": "User requested daily New Grad updates, overdue catch-up on opening, manual refresh and tests. User review before commit/push remains required.",
+  "validation": "Full verification passed: 529 TypeScript tests, type checks, UI baseline and boundary/distribution checks. 275 offline Python Interview tests passed in an isolated configured environment. Browser checked overdue-update status, completion counts and manual refresh with fictional data and stub dispatch; Interview authored fixtures rendered through actual TypeScript/Python integration. No live job verification, model generation or Google actions. Pending user review; no commit/push.",
+  "files": {
+    "src/review/reviewViews.ts": "cc19860ac6bfade89a9886220fd52f78a9ad1f1843016a3dddcd73d164808a8f",
+    "src/review/statusView.ts": "2807241568d67200118f1a069a3d8b84cd01130f8233613f1d57b9ea1a4bb58e",
+    "src/review/workflowViews.ts": "7d4266756cb8dd8cacc3603bf6db7226705c4238bfc5d98cd79998c4f4df3f43",
+    "src/review/applicationStyles.ts": "97cf31b4a9a2e8b9f2869aa76c572897765b155f3c552a85b0d7243672917b40",
+    "src/workbench/views.ts": "46caf67b8e26004dcf43d71054b45596d7f372caf19265c702d3717a86094efb",
+    "src/interview/interviewView.ts": "3f364876619fabaa8ba239bdfdd9882f8aebcd8382754be70fc1c80840805866",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "47e46091aff2102dcd0371b6efae6535d50047a6a6afbb1167938ecaed76d431",
+    "src/workbench/start.ts": "a68220c19ce2468f5262430729cebfa4d8db1b724dcc4749c4c99a6eed575821",
+    "src/workbench/interviewRequests.ts": "2ef6a631e64f0d7486353e03ab9b6abbff6048e75bf95b81500f3f3c38e3e72d",
+    "src/workbench/intakeView.ts": "cc1445054cc312e0957ce23e3a1bf43d37cf32ebbddf01e4078b33743d37c21b",
+    "src/workbench/searchRefreshView.ts": "f6437757cc2768c6366706dbf61a9961e0501c631b81db84e3705d6337a941e8"
+  }
+}

@@ -82,7 +82,7 @@ pass("recovery, fresh initialization and historical no-send boundaries exist");
 async function walk(directory) {
   const paths = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (["node_modules", ".git", "docs"].includes(entry.name)) continue;
+    if (["node_modules", ".git", "docs", ".venv", "__pycache__"].includes(entry.name)) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) paths.push(...await walk(path)); else paths.push(path);
   }

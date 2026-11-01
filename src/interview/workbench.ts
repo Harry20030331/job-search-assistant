@@ -1,3 +1,4 @@
+import { resolveInterviewPython } from "./pythonRuntime.mjs";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { spawn } from "node:child_process";
 import { mkdir, readFile, rename } from "node:fs/promises";
@@ -132,7 +133,7 @@ export async function linkInterview(paths: WorkbenchPaths, input: unknown) {
 
 export function exportInterview(workspace: string): Promise<InterviewSnapshot> {
   return new Promise((accept, reject) => {
-    const child = spawn(process.env.INTERVIEW_PYTHON ?? "python", ["-m", "interview.dashboard", "--workspace", resolve(workspace)], {
+    const child = spawn(resolveInterviewPython(), ["-m", "interview.dashboard", "--workspace", resolve(workspace)], {
       cwd: pythonRoot, shell: false, stdio: ["ignore", "pipe", "pipe"],
       env: { ...process.env, PYTHONIOENCODING: "utf-8", PYTHONDONTWRITEBYTECODE: "1" }
     });

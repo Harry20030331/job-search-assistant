@@ -1,3 +1,6 @@
+import { serveWorkspaceFont } from "../workbench/assets.js";
+import { SearchRefreshService, type SearchRefreshOptions } from "../workbench/searchRefresh.js";
+import { withSearchRefresh } from "../workbench/searchRefreshView.js";
 import { interviewRequestHistory, requestInterviewWork, withInterviewRequests } from "../workbench/interviewRequests.js";
 import { readProfileEditor, saveProfileEditor, saveWebsitePreferences, saveWebsiteResume } from "../workbench/profileStore.js";
 import { renderProfilePage } from "../workbench/profileView.js";
@@ -20,7 +23,7 @@ import { readApplicationTracker } from "../tracker.js";
 import { readJobLibrary } from "../jobs/jobLibrary.js";
 import { renderReviewPage, renderUsStatusPage } from "./reviewViews.js";
 import { buildStatusView } from "./statusView.js";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { readInterviewBoard, interviewEnded } from "../interview/workbench.js";
 import { renderInterviewPage } from "../interview/interviewView.js";
 import { renderHomePage, renderAccountPage } from "../workbench/views.js";
@@ -45,6 +48,7 @@ export interface ReviewServerOptions {
   workspaceRoot?: string;
   repositoryRoot?: string;
   welcomeUrl?: string;
+  searchRefresh?: SearchRefreshOptions;
 }
 
 export interface RunningReviewServer {
@@ -242,6 +246,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
     sendResponse(response, status, body, contentType);
   };
   const workspaceRoot = options.workspaceRoot ?? dirname(dirname(options.trackerPath));
+  const refresh = options.workspaceRoot || basename(dirname(options.trackerPath)) === "data" ? new SearchRefreshService(workspaceRoot, options.repositoryRoot ?? workspaceRoot, options.searchRefresh ?? { automatic: false }) : undefined;
   const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
   const interviewPaths = { trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
   const interviewCsrf = randomBytes(32).toString("hex");
@@ -267,6 +272,8 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
     try {
+      if (request.method === "GET" && url.pathname === "/assets/InterVariable.woff2") { await serveWorkspaceFont(response); return; }
+      if (request.method === "GET" && ["/", "/profile", "/status", "/status/us", "/review", "/interviews"].includes(url.pathname)) void refresh?.check("opened");
       if (request.method === "GET" && url.pathname === "/assets/interview-actions.js") {
         send(response, 200, interviewBrowserScript, "text/javascript; charset=utf-8"); return;
       }
@@ -303,11 +310,15 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "GET" && url.pathname === "/api/interview/requests") {
         send(response, 200, JSON.stringify(await interviewRequestHistory(workspaceRoot)), "application/json; charset=utf-8"); return;
       }
+      if (request.method === "GET" && url.pathname === "/api/search/refresh") {
+        if (!refresh) throw new Error("runner_unavailable");
+        send(response, 200, JSON.stringify(await refresh.snapshot()), "application/json; charset=utf-8"); return;
+      }
       if (request.method === "GET" && url.pathname === "/api/search") {
         send(response, 200, JSON.stringify(await latestSearchStatus(workspaceRoot)), "application/json; charset=utf-8"); return;
       }
       if (request.method === "GET" && url.pathname === "/profile") {
-        send(response, 200, renderProfilePage(await readProfileEditor(workspaceRoot)), "text/html; charset=utf-8"); return;
+        send(response, 200, withSearchRefresh(renderProfilePage(await readProfileEditor(workspaceRoot))), "text/html; charset=utf-8"); return;
       }
       if (request.method === "GET" && url.pathname === "/settings/accounts") {
         send(response, 200, renderAccountPage(), "text/html; charset=utf-8"); return;
@@ -340,7 +351,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "GET" && url.pathname === "/status/us") {
         try {
           const view = await workflow();
-          send(response, 200, await decorate(renderUsStatusPage(view.status), view.version), "text/html; charset=utf-8");
+          send(response, 200, await decorate(refresh ? withSearchRefresh(renderUsStatusPage(view.status)) : renderUsStatusPage(view.status), view.version), "text/html; charset=utf-8");
         } catch {
           send(response, 500, JSON.stringify({ ok: false, error: "request_failed" }), "application/json; charset=utf-8");
         }
@@ -356,7 +367,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         assertBrowserMutationAuthority(request, address.port);
       }
       if (request.method === "POST" && url.pathname === "/api/interview/requests") {
-        const result = await requestInterviewWork(workspaceRoot, options.repositoryRoot ?? workspaceRoot, await readJson(request, true));
+        const result = await requestInterviewWork(workspaceRoot, options.repositoryRoot ?? workspaceRoot, await readJson(request, true), options.tasks?.mode ?? "codex");
         send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
       }
       if (request.method === "POST" && ["/api/profile", "/api/preferences", "/api/resumes", "/api/search"].includes(url.pathname)) {
@@ -364,7 +375,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         const result = url.pathname === "/api/profile" ? await saveProfileEditor(workspaceRoot, body)
           : url.pathname === "/api/preferences" ? await saveWebsitePreferences(workspaceRoot, body)
           : url.pathname === "/api/resumes" ? await saveWebsiteResume(workspaceRoot, body)
-          : await requestWebsiteSearch(workspaceRoot, options.repositoryRoot ?? workspaceRoot, body);
+          : await requestWebsiteSearch(workspaceRoot, options.repositoryRoot ?? workspaceRoot, body, options.searchRefresh);
         send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
       }
       if (request.method === "GET" && url.pathname === "/api/tasks") {
@@ -516,8 +527,10 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
     });
   });
   const address = server.address() as AddressInfo;
+  refresh?.start();
+  void refresh?.check("opened");
   return {
     address: `http://127.0.0.1:${address.port}`,
-    close: () => { google.close(); return new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
+    close: async () => { google.close(); await refresh?.close(); return new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
   };
 }

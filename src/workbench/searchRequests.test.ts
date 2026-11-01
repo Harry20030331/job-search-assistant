@@ -23,6 +23,6 @@ test("New Grad requests bind the sole repository, official verification, current
  expect(await updateSearchRequest(f.root,requestId,"claim",f.threadId)).toMatchObject({state:"running"});
  await expect(updateSearchRequest(f.root,requestId,"claim",f.threadId)).rejects.toThrow("already_handled");
  expect(await latestSearchStatus(f.root)).toMatchObject({state:"running"});
- await updateSearchRequest(f.root,requestId,"finish",f.threadId,"completed");expect(await latestSearchStatus(f.root)).toMatchObject({state:"completed"});
+ await updateSearchRequest(f.root,requestId,"finish",f.threadId,"completed",{completedRound:true,reference:"Fictional repository check: no new roles",inspected:0,observedAt:new Date().toISOString()});expect(await latestSearchStatus(f.root)).toMatchObject({state:"completed"});
 });
 test("a changed matching context is rejected before any message is delivered",async()=>{const f=await setup();await expect(requestWebsiteSearch(f.root,f.base,{requestId:randomUUID(),token:"stale"})).rejects.toThrow("matching_context_changed")});
