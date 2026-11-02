@@ -1,12 +1,12 @@
-# Application UI contract — version 37
+# Application UI contract — version 54
 
-Website-led application workflow, requested by the user on 2026-10-30. The current successor adds candidate-free Welcome, the shared profile editor and website research/interview requests while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
+Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
 Integration, 2026-10-30: The user requested integration of all team modules. V29 preserves the v28 application layouts and actions, the open direction labels, and Interview question rendering, while sharing navigation with Home, Interviews and account settings. Review keeps its own Submit action and Status its Apply action. Historical Matching v2 and Interview v2–v4 manifests are retained under descriptive filenames to avoid collisions with Application versions. This integration does not claim live employer or Google-account verification.
 
 ## Fixed presentation
 
-- Preserve `/status/us`, `/status` and `/review`. The current user-requested visual contract is a minimal productivity tool: white `#FFFFFF`, black `#171717`, light gray `#F5F5F5`, locally bundled Inter, compact tables, understated borders and consistent spacing. Semantic color is limited to status, required fields and actionable errors. Shared navigation uses a black active underline. Status uses a semantic table with Company/Location, Role, Direction and Date, plus All and lifecycle tabs. On narrow screens only the table and tab bar scroll horizontally. Review retains its split view and native application picker on narrow screens, with compact neutral inputs and the separate fixed Submit control. Existing-search selection opens Status; new-candidate and fictional-example onboarding retain Profile entry. Historical warm-card/timeline directions are superseded for visual presentation only.
+- Preserve `/status/us`, `/status` and `/review`. Version 51 extends the user's accepted Status visual language to Profile, Review, Interview preparation, Account and first-use setup: gray navigation, neutral black Inter Sans-serif typography, readable medium/semibold weights, white work surfaces and restrained orange actions/selection. Working pages share a 208px desktop rail, consistent content padding, heading hierarchy and card treatment; narrow navigation scrolls locally and Review retains its native picker below 700px. The refresh panel has pale orange fill, minimal status/guidance copy and a 15px/650 button. Status retains its existing pipeline composition and orange In review count. Initial use opens source-first Profile; remembered real users open Status. Explicit flexible direction/location preferences, per-job Resume tags, immutable application bindings and separate pinned Submit remain in force. Historical manifests are preserved.
 - English-only interface and new review display text. Chat language is independent.
 - No region selector, China entry, or replacement All applications selector.
 - Status stages: Shortlisted → Preparing → In Review → Submitting → Submitted → Interviewing → Offer. Preparing and Submitting are task-derived display states; the shared opportunity schema is unchanged. In Review is shown only when a draft exists and preparation is no longer active. Jobs without ready drafts stay Shortlisted. Only active preparation shows Preparing; a blocked or interrupted preparation adds the small hint Apply again to prepare. Task errors stay in task history rather than becoming a lifecycle stage. Retrying preserves the application identity.
@@ -20,7 +20,7 @@ Integration, 2026-10-30: The user requested integration of all team modules. V29
 - Mark short factual questions with `inputType: "short-text"` (at most 300 characters, no newlines). A failed save restores the prior answer. Saved local answers may be approved before live-form synchronization; synchronization is required before execution can submit.
 - One application-level Approve content control, independent of live ATS/CV readiness but disabled while required answers are missing, edits are unsaved, or a save has failed. Blank optional questions do not block approval. Successful saves recompute availability from saved content; clearing a required answer disables it again. Saving temporarily disables controls. A successful content approval stays visible and read-only with a compact Reviewed label. Preserve the shared Status order after approval; automatically select the next pending item, wrapping to earlier pending items if needed. If none remain, stay on the just-reviewed item.
 - Content approval binds the exact local snapshot and desired revision with `decision.scope: "content-only"`. It does not authorize execution/submission; the user starts a selected batch separately. Live verification gates remain on execution. Approved applications automatically join the submission batch; there are no Review selection checkboxes. Edit answers generates a new snapshot, removes the item from the batch, and requires fresh approval. The final Submit applications count comes from saved approvals rather than browser selection state.
-- Status provides checkboxes and Apply for shortlisted jobs and failed preparations without a ready draft. Tracked rows are read-only with no repeated Review answers links. The navigation has a compact Review (N) count of pending, visible review items; approved items do not contribute to this attention count. The Apply bar is hidden when there are no shortlisted jobs or another lifecycle filter is selected. Only Review has the final pinned Submit applications (N) control. Failed preparation can be retried with Apply from Shortlisted. The final control submits the approved batch only when explicitly clicked. Already running or completed requests are excluded from its count. These actions create durable requests for one executor (the configured existing chat or background runner); Task history stays internal. Display current application stages and concise actionable errors, with no Activity panel or technical event log. The HTTP server has no direct ATS client. Data publication never grants execution authorization.
+- Status provides checkboxes and Apply for shortlisted jobs and failed preparations without a ready draft. Tracked rows have no repeated Review answers links. A completed fictional demo submission may show Simulate interview and then Interview prep, as described below. The navigation has a compact Review (N) count of pending, visible review items; approved items do not contribute to this attention count. The Apply bar is hidden when there are no shortlisted jobs or another lifecycle filter is selected. Only Review has the final pinned Submit applications (N) control. Failed preparation can be retried with Apply from Shortlisted. The final control submits the approved batch only when explicitly clicked. Already running or completed requests are excluded from its count. These actions create durable requests for one executor (the configured existing chat or background runner); Task history stays internal. Display current application stages and concise actionable errors, with no Activity panel or technical event log. The HTTP server has no direct ATS client. Data publication never grants execution authorization.
 - The default Demo mode contacts no employers; its footer label is omitted at the user’s request. A successful rehearsal is grouped under Submitted and labeled Submitted in Status at the user’s request. It leaves active Review without changing the stored opportunity to Submitted or deleting its saved draft. After the entire batch requested from a Review tab completes successfully, that tab opens `/status/us?stage=submitted`; retain the pending request across reloads. Blocked/interrupted batches remain in Review, and unsaved edits or active saves defer navigation. Completion applies only to the same snapshot and revision. Reopened content returns to Review. Verified real submissions leave Review and display the evidence-backed lifecycle. Failed submissions remain in Review. The optional Codex adapter fails visibly when disconnected or configured with fixtures. Requests bind the page’s configured mode so a stale Demo page cannot trigger live execution.
 
 ## Fixed data entry points
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v30.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v54.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -127,7 +127,7 @@ Version 28, 2026-10-30: At the user’s request, shorten the completed demo stat
 
 ## Interview action integration, version 30, 2026-10-31
 
-The user requested merging the updated team code and retesting Interview. Preserve the v29 Application layouts, content-only approval, separate execution tasks, open job directions and configured resume bindings. Restore the Interview v5 exact-plan acceptance, asynchronous practice generation, explicit retry and independent website/chat debrief receipts. Shared headers retain their Application-specific class and render the Interview reminder region and script; shared styles include that region without changing task controls. Earlier Application v5/v29 and Interview v5 manifests are preserved separately. The active manifest at that integration was `ui-contract-v30.json`; this is a controlled integration successor, not a baseline reset to hide a failed check. Tests and actual browser verification are recorded in the team integration report. It does not establish live employer or Google actions, semantic quality or human review.
+The user requested merging the updated team code and retesting Interview. Preserve the v29 Application layouts, content-only approval, separate execution tasks, open job directions and configured resume bindings. Restore the Interview v5 exact-plan acceptance, asynchronous practice generation, explicit retry and independent website/chat debrief receipts. Shared headers retain their Application-specific class and render the Interview reminder region and script; shared styles include that region without changing task controls. Earlier Application v5/v29 and Interview v5 manifests are preserved separately. The active manifest at that integration was `ui-contract-v54.json`; this is a controlled integration successor, not a baseline reset to hide a failed check. Tests and actual browser verification are recorded in the team integration report. It does not establish live employer or Google actions, semantic quality or human review.
 
 ## Website entry and four-page workflow, version 31, 2026-10-31
 
@@ -176,3 +176,89 @@ V35 remains preserved. The active manifest is `ui-contract-v36.json`; no commit/
 ## Interview filter alignment, version 37, 2026-10-31
 
 The user requested correcting the awkward three-plus-one wrapping of All, Upcoming, Completed and Cancelled in the Interview sidebar. V37 presents the same four links in a fixed two-column segmented control, with equal 40-pixel minimum height, centered labels, consistent gaps and a black selected state. URLs, filters, records and interview actions are unchanged. V36 is preserved; user review remains pending, with no commit or push authorized. Browser verification uses an empty read-only preview without creating saved candidate data.
+
+## Welcome rollback, 2026-11-01
+
+At the user's explicit request, the unaccepted V38 welcome redesign was reverted to the exact V37 renderer and styles. The active check remains V37. The rejected V38 manifest is retained as historical context only. The restored welcome keeps the original title, three entry cards and Home navigation; all other pages and records remain unchanged.
+
+## Product-wide interface redesign, version 39, 2026-11-01
+
+The user explicitly requested a major redesign using [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines), [Anthropic frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design), and [21st.dev](https://21st.dev). V39 applies a coherent navigation rail, neutral workspace surfaces, responsive page hierarchy, an entry page with differentiated choices, readable company/location rows, segmented filters, a Review document surface, and consistent Profile/account/Interview panels. It adds a keyboard skip link and retains labeled icons, visible focus, reduced-motion support, tabular numerals, local font loading and mobile input sizing. No external component or runtime dependency is added; 21st.dev serves as component-design reference adapted to the existing server-rendered stack.
+
+The change is presentation-only: selected inputs, stable IDs, source reading/confirmation, freshness, answer saves, exact content approval, Apply, final Submit, plan acceptance and calendar authorization retain their existing domain interfaces. Existing local work on Matching/Jev is preserved. No shared schema or API change requires module-owner integration. Prior manifests, including the rejected V38 Welcome, are retained. V39 is a reviewable successor, not user acceptance; no commit or push is authorized. Detailed browser and automated validation is recorded in [UI redesign](ui-redesign-v39.md).
+
+## Single-user startup and Matching resume routing, version 40, 2026-11-01
+
+The user requested more color from their Morandi reference, single-user Profile onboarding with direct Status return, and Jev-owned per-job resume selection shown on Status. Their subsequent correction limits decorative colors to pale pink, pale blue and muted purple. V40 removes five-color cycling, uses one purple resume-tag treatment, remembers only an explicitly confirmed/resumed real workspace, and displays matched or unresolved Resume labels. The former batch-level resume selector is removed. Each Apply target resolves its own approved key/hash; existing application bindings, answer saves, content approval, final Submit, plan approval and calendar confirmation remain separate and unchanged.
+
+The coordinated interface is documented in [job directions and resume routing](job-directions.md); data retains stable IDs and strict source/version guards. New behavior is tested with fictional inputs and intercepted Jev responses, including mixed-resume batches, stale files/contexts, no-fit choices, restart recovery and preservation of started bindings. Browser checks and validation are recorded in [v40 review](ui-redesign-v40.md). V39 is preserved. User design review remains pending; no commit or push is authorized.
+
+
+## User-directed visual and demo successor — 2026-11-01
+
+Version 41 replaces the earlier pastel palette and B monogram at the user's direction. See [review notes](ui-redesign-v41.md). In a fictional Demo workspace only, a current completed Submit rehearsal exposes **Simulate interview** in Status. The action validates the exact approved snapshot, revision and completed task, then idempotently creates an invited synthetic round. Status derives Interviewing from that valid link. It never changes canonical submission evidence, sends mail, or creates calendar events. Reopened content invalidates the demo projection. Real workspaces and live mode reject this action.
+
+
+## Status composition successor — 2026-11-01
+
+At the user's explicit direction, v42 restructures Status beyond palette changes. Status uses a lighter, narrower navigation rail, a title/description and application overview, a compact update strip, and a single pipeline surface containing filters and the table. Company and role typography take precedence over direction, resume and date metadata. Sans-serif remains universal; orange remains a restrained active-filter accent. Other page layouts retain v41 presentation. Stable IDs, filter numbering, per-job resume tags, Apply, final Submit and the fictional interview shortcut retain their existing behavior and authorization gates. See [v42 review notes](ui-redesign-v42.md).
+
+
+## Status copy reduction — 2026-11-01
+
+User-directed v43 removes the decorative Status eyebrow and subtitle, shared navigation caption and footer slogan. Status navigation uses a distinct neutral gray background with a white active item. Sans-serif, data, counts and controls are preserved. Typecheck and 48 relevant view/demo tests passed; the actual desktop page was visually inspected. Historical v42 remains intact.
+
+
+## Status legibility — 2026-11-01
+
+User-directed v44 increases Status type weight: title 650, company and section headings 600, body/role/metadata 500, navigation and unselected filters 550. Small 10px Status metadata is increased to 11px and secondary text darkened. Inter remains the loaded Sans-serif family. Actual browser computed styles and loaded font were verified; no document overflow at the inspected desktop size. TypeScript and UI baseline checks passed. No workflow behavior changed.
+
+
+## Neutral black Status typography — 2026-11-01
+
+User-directed v45 replaces Status blue-tinted text with neutral black `#202020`, including headings, navigation, row content, metadata, tags, counts and interview links. Gray navigation, white work surfaces, orange icon and active underline remain. Font family and weights remain v44. Browser computed-color checks and visual inspection passed; TypeScript and UI baseline checks passed. No workflow behavior changed.
+
+
+## Larger Status type and orange update region — 2026-11-01
+
+User-directed v46 increases Status font sizes across navigation, row content, metadata, filters and overview. In review count uses deep orange `#b75918`; other text remains neutral black. The refresh region uses pale orange `#fff0df` with an inset and subtle border. Overview uses aligned grid rows so wrapped mobile labels do not offset numbers. Browser checks verified colors, larger actual sizes, matching document/viewport width at 390px and aligned number tops. View tests, TypeScript, boundary and UI checks passed. Behavior and data remain unchanged.
+
+
+## Minimal refresh copy — 2026-11-01
+
+User-directed v47 removes New Grad updates, the source link and routine automatic-cadence copy from the refresh region. It retains last-update status, new-job count when available, Refresh jobs and necessary failure/paused/profile-change guidance. Daily updates and source restrictions remain operationally unchanged. Typecheck and refresh/view tests passed; actual browser inspection confirmed the minimal orange panel.
+
+
+## Refresh-panel legibility — 2026-11-01
+
+User-directed v48 sets the update-status line to 16px/650 and necessary guidance to 15px/550, both neutral black, with a 6px gap. Actual browser computed styles and visual appearance were verified. TypeScript and UI checks passed; behavior is unchanged.
+
+
+## Refresh button typography — 2026-11-01
+
+User-directed v49 sets Refresh jobs to 15px/650 at desktop and mobile widths, matching the prominence of adjacent guidance. Browser computed styles and final appearance were verified. TypeScript and UI checks passed; refresh authorization and disabled-state behavior remain unchanged.
+
+
+## Explicit flexible preferences — 2026-11-01
+
+User-directed v50 adds explicit flexible direction/location options to initial confirmation and Profile. These toggle the corresponding specific-value fields and required-state together. Job-title lists are unnecessary; additional feedback is optional. Saving normalizes checked dimensions to empty canonical filters. Jev receives authoritative current scope and uses documented background/actual responsibilities for flexible direction fit; no live matching run occurs on save. Populated existing constraints, candidate facts and resume bindings remain unchanged until explicit confirmation/save. See [v50 validation](ui-redesign-v50.md) and [direction semantics](job-directions.md).
+
+
+## Shared workspace presentation — 2026-11-01
+
+User-directed v51 carries Status styling to the other product pages through `src/workbench/workspaceTheme.ts`, included by the existing shared design system. It unifies navigation, type, spacing, work surfaces, refresh notices and orange emphasis. Review keeps its queue, inputs, required-state and exact approval controls; Interview keeps its round/plan/practice/debrief structure; Profile keeps its save confirmation and flexible options; Account keeps explicit connection actions and permission explanations. No data, task, authorization or state-transition behavior changes. See [v51 validation](ui-redesign-v51.md).
+
+
+## Profile section priority — 2026-11-02
+
+User-directed v52 puts Search preferences first, Approved resumes second and Background & skills third in DOM and reading order. Existing form IDs, independent save behavior, confirmation and resume approval remain intact. Removed redundant ordinal legend-color selectors so reordering does not change heading color. Browser verified the exact order and black titles. Profile tests, TypeScript and UI checks passed.
+
+
+## Preference save validation repair — 2026-11-02
+
+V53 fixes reported generic preference-save failures. Website feedback and canonical matching feedback both accept multiline prose up to 20,000 characters; single-line identity/reference/filter fields retain their validation. Profile exposes the length bound and actionable missing-direction/location/work-mode and length messages. A failing HTTP regression first reproduced 400 for valid multiline prose; after repair, 581 tests passed. An isolated fictional browser copy saved its existing default multiline preferences and displayed Saved. The user's current page and input were not refreshed, rewritten or submitted. TypeScript, boundary and UI checks passed.
+
+
+## Manual refresh availability repair — 2026-11-02
+
+V54 fixes a disabled Refresh jobs button in a standalone preview: the selected workspace lacked its hosting chat connection and the UI displayed an unrelated automatic-update pause. Review/resume now preserves or creates the selected workspace connection from the hosting thread without queueing work, passes the actual source repository separately, and keeps Demo applications inline. Snapshot/UI distinguish manual availability from timer state. Actual browser inspection verified an enabled button with the misleading pause removed. 584 tests, TypeScript, boundaries and UI checks passed. No actual search was requested during validation. See [repair notes](refresh-repair-v54.md).

@@ -13,9 +13,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Python backend prototyping and TypeScript projects support this saved new-grad software engineering example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
-      "stage": "ready"
+      "stage": "ready",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      }
     },
     {
       "jobId": "alex-adobe-r172083",
@@ -29,9 +37,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. The CS degrees, software internship and Python/TypeScript projects support this saved university software engineering example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
-      "stage": "ready"
+      "stage": "ready",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      }
     },
     {
       "jobId": "alex-wd-744000138717897",
@@ -45,9 +61,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Saved early-career hiring-pool posting, not evidence of a current vacancy.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Saved early-career hiring-pool posting, not evidence of a current vacancy. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. The software internship, Python and SQL provide the general software engineering evidence for this saved hiring-pool example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
-      "stage": "ready"
+      "stage": "ready",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      }
     },
     {
       "jobId": "alex-scale-4730836005",
@@ -61,9 +85,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Eligibility caveat: listing bachelor graduation dates differ from this candidate; retained for platform coverage.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Eligibility caveat: listing bachelor graduation dates differ from this candidate; retained for platform coverage. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Retrieval evaluation and Python experience support the technical resume choice; the saved graduation-cohort question remains unresolved. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
-      "stage": "ready"
+      "stage": "ready",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      }
     },
     {
       "jobId": "alex-palantir-2e6b0ac8",
@@ -77,9 +109,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Backend prototyping, tool validation and team project ownership support this saved FDSE example; relocation and travel remain unresolved. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
-      "stage": "ready"
+      "stage": "ready",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      }
     }
   ]
 }

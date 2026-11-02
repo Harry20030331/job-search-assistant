@@ -24,6 +24,14 @@ The saved postings and questions come from the original five-role exercise on 20
 
 Unanswered questions stay unanswered. Loading Review does not approve the content.
 
+## Resume routing — 2026-11-02
+
+Both checkpoints include a per-job `matched` recommendation for the approved `llm` profile (`alex-liu-resume.pdf`), with its exact PDF hash and the Matching context token for the bundled candidate, preferences and manifest. Review applications also explicitly retain that same profile in `application.resumeCategory`. The loader copies these records without recomputing recommendations; changing the bundled inputs requires reviewing the recommendations and updating their context token. Regression checks verify the loaded context and attachment binding.
+
+These are authored fictional routing fixtures, not results from a Jev call, a live job search or a calibrated matching evaluation. The confidence value of 0.9 is synthetic. Each job's note records its routing rationale. The PDF contains CS education, a software internship, Python/TypeScript backend projects and retrieval evaluation work. This supports the saved software-engineering examples' resume choice; it does not resolve role eligibility, current availability, relocation, travel or the Scale AI graduation-cohort caveat. All five use the same PDF because this example supplies one approved resume; no direction-to-resume inference is performed.
+
+Existing working copies are preserved by startup and are not automatically migrated or reset. Load a checkpoint into a fresh isolated workspace to reproduce the updated example, or update only the saved recommendations through the opportunity domain interface while preserving local progress.
+
 ## Load a checkpoint
 
 Stop Review and other data writers first. From the repository root:

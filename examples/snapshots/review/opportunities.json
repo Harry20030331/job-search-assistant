@@ -13,9 +13,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Python backend prototyping and TypeScript projects support this saved new-grad software engineering example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
       "stage": "in_review",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      },
       "application": {
         "applicationId": "alex-nooks-311d6e70",
         "ats": "ashby",
@@ -24,7 +32,8 @@
         "gmailConfirmation": "not_checked",
         "createdAt": "2026-10-30T19:01:41.622Z",
         "updatedAt": "2026-10-30T19:01:41.622Z",
-        "applicationUrl": "https://jobs.ashbyhq.com/nooks/311d6e70-5cfa-4e80-89f6-fe00ac1f9f53/application"
+        "applicationUrl": "https://jobs.ashbyhq.com/nooks/311d6e70-5cfa-4e80-89f6-fe00ac1f9f53/application",
+        "resumeCategory": "llm"
       }
     },
     {
@@ -39,9 +48,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. The CS degrees, software internship and Python/TypeScript projects support this saved university software engineering example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
       "stage": "in_review",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      },
       "application": {
         "applicationId": "alex-adobe-r172083",
         "ats": "workday",
@@ -50,7 +67,8 @@
         "gmailConfirmation": "not_checked",
         "createdAt": "2026-10-30T19:01:41.628Z",
         "updatedAt": "2026-10-30T19:01:41.628Z",
-        "applicationUrl": "https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced/job/San-Jose/XMLNAME-2027-University-Graduate---Software-Engineer_R172083/apply/applyManually"
+        "applicationUrl": "https://adobe.wd5.myworkdayjobs.com/en-US/external_experienced/job/San-Jose/XMLNAME-2027-University-Graduate---Software-Engineer_R172083/apply/applyManually",
+        "resumeCategory": "llm"
       }
     },
     {
@@ -65,9 +83,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Saved early-career hiring-pool posting, not evidence of a current vacancy.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Saved early-career hiring-pool posting, not evidence of a current vacancy. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. The software internship, Python and SQL provide the general software engineering evidence for this saved hiring-pool example. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
       "stage": "in_review",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      },
       "application": {
         "applicationId": "alex-wd-744000138717897",
         "ats": "long-tail",
@@ -76,7 +102,8 @@
         "gmailConfirmation": "not_checked",
         "createdAt": "2026-10-30T19:01:41.632Z",
         "updatedAt": "2026-10-30T19:01:41.632Z",
-        "applicationUrl": "https://jobs.smartrecruiters.com/oneclick-ui/company/WesternDigital/publication/f0f53e97-3d85-4b45-a8d7-e32f767906a6/screening?dcr_ci=WesternDigital"
+        "applicationUrl": "https://jobs.smartrecruiters.com/oneclick-ui/company/WesternDigital/publication/f0f53e97-3d85-4b45-a8d7-e32f767906a6/screening?dcr_ci=WesternDigital",
+        "resumeCategory": "llm"
       }
     },
     {
@@ -91,9 +118,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Eligibility caveat: listing bachelor graduation dates differ from this candidate; retained for platform coverage.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Eligibility caveat: listing bachelor graduation dates differ from this candidate; retained for platform coverage. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Retrieval evaluation and Python experience support the technical resume choice; the saved graduation-cohort question remains unresolved. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
       "stage": "in_review",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      },
       "application": {
         "applicationId": "alex-scale-4730836005",
         "ats": "greenhouse",
@@ -102,7 +137,8 @@
         "gmailConfirmation": "not_checked",
         "createdAt": "2026-10-30T19:01:53.937Z",
         "updatedAt": "2026-10-30T19:01:53.937Z",
-        "applicationUrl": "https://job-boards.greenhouse.io/scaleai/jobs/4730836005"
+        "applicationUrl": "https://job-boards.greenhouse.io/scaleai/jobs/4730836005",
+        "resumeCategory": "llm"
       }
     },
     {
@@ -117,9 +153,17 @@
       ],
       "firstSeen": "2026-10-15",
       "lastVerified": "2026-10-15",
-      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied.",
+      "note": "Saved public posting reference from 2026-10-15 for a fictional local case. Recheck availability and the live form before preparation; no live session or submission is implied. Authored fictional resume routing (not a Jev run): llm / alex-liu-resume.pdf. Backend prototyping, tool validation and team project ownership support this saved FDSE example; relocation and travel remain unresolved. Confidence is a fixture value, not a calibrated score.",
       "availability": "open",
       "stage": "in_review",
+      "resumeRecommendation": {
+        "profileKey": "llm",
+        "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a",
+        "status": "matched",
+        "confidence": 0.9,
+        "contextToken": "86e7f00acada7790c5e13dc14a3644085bd59366d9fb4450a1f530648f9614d3",
+        "evaluatedAt": "2026-11-02T21:29:32.864Z"
+      },
       "application": {
         "applicationId": "alex-palantir-2e6b0ac8",
         "ats": "lever",
@@ -128,7 +172,8 @@
         "gmailConfirmation": "not_checked",
         "createdAt": "2026-10-30T19:01:53.942Z",
         "updatedAt": "2026-10-30T19:01:53.942Z",
-        "applicationUrl": "https://jobs.lever.co/palantir/2e6b0ac8-83e9-4be5-a3aa-cf319f751728/apply"
+        "applicationUrl": "https://jobs.lever.co/palantir/2e6b0ac8-83e9-4be5-a3aa-cf319f751728/apply",
+        "resumeCategory": "llm"
       }
     }
   ]

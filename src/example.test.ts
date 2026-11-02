@@ -5,6 +5,10 @@ import { fileURLToPath } from "node:url";
 import { afterEach, expect, test } from "vitest";
 import { ensureExampleData, loadExample } from "./example.js";
 import { upsertJob } from "./jobs/jobLibrary.js";
+import { matchingContext } from "./matching/matching.js";
+import { workspaceMatchingPaths } from "./matching/intake.js";
+import { ApplicationTaskService } from "./review/applicationTasks.js";
+import { randomUUID, createHash } from "node:crypto";
 
 const directories: string[] = [];
 const examples = fileURLToPath(new URL("../examples", import.meta.url));
@@ -126,4 +130,31 @@ test("snapshot loading refuses an active runner and an unknown checkpoint withou
   await rm(join(root,"data/application-tasks.json.runner.lock"));
   await expect(loadExample(root,examples,"unknown" as "review")).rejects.toThrow("invalid_example_snapshot");
   expect(await readFile(join(root,"data/opportunities.json"),"utf8")).toBe(before);
+});
+
+test("Alex checkpoints retain current resume routing and preparation pins the exact PDF", async () => {
+  for (const snapshot of ["shortlist", "review"] as const) {
+    const root = await directory();
+    const loaded = await loadExample(root, examples, snapshot);
+    const paths = workspaceMatchingPaths(root);
+    const context = await matchingContext(paths);
+    const document = JSON.parse(await readFile(loaded.jobsPath, "utf8"));
+    const digest = createHash("sha256").update(await readFile(join(root, "data/alex-liu-resume.pdf"))).digest("hex");
+    for (const job of document.opportunities) {
+      expect(job.resumeRecommendation).toMatchObject({ status: "matched", profileKey: "llm", sha256: digest, contextToken: context.token });
+      expect(job.note).toContain("Authored fictional resume routing (not a Jev run)");
+      if (snapshot === "review") expect(job.application.resumeCategory).toBe("llm");
+    }
+    // A synthetic dispatcher retains queued requests without running application work.
+    const queue = new ApplicationTaskService({ ...loaded, taskPath: join(root, "data/application-tasks.json"), matchingPaths: paths }, "demo",
+      async () => { throw new Error("unexpected_execution"); }, { threadId: randomUUID(), send: async () => "fictional-receipt" });
+    try {
+      const selected = document.opportunities.map((job: { jobId: string }) => job.jobId);
+      const queued = await queue.enqueue({ action: "prepare", mode: "demo", requestId: randomUUID(), jobIds: selected });
+      expect(queued).toHaveLength(5);
+      expect(queued.every(task => task.target.resumeCategory === "llm" && task.target.resumeSha256 === digest)).toBe(true);
+      await writeFile(paths.preferences, context.preferences + "\nChanged fictional preferences.\n");
+      if (snapshot === "shortlist") await expect(queue.enqueue({ action: "prepare", mode: "demo", requestId: randomUUID(), jobIds: selected })).rejects.toThrow("matching_resume_changed");
+    } finally { await queue.close(); }
+  }
 });
