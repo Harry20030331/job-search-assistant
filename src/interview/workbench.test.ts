@@ -89,6 +89,10 @@ test("interview rendering escapes source text, distinguishes approvals, and pres
   expect(page).toContain("&lt;img"); expect(page).not.toContain('<img src=x'); expect(page).toContain("Awaiting your approval");
   expect(page).not.toContain("<form"); expect(page).toContain("30-minute plan");
   expect(renderInterviewPage([])).toContain("No interviews");
+  const pending = (await readInterviewBoard(paths, async () => data)).map(item => ({ ...item, snapshot: null }));
+  expect(renderInterviewPage(pending, "interview-1", "preparation", "all", ["interview-1"])).toContain("Please wait, generating preparation plan...");
+  expect(renderInterviewPage(pending, "interview-1", "preparation", "all", ["another-round"])).not.toContain("Please wait, generating preparation plan...");
+  expect(renderInterviewPage(pending, "interview-1", "preparation")).not.toContain("Ask Codex");
 });
 
 test("website plan approval binds the version and disables stale, cancelled and ready plans", async () => {

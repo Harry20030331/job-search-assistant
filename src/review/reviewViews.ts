@@ -192,8 +192,8 @@ const demoInterviewScript = `;document.querySelectorAll('[data-demo-interview]')
  if(button.disabled)return;const target=JSON.parse(button.dataset.demoInterview),message=button.parentElement.querySelector('[data-demo-message]');
  button.disabled=true;button.setAttribute('aria-busy','true');button.textContent='Moving…';message.textContent='';
  try{const response=await fetch('/api/demo/interviews',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(target)}),data=await response.json();
-  if(!response.ok||data.jobId!==target.jobId||data.applicationId!==target.applicationId||typeof data.interviewId!=='string')throw Error(data.error==='demo_interview_unavailable'?'This action is available for fictional demos only.':data.error==='demo_interview_changed'?'This rehearsal changed. Reload Status before trying again.':'Could not create the demo interview. Try again.');
-  location.assign('/status/us?stage=interviewing');
+  if(!response.ok||data.jobId!==target.jobId||data.applicationId!==target.applicationId||typeof data.interviewId!=='string')throw Error(data.error==='runner_unavailable'?'Codex is disconnected. Restart the website from your project chat.':data.error==='task_already_active'?'Wait for the current interview request to finish, then try again.':data.error==='demo_interview_unavailable'?'This action is available for fictional demos only.':data.error==='demo_interview_changed'?'This rehearsal changed. Reload Status before trying again.':'Could not create the demo interview. Try again.');
+  location.assign('/interviews?interview='+encodeURIComponent(data.interviewId)+'&view=preparation&filter=all');
  }catch(error){message.textContent=error.message;button.disabled=false;button.removeAttribute('aria-busy');button.textContent='Simulate interview'}
 }));`;
 

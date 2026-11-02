@@ -1,4 +1,5 @@
 import { loadCandidateProfile } from "../profile.js";
+import { startDemoInterviewPreparation } from "../interview/demoPreparation.js";
 import { matchingContext } from "../matching/matching.js";
 import { serveWorkspaceFont } from "../workbench/assets.js";
 import { SearchRefreshService, type SearchRefreshOptions } from "../workbench/searchRefresh.js";
@@ -26,7 +27,7 @@ import { readJobLibrary } from "../jobs/jobLibrary.js";
 import { renderReviewPage, renderUsStatusPage } from "./reviewViews.js";
 import { buildStatusView } from "./statusView.js";
 import { basename, dirname, join } from "node:path";
-import { readInterviewBoard, linkDemoInterview } from "../interview/workbench.js";
+import { readInterviewBoard } from "../interview/workbench.js";
 import { renderInterviewPage } from "../interview/interviewView.js";
 import { renderAccountPage } from "../workbench/views.js";
 import { GoogleBridge, googleRoutes } from "../interview/googleBridge.js";
@@ -353,8 +354,9 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       }
       if (request.method === "GET" && url.pathname === "/interviews") {
         const items = await readInterviewBoard(interviewPaths);
+        const generatingPlanIds = (await interviewRequestHistory(workspaceRoot)).filter(request => request.action === "preparation" && ["delivered", "running"].includes(request.state)).map(request => request.interviewId);
         send(response, 200, withInterviewRequests(renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
-          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all"), (await readApplicationTracker(options.trackerPath)).applications, url.searchParams.get("interview") ?? ""), "text/html; charset=utf-8");
+          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all", generatingPlanIds), (await readApplicationTracker(options.trackerPath)).applications, url.searchParams.get("interview") ?? ""), "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/review") {
@@ -429,7 +431,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "POST" && url.pathname === "/api/demo/interviews") {
         if (options.tasks?.mode !== "demo") throw new Error("demo_interview_unavailable");
         const body = await readJson(request, true);
-        const result = await linkDemoInterview(interviewPaths, body);
+        const result = await startDemoInterviewPreparation(interviewPaths, workspaceRoot, options.repositoryRoot ?? workspaceRoot, body);
         send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
       }
       if (request.method === "POST" && url.pathname === "/api/review/reopen") {

@@ -35,3 +35,16 @@ test("fictional interview delivery keeps demo provenance and excludes live accou
  expect(args[4]).toContain("Reuse an existing demo checkpoint");
  expect(args[4]).toContain("current plan acceptance");
 });
+
+test.each([false,true])("completed preparation refreshes the Plan while preserving unsaved request input (dirty=%s)",async(dirty)=>{
+ const html=withInterviewRequests('<html><head></head><body><main></main></body></html>',[]);
+ const script=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][0]![1]!;
+ const element=()=>({disabled:false,style:{},append(){},prepend(){},replaceChildren(){}});
+ const button=element(),history=element(),message=element();let onInput=()=>{},poll=()=>{},reloads=0,state="running";
+ const form={querySelector:()=>button,addEventListener:(event:string,callback:()=>void)=>{if(event==="input")onInput=callback},onsubmit:null};
+ new Script(script).runInNewContext({crypto:{randomUUID},document:{hidden:false,getElementById:(id:string)=>id==="interview-request"?form:id==="interview-request-history"?history:message,createElement:element},window:{addEventListener(){}},location:{reload(){reloads++}},setInterval:(callback:()=>void)=>{poll=callback},fetch:async()=>({ok:true,json:async()=>[{requestId:"fictional-plan",action:"preparation",state,message:"Prepare a plan",reply:"Working"}]})});
+ await new Promise(resolve=>setTimeout(resolve,0));
+ expect(reloads).toBe(0);if(dirty)onInput();state="completed";poll();
+ await new Promise(resolve=>setTimeout(resolve,0));
+ expect(reloads).toBe(dirty?0:1);
+});

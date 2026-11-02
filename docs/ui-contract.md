@@ -1,4 +1,4 @@
-# Application UI contract — version 54
+# Application UI contract — version 56
 
 Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v54.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v56.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -262,3 +262,11 @@ V53 fixes reported generic preference-save failures. Website feedback and canoni
 ## Manual refresh availability repair — 2026-11-02
 
 V54 fixes a disabled Refresh jobs button in a standalone preview: the selected workspace lacked its hosting chat connection and the UI displayed an unrelated automatic-update pause. Review/resume now preserves or creates the selected workspace connection from the hosting thread without queueing work, passes the actual source repository separately, and keeps Demo applications inline. Snapshot/UI distinguish manual availability from timer state. Actual browser inspection verified an enabled button with the misleading pause removed. 584 tests, TypeScript, boundaries and UI checks passed. No actual search was requested during validation. See [repair notes](refresh-repair-v54.md).
+
+## Maintenance — 2026-11-02 (v55)
+
+The user requested that Simulate interview start Interview Coordination automatically. The button now dispatches a single fictional Plan request to the connected owning chat and opens that exact round’s Plan tab. Completed requests refresh the interview page only while its request form has no unsaved edits. Disconnection and active-request conflicts remain actionable; uncertain delivery is saved and never silently replayed. Practice still requires approval of the exact current Plan. Layout, application authorization and historical manifests are preserved.
+
+## Maintenance — 2026-11-02 (v56)
+
+At the user’s request, a missing Plan with a delivered/running preparation request for that exact interview displays “Please wait, generating preparation plan...” instead of asking the user to ask Codex. Without an active request, the empty state points to the website request form. Pending-delivery uncertainty and blocked requests do not claim that generation is running. Existing Plan content and approval behavior are unchanged. Preserve v55 as history.

@@ -14,7 +14,11 @@ const roots:string[]=[], services:ApplicationTaskService[]=[], servers:Array<{cl
 afterEach(async()=>{for(const server of servers.splice(0))await server.close();for(const service of services.splice(0))await service.close();for(const root of roots.splice(0))await rm(root,{recursive:true,force:true})});
 async function fixture(fictional=true) {
  const root=await mkdtemp(join(tmpdir(),"demo-interview-"));roots.push(root);
- const profilePath=join(root,"candidate.json"),paths:TaskPaths={trackerPath:join(root,"opportunities.json"),jobsPath:join(root,"opportunities.json"),reviewPath:join(root,"drafts"),taskPath:join(root,"application-tasks.json")};
+ await mkdir(join(root,"data"));
+ const profilePath=join(root,"data/candidate.json"),paths:TaskPaths={trackerPath:join(root,"data/opportunities.json"),jobsPath:join(root,"data/opportunities.json"),reviewPath:join(root,"data/drafts"),taskPath:join(root,"data/application-tasks.json")};
+ const threadId=randomUUID(),deliveryPath=join(root,"deliveries.txt"),executable=join(root,"fake-codex.cjs");
+ await writeFile(executable,`#!${process.execPath}\nrequire('node:fs').appendFileSync(${JSON.stringify(deliveryPath)},JSON.stringify(process.argv.slice(2))+'\\n');console.log('Queued message '+require('node:crypto').randomUUID()+' for thread ${threadId}.');\n`,{mode:0o700});
+ await writeFile(join(root,"data/chat-runner.json"),JSON.stringify({version:1,threadId,executable}));
  await writeFile(profilePath,JSON.stringify({schemaVersion:2,fictional,identity:{fullName:"Fictional Recording Candidate"},contact:{email:"recording@fictional.invalid"}}));await mkdir(paths.reviewPath);
  await saveOpportunities(paths.trackerPath,{schemaVersion:1,opportunities:[]});
  for(let index=0;index<2;index++)await upsertJob(paths.jobsPath,{jobId:"job-"+index,company:"Fictional Employer "+index,title:"Graduate Engineer",location:"Remote",category:"llm",officialUrl:"https://example.invalid/jobs/"+index,sources:["user-provided"],firstSeen:"2026-11-01",lastVerified:"2026-11-01",note:"Authored fictional recording fixture",status:"ready"});
@@ -34,7 +38,7 @@ async function fixture(fictional=true) {
   return {applicationId:draft.applicationId,snapshotId:draft.snapshotId,revision:2};
  };
  const submitted=async()=>{const selection=await ready();const tasks=await service.enqueue({action:"submit",mode:"demo",requestId:randomUUID(),selections:[selection]});await service.idle();return {jobId:"job-0",...selection,taskId:tasks[0]!.id}};
- return {root,paths,profilePath,boardPaths,service,serve,ready,submitted};
+ return {root,paths,profilePath,boardPaths,service,serve,ready,submitted,deliveryPath};
 }
 const post=(address:string,body:unknown,origin=address)=>fetch(address+"/api/demo/interviews",{method:"POST",headers:{origin,"content-type":"application/json"},body:JSON.stringify(body)});
 
@@ -44,16 +48,38 @@ test("the orange recording action appears only after a completed local submissio
  const target=await f.submitted(),before=await readFile(f.paths.trackerPath,"utf8");
  const submitted=await(await fetch(server.address+"/status/us?stage=submitted")).text();expect(submitted).toContain('data-demo-interview="');expect(submitted).toContain('>Simulate interview</button>');
  const response=await post(server.address,target);expect(response.status).toBe(200);const result=await response.json();
+ expect(result.preparationRequestId).toBe(target.taskId);
+ const requests=JSON.parse(await readFile(join(f.root,"data/interview-requests.json"),"utf8"));
+ expect(requests).toHaveLength(1);expect(requests[0]).toMatchObject({action:"preparation",mode:"demo",interviewId:result.interviewId,state:"delivered"});
+ expect(requests[0].message).toContain("60-minute");expect(requests[0].message).toContain("generate Practice only after approval");
+ await Promise.all([post(server.address,target),post(server.address,target)]);
+ expect((await readFile(f.deliveryPath,"utf8")).trim().split("\n")).toHaveLength(1);
  expect(await readFile(f.paths.trackerPath,"utf8")).toBe(before); // No submission evidence or real lifecycle is fabricated.
  const board=await readInterviewBoard(f.boardPaths);expect(board).toHaveLength(1);expect(board[0]).toMatchObject({applicationStage:"interviewing",entry:{interviewId:result.interviewId,jobId:target.jobId,applicationId:target.applicationId,state:"invited",schedule:null,association:{source:"synthetic_test_script"},demoSubmission:{taskId:target.taskId}}});
  const status=await(await fetch(server.address+"/status/us?stage=interviewing")).text();expect(status).toContain('data-job="job-0" data-status="interviewing"');expect(status).not.toContain('data-demo-interview="');expect(status).toContain('>Interview prep ');
- const interviews=await(await fetch(server.address+"/interviews?interview="+result.interviewId+"&view=preparation")).text();expect(interviews).toContain("Fictional Employer 0");expect(interviews).toContain("Fictional preview");expect(interviews).toContain("No plan yet");
+ const interviews=await(await fetch(server.address+"/interviews?interview="+result.interviewId+"&view=preparation")).text();expect(interviews).toContain("Fictional Employer 0");expect(interviews).toContain("Fictional preview");expect(interviews).toContain("Please wait, generating preparation plan...");
  const restart=await f.serve();expect(await(await fetch(restart.address+"/status/us")).text()).toContain('data-job="job-0" data-status="interviewing"');
 });
 test("repeated and concurrent recording clicks reuse one stable interview without replacing preparation pointers",async()=>{
  const f=await fixture(),target=await f.submitted();
  const results=await Promise.all([linkDemoInterview(f.boardPaths,target),linkDemoInterview(f.boardPaths,target),linkDemoInterview(f.boardPaths,target)]);
  expect(new Set(results.map(result=>result.interviewId)).size).toBe(1);const board=await readInterviewBoard(f.boardPaths);expect(board).toHaveLength(1);expect(board[0]?.entry.revision).toBe(1);
+});
+test("a disconnected simulation cannot silently leave an invitation with no preparation request",async()=>{
+ const f=await fixture(),target=await f.submitted(),server=await f.serve();
+ await rm(join(f.root,"data/chat-runner.json"));
+ const response=await post(server.address,target);expect(response.status).toBe(503);
+ expect(await readInterviewBoard(f.boardPaths)).toEqual([]);
+});
+test("uncertain preparation delivery is retained and repeated clicks never resend it",async()=>{
+ const f=await fixture(),target=await f.submitted(),server=await f.serve();
+ const configPath=join(f.root,"data/chat-runner.json"),config=JSON.parse(await readFile(configPath,"utf8"));
+ await writeFile(config.executable,`#!${process.execPath}\nrequire('node:fs').appendFileSync(${JSON.stringify(f.deliveryPath)},'attempt\\n');process.exit(1);\n`,{mode:0o700});
+ expect((await post(server.address,target)).status).toBe(200);
+ expect((await post(server.address,target)).status).toBe(200);
+ const requests=JSON.parse(await readFile(join(f.root,"data/interview-requests.json"),"utf8"));
+ expect(requests).toHaveLength(1);expect(requests[0].state).toBe("pending_delivery");expect(requests[0].reply).toContain("Delivery is unconfirmed");
+ expect(await readFile(f.deliveryPath,"utf8")).toBe("attempt\n");
 });
 test("live mode rejects the simulation endpoint even when old completed demo tasks are present",async()=>{
  const f=await fixture(),target=await f.submitted(),server=await f.serve("codex");
