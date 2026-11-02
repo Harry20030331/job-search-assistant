@@ -1,3 +1,4 @@
+import { jevReadiness } from "../matching/jev.js";
 import { probeInterviewPython } from "../interview/pythonRuntime.mjs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,8 +7,10 @@ import { startWorkbench } from "../workbench/start.js";
 const root=resolve(dirname(fileURLToPath(import.meta.url)),"../..");
 const thread=z.string().uuid().safeParse(process.env.CODEX_THREAD_ID);
 const interview=await probeInterviewPython();
+const matching=await jevReadiness();
+process.stdout.write(`matching_provider=typesafe matching_runtime=${matching.configured?"configured":"key_required"}\n`);
 process.stdout.write(`interview_runtime=${interview.coreReady?"ready":"unavailable"}\n`);
 if(!interview.coreReady)process.stderr.write("Interview preparation needs setup: run npm run interview:setup. Matching and application review remain available.\n");
 const server=await startWorkbench(root,{chat:thread.success?{version:1,threadId:thread.data,executable:process.env.CODEX_CLI_PATH??"codex"}:undefined});
-process.stdout.write(`welcome_url=${server.address}\n`);
+process.stdout.write(`workspace_url=${server.address}\nwelcome_url=${server.address}\n`);
 for(const signal of ["SIGINT","SIGTERM"] as const)process.once(signal,()=>{void server.close().then(()=>process.exit(0))});

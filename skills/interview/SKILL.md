@@ -24,3 +24,8 @@ For preparation, show a short sourced proposal within the explicit time budget. 
 Live Gmail/Calendar uses the separately configured project OAuth backend; platform-connector and other installations' tokens are not inherited. Preserve unread mail state. This repository ships no credentials, real mail or continuous poller. Local stage mode does not configure a live backend. Application submission approval never grants calendar or preparation approval.
 
 For a website request marked `mode: demo`, preserve fictional provenance throughout. Do not access real Gmail, Google Calendar or employer forms. The exact saved Alex Liu case may use the guarded checkpoint in `docs/alex-case-demo.md` after the required local demo submissions; reuse existing staged runs. Synthetic plan decisions and debriefs use `synthetic_test_script`, never human authorization. Model-backed practice still waits for approval of the exact displayed Plan.
+
+
+## Status recording shortcut — 2026-11-01
+
+After a completed local Submit rehearsal, a fictional Demo workspace exposes **Simulate interview** on Status. The shortcut creates one idempotent invited round linked to the exact job/application and completed task, approved snapshot and revision. It stores `demoSubmission` provenance in the interview registry and derives Interviewing only while that proof remains current. No Gmail, Calendar, employer request or canonical submission evidence is created. Reopened content invalidates the projection. Real workspaces and live mode reject the shortcut. Reuse this round when preparing interview materials; do not relink it as a real invitation or invoke the separate authored demo checkpoint. Preparation-plan acceptance remains separate.

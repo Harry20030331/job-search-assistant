@@ -57,3 +57,8 @@ The local benchmark calendar is simulated. Live Google Calendar remains authorit
 ## Retention and inspection
 
 Use `npm run interview:local -- inspect --workspace <absolute-work>` for explicit local inspection, or the documented tool API through `npm run interview:tools`. Outputs may include private user facts; keep them local. No cleanup/retention daemon is implemented. Do not prune raw debriefs or overwrite historical evidence during routine preparation, and do not publish raw mail or connection state as evaluation artifacts.
+
+
+## Status recording shortcut — 2026-11-01
+
+After a completed local Submit rehearsal, a fictional Demo workspace exposes **Simulate interview** on Status. The shortcut creates one idempotent invited round linked to the exact job/application and completed task, approved snapshot and revision. It stores `demoSubmission` provenance in the interview registry and derives Interviewing only while that proof remains current. No Gmail, Calendar, employer request or canonical submission evidence is created. Reopened content invalidates the projection. Real workspaces and live mode reject the shortcut. Reuse this round when preparing interview materials; do not relink it as a real invitation or invoke the separate authored demo checkpoint. Preparation-plan acceptance remains separate.

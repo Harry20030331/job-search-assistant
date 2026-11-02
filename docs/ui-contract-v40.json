@@ -1,0 +1,24 @@
+{
+  "version": 40,
+  "establishedAt": "2026-11-01",
+  "authorization": "User requested a single-user Profile-to-Status startup flow and Jev-owned per-job resume selection shown on Status. Subsequent user correction retains only pale pink, pale blue and muted purple. No commit or push authorized; design acceptance remains pending.",
+  "validation": "569 tests across 55 files; type checking, structural boundaries and distribution checks; actual in-app Browser inspection and 25 measured route/width combinations at 320,390,768,1280,1440px without document overflow. Final three-color screenshot reviewed; source-first setup, Status filters, per-job Resume tags, no global resume picker, restart recovery, mixed-resume Apply batches and pinned PDF version failures verified. Jev extension tested with intercepted responses and fictional fixtures only. See docs/ui-redesign-v40.md.",
+  "files": {
+    "src/review/reviewViews.ts": "990968160d66506d698a0ccb2f191bad6fbb785b44721cf64e7d45c7ea48bd79",
+    "src/review/statusView.ts": "42247ec022024ad93d18674ff5744339cb28073bb5f05df87a3e1a4d4b0fe2f4",
+    "src/review/workflowViews.ts": "0ebf08e35b95b485c3ced88c3831fd1976176888a6d64a87a7cbb424f709c25a",
+    "src/review/applicationStyles.ts": "82015d45d7f39fd207242e99d970b025b562f11e1d11821d7350392f9c6f2b9e",
+    "src/workbench/views.ts": "f7596b52cf312106d1607ef9373bafcf759c0215439243bb37d03ef94a85f965",
+    "src/interview/interviewView.ts": "ce2428703e1f6af2403aa614c12d12e22119f548e98659543041aaabd0b6cb53",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "a7496ffc7c41320fc754ee1a4e2d8886ef77cf86306afc24792157b2981b0128",
+    "src/workbench/start.ts": "0c8ed1cfa83ab03dbd144eeb72fd3d82caf165c86c6f701f9bf574a322c0287a",
+    "src/workbench/interviewRequests.ts": "e1f0659f747866dd6c0d9874282f4fc625368e50c7c072179168d3d2f98009a3",
+    "src/workbench/intakeView.ts": "6dbc603ef03359bf1ec228f02bf924319f7df58c0d24926d1167522c3f2955ef",
+    "src/workbench/searchRefreshView.ts": "dfcc742100591ce4cf427c1728bf105292f7d4dafaf22eeff9bfc0ebd6136d5c",
+    "src/workbench/designSystem.ts": "fb0277f11a76ed0e18004037b3650880dcdf3f57fe4a5d14005b86798c407925",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3"
+  }
+}

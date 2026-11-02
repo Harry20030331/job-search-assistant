@@ -1,6 +1,6 @@
-# Job Search Assistant
+# BeyondAutofill
 
-Send **Start** in a Codex project chat to open Welcome. Continue on the website through **Profile & preferences → Status / Shortlist → Review → Interview preparation**. New candidate starts with a LinkedIn link, pasted text or PDF, followed by a profile preview for confirmation. Selected real workspaces check New Grad listings daily, catch up when overdue, and offer manual refresh. See [website setup](docs/welcome.md) and [daily updates](docs/job-refresh.md).
+Send **Start** in a Codex project chat to open Profile setup on first use; returning users open Status. Continue on the website through **Profile & preferences → Status / Shortlist → Review → Interview preparation**. New candidate starts with a LinkedIn link, pasted text or PDF, followed by a profile preview for confirmation. Selected real workspaces check New Grad listings daily, catch up when overdue, and offer manual refresh. See [website setup](docs/welcome.md) and [daily updates](docs/job-refresh.md).
 
 A local job-search workbench built on Codex. Develop around one candidate: load a saved example into local data, then keep that candidate's facts, preferences and task progress in the same workspace. Codex performs the workflow; the application validates records and presents the shared profile, shortlist, application review and interview workflow.
 

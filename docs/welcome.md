@@ -1,17 +1,19 @@
 # Start the website
 
-Open this repository as the primary folder in a Codex project and send `Start` (or `Hi` / `Get started`). Codex reads `AGENTS.md`, starts `npm start` in a persistent terminal session, and visibly opens the printed `welcome_url` in the in-app Browser. Users do not need to type terminal commands or supply JSON.
+Open this repository as the primary folder in a Codex project and send `Start` (or `Hi` / `Get started`). Codex reads `AGENTS.md`, starts `npm start` in a persistent terminal session, and visibly opens the printed `workspace_url` (`welcome_url` alias) in the in-app Browser. Users do not need to type terminal commands or supply JSON.
 
 The first message is the trigger. Opening a folder alone does not run a model turn, select a candidate, save facts or authorize research. Explicit development requests are not onboarding.
 
-## Welcome and four shared pages
+## Single-user entry and four shared pages
 
-Welcome is candidate-free. Choose **New candidate**, **Continue an existing search**, or **Try the fictional example** on the website. Existing searches show names, locations, counts and missing-data diagnostics. New setup offers three source methods: a designated LinkedIn profile link, freely pasted background text, or a PDF upload. Codex reads the source and publishes a profile preview; corrections stay on the website. Only after the user reviews the preview and confirms search preferences does setup create a fresh private candidate workspace. The example creates a separate fictional copy and remains a local rehearsal.
+Normal startup opens the root URL returned as `workspace_url` (also returned as `welcome_url` for older clients). With no confirmed active user, the root opens source-first Create profile directly: LinkedIn, pasted text or a PDF, then source review and explicit confirmation. After a real profile is confirmed or an existing real workspace is explicitly resumed, the service privately remembers its path in `local/active-workspace.json`. Subsequent visits and restarts open that user's Status page directly, including a valid empty shortlist. There is no recurring candidate selection or Home dashboard. A missing/unreadable remembered workspace shows Restore your workspace without switching identities or creating another profile.
+
+Profile remains available for later edits and multiple approved PDF versions. Initial setup still opens Profile once; returning visits open Status. The explicit `/welcome`, `/existing` and `/example` routes remain compatibility/recovery/demo surfaces. Fictional examples never replace a remembered real user and never become the automatic startup target. Opening a folder does not create the active-user pointer. No unconfirmed source preview is persisted as a user selection.
 
 The selected workspace has four main pages:
 
 1. **Profile & preferences:** confirm background, skills, education and experience; save search feedback; upload and explicitly approve a PDF under a new resume-profile key; see daily New Grad update status or refresh manually; all matching uses SimplifyJobs/New-Grad-Positions followed by official-page verification. Open web search is outside the current scope.
-2. **Status / Shortlist:** inspect saved matches, select an approved resume profile for live preparation, select jobs and click Apply.
+2. **Status / Shortlist:** inspect saved matches and their per-job Resume tags, then select jobs and click Apply. Jev chooses the approved PDF during Matching; there is no batch-level resume picker. Unmatched, uncertain or stale routing blocks live preparation until the inputs are corrected and Matching is refreshed.
 3. **Review:** edit drafts, resolve missing facts, approve content, then separately click Submit applications for the exact approved batch.
 4. **Interview preparation:** paste invitations, give availability, request plan changes and share debriefs through the webpage request form; read results or follow-up questions there. Existing exact-plan approval and practice views remain in place. Calendar writes require confirmation of the exact proposed action in a subsequent request.
 
@@ -36,3 +38,10 @@ The user rejected the long upfront candidate form and requested LinkedIn link, p
 ## Daily updates — 2026-10-31
 
 After selection, a confirmed real workspace checks for an initial/overdue matching round in the background and then every 24 hours while the local service runs. Reopening catches up; manual Refresh jobs stays available on Status and Profile. All triggers share one durable active request. Failed or uncertain work cannot advance the successful timestamp. Fictional examples pause automatic research. Source scope, details and local-process limitations are in [daily updates](job-refresh.md). Welcome and unconfirmed intake still run no matching.
+
+## Maintenance — 2026-11-01
+
+The user requested a single-user product: initial Profile setup followed by direct Status entry on later opens. This supersedes the recurring candidate-choice entry. They also requested moving resume selection into Matching, with per-job Resume tags and different approved PDFs within one Apply batch. Active selection is a private pointer, not a duplicate candidate or job store; examples remain isolated. The Morandi presentation and exact resume handoff are recorded in UI v40 and [job directions](job-directions.md).
+
+
+Maintenance — 2026-11-01: New-profile confirmation and Profile preferences now offer explicit flexible direction/location options. Users need not enumerate target job titles. Save/confirmation records the chosen scope; Jev later evaluates actual role responsibilities against the confirmed background. Saving preferences does not run discovery or change application authorization.

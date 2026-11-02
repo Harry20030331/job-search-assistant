@@ -1,0 +1,25 @@
+{
+  "version": 42,
+  "establishedAt": "2026-11-01",
+  "authorization": "User explicitly requested a complete Status composition redesign focused on layout, typography hierarchy and whitespace while retaining Sans-serif, rather than another palette change. No commit or push authorized.",
+  "validation": "576 tests across 56 files; TypeScript, boundary and distribution checks passed. Final in-app Browser desktop/mobile inspection, filter/empty-state checks and 320/390/768/1024/1440px measurements passed. See docs/ui-redesign-v42.md.",
+  "files": {
+    "src/review/reviewViews.ts": "14b8b11080eeab4827b9a91ee3d2cd16289fc666d2d61386251446019943a80d",
+    "src/review/statusView.ts": "ae64e9337a288c429c2f2855a4ea0498cdbd8f9dd77ddada6f37135104ab6ae7",
+    "src/review/workflowViews.ts": "0ebf08e35b95b485c3ced88c3831fd1976176888a6d64a87a7cbb424f709c25a",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "3c60b9e26565313daa332efd2dee325fabc43acf6d12d0521d5a43f11db852e4",
+    "src/interview/interviewView.ts": "ac71905f5d59ad0b782b32390fc5d2eb852843fecd104dfbe692fd1e02e447be",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "a7496ffc7c41320fc754ee1a4e2d8886ef77cf86306afc24792157b2981b0128",
+    "src/workbench/start.ts": "482393b582b0d8200894da0faaef7b30a96fb081f44713602cf1ec3e144dade6",
+    "src/workbench/interviewRequests.ts": "3e0c19147c14f3cc73124f7341bf003adb1393f4a4a5a177500092d78f0e9ad3",
+    "src/workbench/intakeView.ts": "5f8de28a7fb939255b7232aea9d4f6620fde07da60754f1c12f40ac382395db5",
+    "src/workbench/searchRefreshView.ts": "dfcc742100591ce4cf427c1728bf105292f7d4dafaf22eeff9bfc0ebd6136d5c",
+    "src/workbench/designSystem.ts": "b4bfe025cc6934a04258fe8ecc0c8b44304a7e55d9063954b4bb8e2fa166c2e0",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "acc4640d0a609f097c3ff15e981a66a43f1eeccb570f265097e41a4ebb704728"
+  }
+}

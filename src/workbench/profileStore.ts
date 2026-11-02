@@ -1,3 +1,4 @@
+import { resumeCategorySchema } from "../classification.js";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, rename, mkdir, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -56,20 +57,27 @@ export async function saveProfileEditor(root: string, input: unknown) {
   }));
 }
 export async function saveWebsitePreferences(root: string, input: unknown) {
-  const command = z.object({ token: z.string(), directions: z.array(line.min(1)).min(1), locations: z.array(line.min(1)),
-    workModes: z.array(z.enum(["remote", "hybrid", "onsite"])).min(1), feedback: line.min(1) }).strict().parse(input);
+  const command = z.object({ token: z.string(), directions: z.array(line.min(1)), locations: z.array(line.min(1)),
+    flexibleDirection: z.boolean().optional(), flexibleLocation: z.boolean().optional(),
+    workModes: z.array(z.enum(["remote", "hybrid", "onsite"])), feedback: z.string().trim().default("") }).strict().parse(input);
+  if (!command.flexibleDirection && !command.directions.length) throw new Error("preference_direction_required");
+  if (command.flexibleLocation === false && !command.locations.length) throw new Error("preference_location_required");
+  if (!command.workModes.length) throw new Error("preference_work_mode_required");
+  if (command.feedback.length > 20000) throw new Error("preference_feedback_too_long");
+  const directions = command.flexibleDirection ? [] : command.directions;
+  const locations = command.flexibleLocation ? [] : command.locations;
   const paths = workspaceMatchingPaths(root);
   const context = await matchingContext(paths);
   if (context.token !== command.token) throw new Error("matching_context_changed");
-  const rules = { categories: command.directions, locations: command.locations, workModes: command.workModes,
+  const rules = { categories: directions, locations, workModes: command.workModes,
     excludedCompanies: [], excludedJobIds: [], limit: 10, perCompany: 2 };
   await saveMatchingPreferences(paths, { expectedToken: command.token, ...(!context.policy ? { initialRules: rules } : {}),
-    feedback: { id: randomUUID(), text: command.feedback, reference: "Confirmed on Profile & preferences", at: new Date().toISOString(),
-      patch: { categories: command.directions, locations: command.locations, workModes: command.workModes } } });
+    feedback: { id: randomUUID(), text: command.feedback || "Updated search preferences on the website", reference: "Confirmed on Profile & preferences", at: new Date().toISOString(),
+      patch: { categories: directions, locations, workModes: command.workModes } } });
   return readProfileEditor(root);
 }
 export async function saveWebsiteResume(root: string, input: unknown) {
-  const command = z.object({ token: z.string(), category: z.string().regex(/^[a-zA-Z0-9_-]{1,80}$/),
+  const command = z.object({ token: z.string(), category: resumeCategorySchema,
     filename: z.string().min(1).max(200), base64: z.string().max(14_000_000), approved: z.literal(true) }).strict().parse(input);
   const paths = workspaceMatchingPaths(root);
   return withPreferences(paths.preferences, async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { formatReviewServerStartup, parseReviewServerArgs } from "./reviewServerCli.js";
+import { formatReviewServerStartup, parseReviewServerArgs, reviewWorkspaceRoot } from "./reviewServerCli.js";
 
 describe("review server CLI", () => {
   test("parses exact local paths and port", () => {
@@ -47,4 +47,10 @@ describe("review server CLI", () => {
         "recovery_action=re-observe ATS pages; replace snapshots when live continuity is lost"
       ].join("\n") + "\n");
   });
+});
+
+
+test("explicit canonical tracker paths bind refresh to the selected workspace rather than the source checkout",()=>{
+ expect(reviewWorkspaceRoot("/tmp/fictional-case/data/opportunities.json","/tmp/fictional-source")).toBe("/tmp/fictional-case");
+ expect(reviewWorkspaceRoot("/tmp/legacy-tracker.json","/tmp/fictional-source")).toBe("/tmp/fictional-source");
 });

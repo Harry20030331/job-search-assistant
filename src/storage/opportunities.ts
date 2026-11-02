@@ -1,3 +1,4 @@
+import { resumeRecommendationSchema } from "../matching/resumeRecommendation.js";
 import { writePrivateFile as writeFile } from "./privateFiles.js";
 import { randomUUID } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
@@ -26,6 +27,7 @@ const schema = z.object({
     sources: z.array(z.enum(jobSources)).min(1),
     firstSeen: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), lastVerified: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     note: z.string(), availability: z.enum(["open", "closed", "unknown"]), stage: z.enum(stages),
+    resumeRecommendation: resumeRecommendationSchema.optional(),
     application: z.record(z.unknown()).optional()
   }).strict())
 }).strict();

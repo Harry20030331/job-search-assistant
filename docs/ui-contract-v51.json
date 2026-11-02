@@ -1,0 +1,28 @@
+{
+  "version": 51,
+  "establishedAt": "2026-11-01",
+  "authorization": "User requested extending the reviewed Status visual style to the remaining product pages. No commit or push authorized.",
+  "validation": "580 tests across 56 files; TypeScript, boundary and distribution checks passed. Browser inspected desktop working pages and first-use setup, mobile Review/Interview and 20 measured route/width combinations with consistent Inter font and gray navigation, no document overflow. See docs/ui-redesign-v51.md.",
+  "files": {
+    "src/review/reviewViews.ts": "f23dc6f753df96f4b4c247980b40761e686ec32d4119881e66afc86bb18d9b13",
+    "src/review/statusView.ts": "ae64e9337a288c429c2f2855a4ea0498cdbd8f9dd77ddada6f37135104ab6ae7",
+    "src/review/workflowViews.ts": "0ebf08e35b95b485c3ced88c3831fd1976176888a6d64a87a7cbb424f709c25a",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "51fe6ce8638e84d0b24ac4d54115502f220f45ed9522056cebdbde942322a0b3",
+    "src/interview/interviewView.ts": "ac71905f5d59ad0b782b32390fc5d2eb852843fecd104dfbe692fd1e02e447be",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "73307d90cc257158f5fc186b855c7f2a5414c399370dafd899e88ec4100b9fe3",
+    "src/workbench/start.ts": "6df8952d6912e8685a36dfc17c762b6142dcb93280bc5ba09cf876a0a78c2bdf",
+    "src/workbench/interviewRequests.ts": "3e0c19147c14f3cc73124f7341bf003adb1393f4a4a5a177500092d78f0e9ad3",
+    "src/workbench/intakeView.ts": "2ab9b512dcf849771dd0c85070e0a9d2914aee9b6aa8431b91a62d5e992b707a",
+    "src/workbench/searchRefreshView.ts": "900a8f8dfbe92e41c6c5696abdca7ffbd59ecc61e5cc3267a611d58042cacd48",
+    "src/workbench/designSystem.ts": "b93a2e72fe8fbc616cdb9a05dd68690fe6b63525e39cac091ca43481efbe64cf",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "d800b1d6b7af08b4e849ba567e1b2b4e5a1fc083054ba153cfb7ca3cbda1cd94",
+    "src/workbench/profileStore.ts": "6107b72dcc7a9ecef67af5b99eb28415657719a0abe6b749119ead2711dbf843",
+    "src/workbench/intakeRequests.ts": "d28caab742c8bc6376ab3c135963e876bc10f54010fe34747887369f7eb8f6b2",
+    "src/workbench/workspaceTheme.ts": "98d53b673dce9dffe4998377e8ae1449b106da8f037cf58809cbd71e1a8aebfd"
+  }
+}

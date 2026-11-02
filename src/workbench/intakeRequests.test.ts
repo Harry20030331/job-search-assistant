@@ -48,3 +48,14 @@ test("LinkedIn previews must match observed facts and retain source confirmation
  const root=await confirmIntakeRequest(f.root,requestId,preferences);
  expect(JSON.parse(await readFile(join(root,"data/candidate.json"),"utf8"))).toMatchObject({_meta:{linkedinImport:{sourceUrl,state:"confirmed"}}});
 });
+
+
+test("confirmed flexible intake needs no direction list or location list and keeps candidate facts intact",async()=>{
+ const f=await setup(),id=randomUUID();
+ await beginIntakeRequest(f.root,f.chat,{requestId:id,kind:"text",value:"Fictional background for flexible intake."},f.run);
+ await workIntakeRequest(f.root,id,0,f.chat.threadId,"claim");await workIntakeRequest(f.root,id,0,f.chat.threadId,"preview",preview);
+ await expect(confirmIntakeRequest(f.root,id,{...preferences,directions:[],flexibleDirection:false})).rejects.toThrow("intake_direction_required");
+ const root=await confirmIntakeRequest(f.root,id,{...preferences,directions:[],flexibleDirection:true});
+ const policy=await readFile(join(root,"data/preferences.md"),"utf8");expect(policy).toContain('"categories": []');expect(policy).toContain('"locations": []');
+ expect(JSON.parse(await readFile(join(root,"data/candidate.json"),"utf8")).identity).toEqual(candidate.identity);
+});

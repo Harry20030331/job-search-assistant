@@ -58,6 +58,7 @@ describe("status view projection", () => {
         title: "Machine Learning Engineer",
         location: "San Francisco, CA",
         category: "llm",
+        resumeProfile: "llm",
         href: "https://example.com/applications/tracked",
         status: "confirmed",
         dateLabel: "08-07",

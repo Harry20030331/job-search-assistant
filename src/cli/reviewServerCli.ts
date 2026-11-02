@@ -1,11 +1,12 @@
-import { dirname, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { startReviewServer } from "../review/reviewServer.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
 import { ensureExampleData } from "../example.js";
 import { readReviewBatch, initializeReviewOrder } from "../review/reviewStore.js";
 import { ApplicationTaskService, demoTaskExecutor } from "../review/applicationTasks.js";
-import { readChatTaskConfig, createChatTaskDispatcher } from "../review/chatTaskBridge.js";
+import { connectCurrentChat, createChatTaskDispatcher } from "../review/chatTaskBridge.js";
 import { codexTaskExecutor } from "../review/codexTaskExecutor.js";
 import { assertLiveCandidate } from "../review/liveCandidate.js";
 
@@ -60,6 +61,10 @@ export function formatReviewServerStartup(address: string, reviewPath: string, a
 const modulePath = fileURLToPath(import.meta.url);
 const defaultProjectRoot = resolve(dirname(modulePath), "../..");
 
+export function reviewWorkspaceRoot(trackerPath: string, fallback: string) {
+  return basename(dirname(trackerPath)) === "data" ? dirname(dirname(trackerPath)) : fallback;
+}
+
 export async function runReviewServerCli(argv: readonly string[], projectRoot = defaultProjectRoot): Promise<void> {
   if (argv[0] === "--runtime-dir") {
     if (argv.length !== 2 || !argv[1] || argv[1].startsWith("--")) throw new Error("invalid_cli_arguments");
@@ -80,10 +85,16 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
     explicitReview!.applications.map((application) => application.applicationId);
   const mode = process.env.APPLICATION_RUNNER ?? "demo";
   if (mode !== "demo" && mode !== "codex") throw new Error("invalid_application_runner");
-  if (mode === "codex") await assertLiveCandidate(projectRoot);
-  const chat = await readChatTaskConfig(projectRoot);
-  const tasks = new ApplicationTaskService({ reviewPath, trackerPath, jobsPath, taskPath: resolve(dirname(trackerPath), "application-tasks.json") },
-    mode, mode === "demo" ? demoTaskExecutor : codexTaskExecutor(projectRoot, process.env.CODEX_CLI_PATH ?? "codex"), chat ? createChatTaskDispatcher(projectRoot, chat) : undefined);
+  const workspaceRoot = reviewWorkspaceRoot(trackerPath, projectRoot);
+  if (mode === "codex") await assertLiveCandidate(workspaceRoot);
+  const chat = await connectCurrentChat(workspaceRoot);
+  const dispatchToChat = mode === "codex" && Boolean(chat);
+  const tasks = new ApplicationTaskService({ reviewPath, trackerPath, jobsPath, taskPath: resolve(dirname(trackerPath), "application-tasks.json"),
+    ...(existsSync(resolve(dirname(trackerPath), "resumes.json")) ? { matchingPaths: {
+      profile: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : resolve(dirname(trackerPath), "candidate.json"),
+      preferences: resolve(dirname(trackerPath), "preferences.md"), manifest: resolve(dirname(trackerPath), "resumes.json"), opportunities: trackerPath
+    } } : {}) },
+    mode, mode === "demo" ? demoTaskExecutor : codexTaskExecutor(projectRoot, process.env.CODEX_CLI_PATH ?? "codex"), dispatchToChat ? createChatTaskDispatcher(workspaceRoot, chat!) : undefined);
   await tasks.start();
   const running = await startReviewServer({
     reviewPath,
@@ -94,12 +105,15 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
     profilePath: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : undefined,
     googleRoot: "googleRoot" in parsed && parsed.googleRoot ? resolve(parsed.googleRoot) : undefined,
     port: parsed.port,
+    workspaceRoot,
+    repositoryRoot: defaultProjectRoot,
+    searchRefresh: { automatic: false },
     tasks
   });
   const stop = async () => { await tasks.close(); await running.close(); process.exit(0); };
   process.once("SIGTERM", () => { void stop(); });
   process.once("SIGINT", () => { void stop(); });
-  process.stdout.write(`application_runner=${mode}\napplication_dispatch=${chat ? "chat" : "runner"}\n`);
+  process.stdout.write(`application_runner=${mode}\napplication_dispatch=${dispatchToChat ? "chat" : "runner"}\n`);
   process.stdout.write(formatReviewServerStartup(running.address, reviewPath, applicationIds));
   process.stdout.write(`interviews_url=${running.address}/interviews\n`);
 }

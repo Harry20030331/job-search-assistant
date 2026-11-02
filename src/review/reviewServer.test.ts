@@ -290,7 +290,7 @@ describe("local review server", () => {
     const row = html.match(/<tr class="status-row"[\s\S]*?<\/tr>/)?.[0] ?? "";
 
     expect(response.status).toBe(200);
-    expect(row).toContain("Legacy Co · Washington");
+    expect(row).toContain('<div class="company-line">Legacy Co</div><div class="row-location">Washington</div>');
     expect(row).toContain('data-status="shortlisted"');
     expect(row).not.toContain("final_review");
   });
@@ -326,7 +326,7 @@ describe("local review server", () => {
     const response = await fetch(`${server.address}/status`);
     const html = await response.text();
     expect(response.status).toBe(200);
-    expect(html).toContain("Shortlist Co · New York");
+    expect(html).toContain('<div class="company-line">Shortlist Co</div><div class="row-location">New York</div>');
     expect(html).toContain('data-status="shortlisted"');
     expect(html.indexOf("Shortlist Co")).toBeLessThan(html.indexOf("Legacy Co"));
     expect(html).toContain("New Co");

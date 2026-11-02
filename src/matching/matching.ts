@@ -1,3 +1,4 @@
+import { resumeRecommendationSchema } from "./resumeRecommendation.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, realpath, rename } from "node:fs/promises";
@@ -14,7 +15,7 @@ const text = z.string().trim().min(1).max(2000).refine(s => !/[\r\n]/.test(s));
 const category = jobDirectionSchema;
 const mode = z.enum(["remote", "hybrid", "onsite"]);
 const rulesSchema = z.object({
-  categories: z.array(category).min(1),
+  categories: z.array(category),
   workModes: z.array(mode).min(1),
   locations: z.array(text),
   excludedCompanies: z.array(text),
@@ -23,7 +24,7 @@ const rulesSchema = z.object({
   perCompany: z.number().int().min(1).max(25)
 }).strict();
 const feedbackSchema = z.object({
-  id: text, text, reference: text, at: z.string().datetime(),
+  id: text, text: z.string().trim().min(1).max(20000), reference: text, at: z.string().datetime(),
   patch: rulesSchema.partial()
 }).strict();
 const policySchema = z.object({
@@ -98,7 +99,7 @@ export async function saveMatchingPreferences(paths: MatchingPaths, input: unkno
   });
 }
 
-const assessmentSchema = z.object({
+export const assessmentSchema = z.object({
   jobId: text, company: text, title: text, location: text, category,
   officialUrl: z.string().url().startsWith("https://"),
   sources: z.array(z.enum(jobSources)).min(1),
@@ -107,12 +108,13 @@ const assessmentSchema = z.object({
   eligibleLocations: z.array(text),
   decision: z.enum(["recommend", "needs_confirmation", "reject"]),
   match: z.array(text).min(1), gaps: z.array(text), questions: z.array(text),
+  resumeRecommendation: resumeRecommendationSchema.optional(),
   candidateEvidence: z.array(text).min(1), jobEvidence: z.array(text).min(1)
 }).strict();
 export type Assessment = z.infer<typeof assessmentSchema>;
 const roundSchema = z.object({ version: z.literal(1), contextToken: text, assessments: z.array(assessmentSchema).min(1).max(100) }).strict();
 
-/** Language reasoning belongs to Codex. This gate enforces explicit structured constraints. */
+/** Deterministic storage gate. Production CLI evaluates with Jev first; explicit offline fixtures may invoke this directly. */
 export async function publishMatchingRound(paths: MatchingPaths, input: unknown) {
   const round = roundSchema.parse(input);
   return withPreferences(paths.preferences, async () => {
@@ -128,13 +130,16 @@ export async function publishMatchingRound(paths: MatchingPaths, input: unknown)
       const results = round.assessments.map(input => {
         const existing = document.opportunities.find(j => j.jobId === input.jobId || normalizeOfficialUrl(j.officialUrl) === normalizeOfficialUrl(input.officialUrl));
         if (existing && normalizeOfficialUrl(existing.officialUrl) !== normalizeOfficialUrl(input.officialUrl)) throw new Error("matching_identity_changed");
+        const recommendation = input.resumeRecommendation;
+        if (recommendation && (recommendation.contextToken !== context.token ||
+          (recommendation.profileKey !== null && !context.manifest.some(entry => entry.category === recommendation.profileKey && entry.sha256 === recommendation.sha256)))) throw new Error("matching_resume_changed");
         const a = { ...input, jobId: existing?.jobId ?? input.jobId };
         const url = normalizeOfficialUrl(a.officialUrl);
         if (ids.has(a.jobId) || urls.has(url)) throw new Error("duplicate_matching_assessment");
         ids.add(a.jobId); urls.add(url);
         if (a.firstSeen > a.lastVerified) throw new Error("invalid_matching_dates");
         const reasons: string[] = [];
-        if (!rules.categories.some(direction => equal(direction, a.category))) reasons.push("Direction excluded by preferences");
+        if (rules.categories.length && !rules.categories.some(direction => equal(direction, a.category))) reasons.push("Direction excluded by preferences");
         if (rules.excludedJobIds.includes(a.jobId)) reasons.push("Job excluded by user");
         if (rules.excludedCompanies.some(c => equal(c, a.company))) reasons.push("Company excluded by user");
         if (a.workMode && !rules.workModes.includes(a.workMode)) reasons.push("Work mode excluded by preferences");
@@ -170,7 +175,7 @@ export async function publishMatchingRound(paths: MatchingPaths, input: unknown)
         const visible = result.decision === "recommend" || (result.decision === "needs_confirmation" && !preferenceProofMissing);
         const note = `${visible ? "" : "user-excluded: "}matching: ${result.decision}. ${explanation}`;
         const { jobId, company, title, location, category, officialUrl, sources, firstSeen, lastVerified } = result;
-        const record = upsertRecord(existingJobs, { jobId, company, title, location, category, officialUrl, sources, firstSeen, lastVerified, note, status: "ready" });
+        const record = upsertRecord(existingJobs, { jobId, company, title, location, category, officialUrl, sources, firstSeen, lastVerified, note, status: "ready", ...(result.resumeRecommendation ? { resumeRecommendation: result.resumeRecommendation } : {}) });
         record.status = result.decision === "recommend" ? "ready" : "new";
         mergeJobs(document, [record]);
       }

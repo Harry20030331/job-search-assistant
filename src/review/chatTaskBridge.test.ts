@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { afterEach, expect, test } from "vitest";
-import { createChatTaskDispatcher, readChatTaskConfig } from "./chatTaskBridge.js";
+import { createChatTaskDispatcher, readChatTaskConfig, connectCurrentChat } from "./chatTaskBridge.js";
 import type { ApplicationTask } from "./applicationTasks.js";
 
 const directories: string[] = [];
@@ -42,4 +42,17 @@ test("private runtime config is optional but malformed config fails closed", asy
   expect((await readChatTaskConfig(f.root))!.threadId).toBe(f.threadId);
   await writeFile(join(f.root, "data/chat-runner.json"), JSON.stringify({ version: 1, threadId: "not-a-thread", executable: f.executable }));
   await expect(readChatTaskConfig(f.root)).rejects.toThrow();
+});
+
+
+test("a missing connection binds to the hosting chat once without sending or replacing existing configuration",async()=>{
+ const f=await fixture();await rm(join(f.root,"data/chat-runner.json"),{force:true});
+ expect(await connectCurrentChat(f.root,{})).toBeUndefined();
+ expect(await connectCurrentChat(f.root,{CODEX_THREAD_ID:"not-a-thread"})).toBeUndefined();
+ const input={CODEX_THREAD_ID:f.threadId,CODEX_CLI_PATH:f.executable};
+ const [a,b]=await Promise.all([connectCurrentChat(f.root,input),connectCurrentChat(f.root,input)]);
+ expect(a).toEqual({version:1,threadId:f.threadId,executable:f.executable});expect(b).toEqual(a);
+ const bytes=await readFile(join(f.root,"data/chat-runner.json"),"utf8");
+ expect(await connectCurrentChat(f.root,{CODEX_THREAD_ID:randomUUID(),CODEX_CLI_PATH:"another-cli"})).toEqual(a);
+ expect(await readFile(join(f.root,"data/chat-runner.json"),"utf8")).toBe(bytes);
 });

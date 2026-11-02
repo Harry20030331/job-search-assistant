@@ -37,7 +37,7 @@ export const reviewStyles = `${workspaceStyles}
 .detail-wrap{padding:0 0 24px}
 .detail-head{display:grid;grid-template-columns:minmax(0,1fr) 210px;align-items:start;gap:28px;padding:8px 0 26px;border-bottom:1px solid var(--line)}
 .detail-head>div{min-width:0}
-.category{display:inline-block;font:650 11px/1.4 ui-monospace,monospace;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.category{display:inline-block;font:650 11px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
 .detail h1{font:500 clamp(25px,2.5vw,36px)/1.15 Inter,Arial,sans-serif;letter-spacing:-.025em;margin:0;overflow-wrap:anywhere;text-wrap:pretty}
 .detail-head p{font-size:14px;margin:12px 0 0;color:var(--muted)}
 .detail-actions{display:flex;flex-direction:column;align-items:stretch;gap:10px;text-align:right}

@@ -1,5 +1,7 @@
 # Saved searches and their website
 
+Normal startup restores the explicitly remembered real user directly to Status through `local/active-workspace.json`; see [single-user entry](welcome.md). The following workspace chooser and CLI procedures are recovery/compatibility tools, not a recurring step for the product user. Fictional examples never replace the active real user.
+
 Selecting "Continue an existing search" first runs `npm run matching -- workspaces`. Codex displays an English numbered list with candidate, saved folder, total/active jobs and latest recorded job activity. The date describes stored observations, not a completed discovery scan. Same-name candidates in separate folders remain separate choices. The user selects a number rather than having to remember a path.
 
 With no saved job records, say "No saved search results were found" and offer new setup or the fictional example. Candidate workspaces with zero jobs are reported separately as "No search results yet" and can be selected to begin searching. Missing registered folders, malformed records and unreadable locations are diagnostics, not evidence of no results. Listing never repairs, deletes, initializes or switches candidates.

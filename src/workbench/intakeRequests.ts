@@ -166,7 +166,7 @@ export async function workIntakeRequest(repository: string, requestId: string, r
 export async function confirmIntakeRequest(repository: string, requestId: string, input: unknown) {
   const confirmation = z.object({ revision: z.number().int().nonnegative(), confirmed: z.literal(true) }).passthrough().parse(input);
   const schema = z.object({ revision: z.number().int().nonnegative(), confirmed: z.literal(true),
-    directions: z.array(text).min(1), locations: z.array(text), flexibleLocation: z.boolean(),
+    directions: z.array(text), flexibleDirection: z.boolean().default(false), locations: z.array(text), flexibleLocation: z.boolean(),
     workModes: z.array(z.enum(["remote", "hybrid", "onsite"])).min(1), notes: z.string().trim().max(5000) }).strict();
   return locked(repository, requestId, async () => {
     const current = await read(repository, requestId);
@@ -174,14 +174,15 @@ export async function confirmIntakeRequest(repository: string, requestId: string
     if (current.state === "confirmed" && current.workspace) return current.workspace;
     const command = schema.parse(input);
     if (current.state !== "preview_ready" || !current.preview) throw Error("intake_preview_required");
+    if (!command.flexibleDirection && !command.directions.length) throw Error("intake_direction_required");
     if (!command.flexibleLocation && !command.locations.length) throw Error("intake_location_required");
     const root = join(repository, "local/workspaces", `candidate-${requestId}`);
     await mkdir(join(repository, "local/workspaces"), { recursive: true, mode: 0o700 });
     const candidate = current.preview.candidate;
     await createMatchingWorkspace(root, { confirmed: true, reference: `Website intake ${requestId}, revision ${current.revision}: user confirmed displayed facts`,
       candidate: { ...candidate, _meta: { ...(candidate._meta as Record<string, unknown> ?? {}), websiteIntake: { requestId, revision: current.revision, kind: current.kind, sourceHash: current.sourceHash, reference: current.preview.reference } } },
-      preferences: `Job directions: ${command.directions.join(", ")}\nLocations: ${command.flexibleLocation ? "Flexible" : command.locations.join(", ")}\nWork arrangements: ${command.workModes.join(", ")}\n${command.notes}`,
-      rules: { categories: command.directions, locations: command.flexibleLocation ? [] : command.locations, workModes: command.workModes, excludedCompanies: [], excludedJobIds: [], limit: 10, perCompany: 2 }
+      preferences: `Job directions: ${command.flexibleDirection ? "Flexible; match suitable roles to my background" : command.directions.join(", ")}\nLocations: ${command.flexibleLocation ? "Flexible" : command.locations.join(", ")}\nWork arrangements: ${command.workModes.join(", ")}\n${command.notes}`,
+      rules: { categories: command.flexibleDirection ? [] : command.directions, locations: command.flexibleLocation ? [] : command.locations, workModes: command.workModes, excludedCompanies: [], excludedJobIds: [], limit: 10, perCompany: 2 }
     }, join(repository, "local/search-workspaces.json"));
     current.state = "confirmed"; current.workspace = root; current.message = "Your profile is saved."; await save(repository, current);
     return root;

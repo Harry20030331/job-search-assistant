@@ -124,3 +124,14 @@ test("offline demo is isolated and refuses to replace existing state", async () 
   expect(demo.after.filter(r => r.decision === "recommend").map(r => r.jobId)).toEqual(["fictional-meadow"]);
   await expect(runMatchingDemo(root)).rejects.toThrow();
 });
+
+
+test("explicit flexible direction and location admit source-backed new directions while exclusions still apply",async()=>{
+ const {paths,assessments}=await setup();await feedback(paths,{categories:[],locations:[],excludedCompanies:[assessments[1]!.company]});
+ const jobs=assessments.map(a=>({...a,category:"Product Research",eligibleLocations:["Another City"],questions:[],decision:"recommend" as const}));
+ const result=await publish(paths,jobs);
+ expect(result.results[0]?.reasons).not.toContain("Direction excluded by preferences");
+ expect(result.results[0]?.reasons).not.toContain("Location excluded by preferences");
+ expect(result.results[0]?.decision).toBe("recommend");
+ expect(result.results[1]?.reasons).toContain("Company excluded by user");
+});

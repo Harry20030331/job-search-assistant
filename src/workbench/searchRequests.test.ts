@@ -17,7 +17,7 @@ test("New Grad requests bind the sole repository, official verification, current
  const request={requestId,token:context.token};expect(await requestWebsiteSearch(f.root,f.base,request)).toMatchObject({state:"delivered"});
  expect(await requestWebsiteSearch(f.root,f.base,request)).toMatchObject({state:"delivered"});
  const args=JSON.parse(await readFile(f.argsPath,"utf8"));expect(args.slice(0,4)).toEqual(["queue","--thread",f.threadId,"--message"]);
- expect(args[5]).toBe("--resume");expect(args[4]).toContain('"allowOpenWebSearch":false');expect(args[4]).toContain("Product Management anchor for PM");expect(args[4]).toContain("official employer links");expect(args[4]).toContain("search:request -- claim");
+ expect(args[5]).toBe("--resume");expect(args[4]).toContain('"allowOpenWebSearch":false');expect(args[4]).toContain("Product Management anchor for PM");expect(args[4]).toContain("official employer links");expect(args[4]).toContain("search:request -- claim");expect(args[4]).toContain("matching -- provider-status");expect(args[4]).toContain("jobDescriptionReference");expect(args[4]).toContain("Do not substitute Codex-only matching");
  const saved=JSON.parse(await readFile(join(f.root,"data/search-requests",requestId+".json"),"utf8"));expect(saved.scope).toMatchObject({cohort:"new-grad",source:"simplify-new-grad",allowOpenWebSearch:false});
  await expect(updateSearchRequest(f.root,requestId,"claim",randomUUID())).rejects.toThrow("wrong_chat_thread");
  expect(await updateSearchRequest(f.root,requestId,"claim",f.threadId)).toMatchObject({state:"running"});

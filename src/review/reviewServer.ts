@@ -1,3 +1,5 @@
+import { loadCandidateProfile } from "../profile.js";
+import { matchingContext } from "../matching/matching.js";
 import { serveWorkspaceFont } from "../workbench/assets.js";
 import { SearchRefreshService, type SearchRefreshOptions } from "../workbench/searchRefresh.js";
 import { withSearchRefresh } from "../workbench/searchRefreshView.js";
@@ -24,9 +26,9 @@ import { readJobLibrary } from "../jobs/jobLibrary.js";
 import { renderReviewPage, renderUsStatusPage } from "./reviewViews.js";
 import { buildStatusView } from "./statusView.js";
 import { basename, dirname, join } from "node:path";
-import { readInterviewBoard, interviewEnded } from "../interview/workbench.js";
+import { readInterviewBoard, linkDemoInterview } from "../interview/workbench.js";
 import { renderInterviewPage } from "../interview/interviewView.js";
-import { renderHomePage, renderAccountPage } from "../workbench/views.js";
+import { renderAccountPage } from "../workbench/views.js";
 import { GoogleBridge, googleRoutes } from "../interview/googleBridge.js";
 import { randomBytes } from "node:crypto";
 import { approveWebsitePlan } from "../interview/webActions.js";
@@ -59,7 +61,7 @@ export interface RunningReviewServer {
 const maximumJsonBodyBytes = 65_536;
 const browserMutationPaths = new Set([
   "/api/interview/requests", "/api/profile", "/api/preferences", "/api/resumes", "/api/search",
-  "/api/tasks",
+  "/api/tasks", "/api/demo/interviews",
   "/api/review/generated-answer",
   "/api/review/reopen",
   "/api/review/content-approval",
@@ -207,6 +209,7 @@ function publicError(error: unknown): { status: number; code: string } {
   const expected = new Map<string, { status: number; code: string }>([
     ...["profile_changed", "matching_context_changed", "resume_profile_exists", "shared_profile_read_only"].map(code => [code, { status: 409, code }] as [string, { status: number; code: string }]),
     ["invalid_resume", { status: 400, code: "invalid_resume" }],
+    ...["preference_direction_required", "preference_location_required", "preference_work_mode_required", "preference_feedback_too_long"].map(code => [code, { status: 400, code }] as [string, { status: number; code: string }]),
     ["matching_initial_rules_required", { status: 422, code: "matching_initial_rules_required" }],
     ["task_target_unavailable", { status: 409, code: "task_target_unavailable" }],
     ["task_already_active", { status: 409, code: "task_already_active" }],
@@ -237,6 +240,10 @@ function publicError(error: unknown): { status: number; code: string } {
     ["invalid_decision_timestamp", { status: 400, code: "invalid_request" }],
     ["invalid_decision_chronology", { status: 400, code: "invalid_request" }]
   ]);
+  if (message === "demo_interview_unavailable") return { status: 403, code: message };
+  if (message === "demo_interview_changed") return { status: 409, code: message };
+  if (["approved_cv_hash_mismatch", "approved_cv_missing", "approved_cv_not_configured", "approved_cv_manifest_invalid"].includes(message)) return { status: 409, code: "matching_resume_changed" };
+  if (["matching_resume_required", "matching_resume_changed"].includes(message)) return { status: 409, code: message };
   return expected.get(message) ?? { status: 500, code: "request_failed" };
 }
 
@@ -248,7 +255,7 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
   const workspaceRoot = options.workspaceRoot ?? dirname(dirname(options.trackerPath));
   const refresh = options.workspaceRoot || basename(dirname(options.trackerPath)) === "data" ? new SearchRefreshService(workspaceRoot, options.repositoryRoot ?? workspaceRoot, options.searchRefresh ?? { automatic: false }) : undefined;
   const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
-  const interviewPaths = { trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
+  const interviewPaths = { taskPath: options.tasks?.paths.taskPath, reviewPath: options.reviewPath, trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
   const interviewCsrf = randomBytes(32).toString("hex");
   const decorate = async (html: string, version = "") => {
     let resumes: string[] | undefined;
@@ -259,14 +266,32 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
     const [review, tracker, jobs, tasks] = await Promise.all([
       readReviewBatch(options.reviewPath), readApplicationTracker(options.trackerPath), readJobLibrary(options.jobsPath), options.tasks?.list() ?? []
     ]);
-    const status = buildStatusView(tracker.applications, jobs, { review, tasks, mode: options.tasks?.mode });
+    let demoInterviewEnabled = false;
+    let demoInterviews: Awaited<ReturnType<typeof readInterviewBoard>> = [];
+    if (options.tasks?.mode === "demo" && tasks.some(task => task.mode === "demo" && task.action === "submit" && task.state === "demo_complete")) {
+      try {
+        const candidate = await loadCandidateProfile(interviewPaths.profilePath);
+        const email = String((candidate.contact as { email?: string })?.email ?? "");
+        demoInterviewEnabled = candidate.fictional === true || /@(?:.*\.)?example\.(com|org|net)$/i.test(email);
+        if (demoInterviewEnabled) demoInterviews = (await readInterviewBoard(interviewPaths)).filter(item => item.entry.demoSubmission);
+      } catch { demoInterviewEnabled = false; }
+    }
+    const status = buildStatusView(tracker.applications, jobs, { review, tasks, mode: options.tasks?.mode, demoInterviewEnabled, demoInterviews });
+    if (options.workspaceRoot || options.tasks?.paths.matchingPaths) {
+      const current = options.tasks?.paths.matchingPaths ? await matchingContext(options.tasks.paths.matchingPaths) : await readProfileEditor(workspaceRoot);
+      for (const item of status) {
+        if (item.resumeProfile || !item.resumeRecommendation) continue;
+        const recommendation = item.resumeRecommendation;
+        item.resumeStale = recommendation.contextToken !== current.token || (recommendation.profileKey !== null && !current.manifest.some(entry => entry.category === recommendation.profileKey && entry.sha256 === recommendation.sha256));
+      }
+    }
     const states = new Map(status.filter(item => item.applicationId).map(item => [item.applicationId!, item.status]));
     const activeReview = { ...review, applications: review.applications.filter(item => {
       const state = states.get(item.applicationId);
       // Untracked legacy review batches remain readable; known records must be ready and active.
       return !tracker.applications.some(record => record.applicationId === item.applicationId) || (state !== undefined && ["in_review", "submitting", "submission_failed"].includes(state));
     }) };
-    const version = createHash("sha256").update(JSON.stringify({ status: status.map(item => [item.jobId, item.status, item.preparationNeedsRetry === true]), review: activeReview.applications.map(item => [item.applicationId, item.snapshotId, item.decision.state]) })).digest("hex");
+    const version = createHash("sha256").update(JSON.stringify({ status: status.map(item => [item.jobId, item.status, item.preparationNeedsRetry === true, item.resumeRecommendation, item.resumeStale, item.interviewHref, item.demoInterviewTarget]), review: activeReview.applications.map(item => [item.applicationId, item.snapshotId, item.decision.state]) })).digest("hex");
     return { review: activeReview, tracker, tasks, status, states, version };
   };
   const server = createServer(async (request, response) => {
@@ -324,17 +349,10 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         send(response, 200, renderAccountPage(), "text/html; charset=utf-8"); return;
       }
       if (request.method === "GET" && url.pathname === "/") {
-        const applications = (await readApplicationTracker(options.trackerPath)).applications;
-        let interviews: Awaited<ReturnType<typeof readInterviewBoard>> = [];
-        try { interviews = await readInterviewBoard({ trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") }); } catch { /* Candidate-free legacy runtimes still expose navigation and account setup. */ }
-        send(response, 200, renderHomePage({ applications: applications.length,
-          interviews: interviews.filter(i => ["invited", "scheduled"].includes(i.entry.state) && !interviewEnded(i)).length,
-          pendingPlans: interviews.filter(i => i.snapshot?.proposal?.status === "awaiting_plan_approval").length,
-          practiceReady: interviews.filter(i => i.snapshot?.freshness === "current" && i.snapshot.materials).length }), "text/html; charset=utf-8"); return;
+        response.writeHead(302, { location: "/status", "cache-control": "no-store" }); response.end(); return;
       }
       if (request.method === "GET" && url.pathname === "/interviews") {
-        const items = await readInterviewBoard({ trackerPath: options.trackerPath,
-          profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") });
+        const items = await readInterviewBoard(interviewPaths);
         send(response, 200, withInterviewRequests(renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
           url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all"), (await readApplicationTracker(options.trackerPath)).applications, url.searchParams.get("interview") ?? ""), "text/html; charset=utf-8");
         return;
@@ -403,13 +421,16 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
       if (request.method === "POST" && url.pathname === "/api/tasks") {
         if (!options.tasks) throw new Error("runner_unavailable");
         const body = await readJson(request, true);
-        if (options.workspaceRoot && options.tasks.mode === "codex" && body.action === "prepare") {
-          const context = await readProfileEditor(workspaceRoot);
-          if (typeof body.resumeCategory !== "string" || !context.availableResumeCategories.includes(body.resumeCategory)) throw new Error("invalid_request");
-        }
+        if (options.workspaceRoot && options.tasks.mode === "codex" && body.action === "prepare" && !options.tasks.paths.matchingPaths) throw new Error("matching_resume_required");
         const tasks = await options.tasks.enqueue(body);
         send(response, 202, JSON.stringify({ tasks }), "application/json; charset=utf-8");
         return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/demo/interviews") {
+        if (options.tasks?.mode !== "demo") throw new Error("demo_interview_unavailable");
+        const body = await readJson(request, true);
+        const result = await linkDemoInterview(interviewPaths, body);
+        send(response, 200, JSON.stringify(result), "application/json; charset=utf-8"); return;
       }
       if (request.method === "POST" && url.pathname === "/api/review/reopen") {
         const body = await readJson(request, true);

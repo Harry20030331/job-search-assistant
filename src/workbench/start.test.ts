@@ -19,7 +19,7 @@ async function candidate(){const base=await temporary(),root=join(base,"candidat
 const post=(url:string,body:unknown,origin=new URL(url).origin)=>fetch(url,{method:"POST",headers:{"content-type":"application/json",origin},body:JSON.stringify(body)});
 test("welcome starts without selecting or writing candidate data; new setup is isolated and idempotent",async()=>{
  const root=await temporary();const s=await startWorkbench(root,{temporaryRoots:[]});servers.push(s);const base=new URL(s.address).origin;
- expect(await(await fetch(s.address)).text()).toContain("Application<br>workspace");expect(await readdir(root)).toEqual([]);
+ expect(await(await fetch(s.address)).text()).toContain("Create profile");expect(await readdir(root)).toEqual([]);
  expect(await(await fetch(base+"/existing")).text()).toContain("No saved search results");
  const input={requestId:randomUUID(),fullName:fields.fullName,email:fields.email,summary:fields.summary,skills:"Research",institution:"Example School",degree:"BS",company:"",title:"",directions:"Research",locations:"",preferences:"Remote roles",confirmed:true};
  expect((await post(base+"/api/start/new",input,"https://attacker.invalid")).status).toBe(403);
@@ -70,3 +70,55 @@ test("profile endpoints enforce origin, strict JSON, consent, body limits and di
 test("profile scripts remain valid and escape untrusted candidate content",async()=>{const root=await candidate();const state=await readProfileEditor(root);state.candidate.summary="</script><script>untrusted()</script>";const html=renderProfilePage(state);for(const match of html.matchAll(/<script>([\s\S]*?)<\/script>/g))expect(()=>new Script(match[1]!)).not.toThrow();expect(html).not.toContain("<script>untrusted()</script>")});
 
 test("fictional examples execute local Apply tasks without dispatching to the connected chat",async()=>{const root=await temporary();const server=await startWorkbench(root,{temporaryRoots:[],chat:{version:1,threadId:randomUUID(),executable:"missing-fictional-chat-executable"}});servers.push(server);const base=new URL(server.address).origin;const response=await fetch(base+"/api/start/example",{method:"POST",headers:{origin:base}});const selected=await response.json();const address=new URL(selected.url).origin;const request=await post(address+"/api/tasks",{action:"prepare",mode:"demo",requestId:randomUUID(),jobIds:["alex-nooks-311d6e70"]});expect(request.status).toBe(202);await expect.poll(async()=>{const state=await(await fetch(address+"/api/tasks")).json();return state.tasks[0]?.state},{interval:10,timeout:2000}).toBe("needs_review");const state=await(await fetch(address+"/api/tasks")).json();expect(state.tasks[0].chatDelivery).toBeUndefined()});
+
+test("a confirmed single-user workspace reopens directly on Status after restart; examples never replace it",async()=>{
+ const root=await temporary();let server=await startWorkbench(root,{temporaryRoots:[]});servers.push(server);
+ const base=new URL(server.address).origin;
+ expect(await(await fetch(server.address)).text()).toContain("Create profile");
+ expect(await readdir(root)).toEqual([]);
+ const input={requestId:randomUUID(),fullName:"Fictional Persistent User",email:"persistent@fictional.invalid",summary:fields.summary,skills:"Research",institution:"Example School",degree:"BS",company:"",title:"",directions:"Research",locations:"",preferences:"Remote roles",confirmed:true};
+ const initial=await(await post(base+"/api/start/new",input)).json();expect(new URL(initial.url).pathname).toBe("/profile");
+ const pointer=await readFile(join(root,"local/active-workspace.json"),"utf8");
+ const demo=await fetch(base+"/api/start/example",{method:"POST",headers:{origin:base}});expect(demo.status).toBe(200);
+ expect(await readFile(join(root,"local/active-workspace.json"),"utf8")).toBe(pointer);
+ await servers.pop()!.close();server=await startWorkbench(root,{temporaryRoots:[]});servers.push(server);
+ const reopened=await fetch(server.address);expect(new URL(reopened.url).pathname).toBe("/status/us");expect(await reopened.text()).toContain("<h1>Applications</h1>");
+ const restored=JSON.parse(await readFile(join(root,"local/active-workspace.json"),"utf8"));
+ await servers.pop()!.close();await rm(restored.workspace,{recursive:true});server=await startWorkbench(root,{temporaryRoots:[]});servers.push(server);
+ expect(await(await fetch(server.address)).text()).toContain("Restore your workspace");
+ expect(await readdir(join(root,"local/workspaces"))).toHaveLength(1); // Only the explicitly opened fictional example remains.
+});
+
+
+test("flexible website preferences clear only requested filters and survive reload without manual job titles",async()=>{
+ const root=await candidate(),before=await readProfileEditor(root);
+ const after=await saveWebsitePreferences(root,{token:before.token,directions:["Stale direction"],flexibleDirection:true,locations:["Stale city"],flexibleLocation:true,workModes:["remote"],feedback:""});
+ expect(after.policy?.rules.categories).toEqual([]);expect(after.policy?.rules.locations).toEqual([]);
+ expect(after.policy?.rules.excludedCompanies).toEqual(before.policy?.rules.excludedCompanies);
+ expect(after.candidate).toEqual(before.candidate);expect(after.manifest).toEqual(before.manifest);
+ expect((await readProfileEditor(root)).policy?.rules.categories).toEqual([]);
+ const html=renderProfilePage(after);expect(html).toContain('name="flexibleDirection"');expect(html).toContain('name="flexibleLocation"');expect(html).toContain('No job titles needed.');
+ for(const script of html.matchAll(/<script>([\s\S]*?)<\/script>/g))expect(()=>new Script(script[1]!)).not.toThrow();
+ await expect(saveWebsitePreferences(root,{token:after.token,directions:[],flexibleDirection:false,locations:[],flexibleLocation:true,workModes:["remote"],feedback:""})).rejects.toThrow("preference_direction_required");
+ await expect(saveWebsitePreferences(root,{token:after.token,directions:["Research"],locations:[],flexibleLocation:false,workModes:["remote"],feedback:""})).rejects.toThrow("preference_location_required");
+ const specific=await saveWebsitePreferences(root,{token:after.token,directions:["Research"],flexibleDirection:false,locations:["Example City"],flexibleLocation:false,workModes:["hybrid"],feedback:"Specific scope"});
+ expect(specific.policy?.rules.categories).toEqual(["Research"]);expect(specific.policy?.rules.locations).toEqual(["Example City"]);
+});
+
+test("preferences HTTP accepts multiline feedback longer than 2000 characters and reports actionable field errors",async()=>{
+ const root=await candidate(),paths=workspaceMatchingPaths(root);
+ const server=await startReviewServer({trackerPath:paths.opportunities,jobsPath:paths.opportunities,reviewPath:join(root,"data/drafts"),workspaceRoot:root,port:0});servers.push(server);
+ const initial=await readProfileEditor(root),feedback="Remote roles\n\n"+"Fictional preference detail. ".repeat(100);
+ const input={token:initial.token,directions:[],flexibleDirection:true,locations:[],flexibleLocation:true,workModes:["remote"],feedback};
+ const response=await post(server.address+"/api/preferences",input);expect(response.status).toBe(200);
+ const saved=await response.json();expect(saved.policy.feedback.at(-1).text).toBe(feedback.trim());
+ expect(saved.policy.rules.categories).toEqual([]);expect(saved.policy.rules.excludedCompanies).toEqual(initial.policy?.rules.excludedCompanies);
+ expect(saved.candidate).toEqual(initial.candidate);expect(saved.manifest).toEqual(initial.manifest);
+ expect((await readProfileEditor(root)).policy?.feedback.at(-1)?.text).toBe(feedback.trim());
+ const before=await readFile(paths.preferences,"utf8");
+ for(const [patch,error] of [[{feedback:"x".repeat(20001)},"preference_feedback_too_long"],[{workModes:[]},"preference_work_mode_required"],[{flexibleDirection:false},"preference_direction_required"],[{flexibleLocation:false},"preference_location_required"]] as const){
+  const rejected=await post(server.address+"/api/preferences",{...input,token:saved.token,...patch});expect(rejected.status).toBe(400);expect(await rejected.json()).toEqual({ok:false,error});
+ }
+ expect(await readFile(paths.preferences,"utf8")).toBe(before);
+ expect((await post(server.address+"/api/preferences",input)).status).toBe(409);
+});

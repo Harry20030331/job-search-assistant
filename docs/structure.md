@@ -39,7 +39,7 @@ The source workflow's private archive and runtime are excluded. Inert regional a
 
 See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contract](ui-contract.md), and [workflow contract](workflow-contract.md).
 
-Ignored `local/search-workspaces.json` indexes known workspace paths only; it is not a second job store. Matching intake and fictional workspace creation register paths for resume discovery. See [saved searches](workspaces.md).
+Ignored `local/active-workspace.json` stores only the explicitly confirmed/resumed real user path for direct Status startup; fictional examples never update it. Ignored `local/search-workspaces.json` indexes known workspace paths only; it is not a second job store. Matching intake and fictional workspace creation register paths for resume discovery. See [saved searches](workspaces.md).
 
 ## Example and local workspace
 

@@ -4,11 +4,11 @@ import { beginIntakeRequest, readIntakeRequest, reviseIntakeRequest, confirmInta
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { randomUUID } from "node:crypto";
-import { mkdir, realpath } from "node:fs/promises";
+import { mkdir, realpath, readFile, rename } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
 import { listMatchingWorkspaces } from "../matching/workspaces.js";
-import { createMatchingWorkspace, createExampleSearchWorkspace } from "../matching/intake.js";
+import { workspaceMatchingPaths, createMatchingWorkspace, createExampleSearchWorkspace } from "../matching/intake.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
 import { startReviewServer, type RunningReviewServer } from "../review/reviewServer.js";
 import { ApplicationTaskService, demoTaskExecutor } from "../review/applicationTasks.js";
@@ -18,7 +18,7 @@ import { writePrivateFile } from "../storage/privateFiles.js";
 import { page as workspacePage, escapeText } from "./views.js";
 
 function page(...args: Parameters<typeof workspacePage>) {
-  return workspacePage(...args).replace(/<header[\s\S]*?<\/header>/, '<header class="workspace-top"><a class="workspace-brand" href="/welcome">Application workspace</a><nav aria-label="Primary"><a href="/welcome" aria-current="page">Home</a></nav></header>')
+  return workspacePage(...args).replace("<body>", '<body class="welcome-shell">').replace(/<header[\s\S]*?<\/header>/, '<header class="workspace-top"><a class="workspace-brand" href="/welcome">BeyondAutofill</a><nav aria-label="Primary"><a href="/welcome" aria-current="page">Home</a></nav></header>')
     .replace('</body>', `<script>for(const form of document.querySelectorAll('form[method="post"]'))form.addEventListener('submit',async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;let message=form.querySelector('[role=status]');if(!message){message=document.createElement('p');message.setAttribute('role','status');form.append(message)}message.textContent='Opening your workspace…';try{const r=await fetch(form.action,{method:'POST',body:new URLSearchParams(new FormData(form))});const d=await r.json();if(!r.ok)throw Error(d.message||'Could not open this workspace.');location.assign(d.url)}catch(e){message.textContent=e.message;button.disabled=false}});</script></body>`);
 }
 
@@ -28,31 +28,46 @@ function welcome() {
     '<path d="M3 7V5h6l2 2h10v13H3z"/>',
     '<path d="M14 3H5v18h14V8zM14 3v5h5M8 13h8M8 17h6"/>'
   ];
-  return page("Welcome", "home", `<section class="welcome-page"><h1>Application<br>workspace</h1><div class="welcome-options">${[["/new","New candidate"],["/existing","Continue a search"],["/example","Try example"]].map(([url,label],i)=>`<a class="welcome-option" href="${url}"><span class="welcome-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[i]}</svg></span><span>${label}</span><span class="option-arrow" aria-hidden="true">→</span></a>`).join("")}</div></section>`);
+  const options = [
+    ["/new", "New candidate", "Build a profile and find roles that fit.", "Get started"],
+    ["/existing", "Continue a search", "Pick up where you left off.", "Open saved searches"],
+    ["/example", "Try example", "Explore the workflow with a fictional candidate.", "Explore example"]
+  ];
+  return page("Welcome", "home", `<section class="welcome-page"><div class="welcome-copy"><div class="welcome-tag"><span aria-hidden="true"></span>From first search to next chapter</div><h1>Your next role.<br>A clearer path.</h1><p class="welcome-intro">Find the right opportunities, give every application your best, and walk into interviews prepared.</p><div class="journey" aria-label="Your application journey"><span>Discover</span><i aria-hidden="true"></i><span>Apply</span><i aria-hidden="true"></i><span>Prepare</span></div><p class="welcome-note">Your search, with you in control.</p></div><div class="welcome-options">${options.map(([url,label,description,action],i)=>`<a class="welcome-option" href="${url}"><span class="welcome-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[i]}</svg></span><span class="welcome-option-copy"><strong>${label}</strong><span>${description}</span><span class="welcome-action">${action}<span aria-hidden="true"> ↗</span></span></span></a>`).join("")}</div></section>`);
 }
 /** A candidate-free launch page. Explicit selection alone opens a candidate service. */
 export async function startWorkbench(repository: string, options: { port?: number; chat?: ChatTaskConfig; temporaryRoots?: string[] } = {}) {
   const registry = join(repository, "local/search-workspaces.json");
-  const running = new Map<string, { server: RunningReviewServer; tasks?: ApplicationTaskService }>();
+  const activePath = join(repository, "local/active-workspace.json");
+  const running = new Map<string, { server: RunningReviewServer; tasks?: ApplicationTaskService; real: boolean }>();
   const opening = new Map<string, Promise<string>>();
   const creations = new Map<string, Promise<string>>();
   const choices = new Map<string, string>();
+  async function rememberActive(root: string) {
+    await mkdir(join(repository, "local"), { recursive: true, mode: 0o700 });
+    const temporary = join(repository, "local", `.${randomUUID()}.tmp`);
+    await writePrivateFile(temporary, JSON.stringify({ version: 1, workspace: root, selectedAt: new Date().toISOString() }));
+    await rename(temporary, activePath);
+  }
   async function open(workspace: string) {
     const root = await realpath(workspace);
-    if (running.has(root)) return running.get(root)!.server.address + "/profile";
+    if (running.has(root)) { if (running.get(root)!.real) await rememberActive(root); return running.get(root)!.server.address + "/profile"; }
     if (opening.has(root)) return opening.get(root)!;
     const promise = (async () => {
       const inputs = await resolveRecoveryInputs(root);
       const candidate = await loadCandidateProfile(join(root, "data/candidate.json"));
       const email = String((candidate.contact as { email?: string })?.email ?? "");
       const mode = candidate.fictional === true || /@(?:.*\.)?example\.(com|org|net)$/i.test(email) ? "demo" : "codex";
-      const tasks = options.chat || mode === "demo" ? new ApplicationTaskService({ ...inputs, taskPath: join(root,"data/application-tasks.json") }, mode,
+      const tasks = options.chat || mode === "demo" ? new ApplicationTaskService({ ...inputs, taskPath: join(root,"data/application-tasks.json"), matchingPaths: workspaceMatchingPaths(root) }, mode,
         mode === "demo" ? demoTaskExecutor : async () => { throw new Error("runner_unavailable"); }, mode === "codex" && options.chat ? createChatTaskDispatcher(root, options.chat) : undefined) : undefined;
       await tasks?.start();
       try {
         if (options.chat) await writePrivateFile(join(root,"data/chat-runner.json"),JSON.stringify(options.chat));
         const selectedServer = await startReviewServer({ ...inputs, port: 0, profilePath: join(root,"data/candidate.json"), workspaceRoot: root, repositoryRoot: repository, welcomeUrl: `http://127.0.0.1:${(server.address() as AddressInfo).port}/welcome`, searchRefresh: { automatic: mode === "codex", ...(mode === "demo" ? { pausedReason: "Demo · automatic updates paused." } : {}) }, tasks });
-        running.set(root, { server: selectedServer, tasks }); return selectedServer.address + "/profile";
+        try { if (mode === "codex") await rememberActive(root); }
+        catch (error) { await selectedServer.close(); throw error; }
+        running.set(root, { server: selectedServer, tasks, real: mode === "codex" });
+        return selectedServer.address + "/profile";
       } catch(error) { await tasks?.close(); throw error; }
     })();
     opening.set(root,promise);
@@ -69,7 +84,19 @@ export async function startWorkbench(repository: string, options: { port?: numbe
       if (![ `127.0.0.1:${address.port}`, `localhost:${address.port}` ].includes(request.headers.host ?? "")) {send(403,"Invalid host");return;}
       if(request.method==="POST" && (request.headers["sec-fetch-site"] === "cross-site" || request.headers.origin !== `http://${request.headers.host}`)){send(403,"Invalid origin");return;}
       if (request.method === "GET" && url.pathname === "/assets/InterVariable.woff2") { await serveWorkspaceFont(response); return; }
-      if(request.method==="GET" && ["/","/welcome"].includes(url.pathname)){send(200,welcome());return;}
+      if (request.method === "GET" && url.pathname === "/") {
+        let active: { version: 1; workspace: string } | undefined;
+        try { active = z.object({ version: z.literal(1), workspace: z.string().min(1), selectedAt: z.string().datetime() }).strict().parse(JSON.parse(await readFile(activePath, "utf8"))); }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") { send(200, page("Restore workspace", "home", '<h1>Restore your workspace</h1><p class="intro">Your saved workspace could not be read. Choose your existing search to reconnect it.</p><a class="primary" href="/existing">Restore saved search</a>')); return; }
+        }
+        if (active) {
+          try { const target = (await open(active.workspace)).replace(/\/profile$/, "/status"); response.writeHead(302, { location: target, "cache-control": "no-store" }); response.end(); }
+          catch { send(200, page("Restore workspace", "home", '<h1>Restore your workspace</h1><p class="intro">Your saved workspace is unavailable. Reconnect your existing search to continue.</p><a class="primary" href="/existing">Restore saved search</a>')); }
+        } else send(200, renderNewCandidate());
+        return;
+      }
+      if(request.method==="GET" && url.pathname==="/welcome"){send(200,welcome());return;}
       if(request.method==="GET" && url.pathname==="/new"){send(200,renderNewCandidate());return;}
       const intakeMatch = /^\/api\/intake\/([0-9a-f-]{36})(?:\/(revise|confirm))?$/.exec(url.pathname);
       if (request.method === "GET" && intakeMatch && !intakeMatch[2]) {
@@ -118,11 +145,11 @@ export async function startWorkbench(repository: string, options: { port?: numbe
       send(404,"Not found");
     } catch(error) {
       const code = error instanceof Error ? error.message : "request_failed";
-      const publicCodes = new Set(["runner_unavailable", "invalid_pdf", "linkedin_profile_url_required", "intake_request_changed", "intake_preview_required", "intake_location_required"]);
+      const publicCodes = new Set(["runner_unavailable", "invalid_pdf", "linkedin_profile_url_required", "intake_request_changed", "intake_preview_required", "intake_location_required", "intake_direction_required"]);
       if (publicCodes.has(code)) { send(code === "runner_unavailable" ? 503 : code === "intake_request_changed" ? 409 : 422, JSON.stringify({ error: code }), "application/json; charset=utf-8"); return; }
       send((error as NodeJS.ErrnoException).code === "ENOENT" ? 404 : 400, JSON.stringify({ message: code === "matching_background_required" ? "Add an education or experience entry to continue." : "Could not open this request. Check your input or choose another background source." }), "application/json; charset=utf-8");
     }
   });
   await new Promise<void>((resolve,reject)=>{server.once("error",reject);server.listen(options.port??0,"127.0.0.1",resolve)});
-  return { address:`http://127.0.0.1:${(server.address() as AddressInfo).port}/welcome`, async close(){await Promise.all([...running.values()].map(async r=>{await r.tasks?.close();await r.server.close()}));await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()))} };
+  return { address:`http://127.0.0.1:${(server.address() as AddressInfo).port}/`, async close(){await Promise.all([...running.values()].map(async r=>{await r.tasks?.close();await r.server.close()}));await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()))} };
 }

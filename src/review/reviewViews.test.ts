@@ -524,8 +524,8 @@ describe("review console views", () => {
 
     expect(html).toContain('href="https://jobs.ashbyhq.com/notion/1/application?from=status&amp;step=final"');
     expect(html).toContain("01 ↗");
-    expect(html).toContain("Notion · San Francisco");
-    expect(html).toMatch(/Notion · San Francisco[\s\S]*Software Engineer, Early Career \(AI\)/);
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">San Francisco</div>');
+    expect(html).toMatch(/Notion<\/div><div class="row-location">San Francisco[\s\S]*Software Engineer, Early Career \(AI\)/);
     expect(html).toContain("LLM");
     expect(html).toContain("In Review");
     expect(html).toContain("08-07");
@@ -547,7 +547,7 @@ describe("review console views", () => {
     }]));
 
     expect(html).toContain('href="https://example.com/jobs/gm-ml-validation?view=official"');
-    expect(html).toContain("General Motors · Sunnyvale");
+    expect(html).toContain('<div class="company-line">General Motors</div><div class="row-location">Sunnyvale</div>');
     expect(html).toContain('data-status="shortlisted"');
     expect(html).toContain('class="job-select"');
     expect(html).toContain('<time datetime="2026-08-07T00:00:00.000Z" aria-label="Updated 08-07">08-07</time>');
@@ -617,7 +617,7 @@ describe("review console views", () => {
     } as unknown as ApplicationRecord;
     const html = renderStatusPage(buildStatusView([unsafe], []));
     expect(html).toContain('href="#"');
-    expect(html).toContain("&lt;script&gt;alert(&quot;company&quot;)&lt;/script&gt; · New York");
+    expect(html).toContain('&lt;script&gt;alert(&quot;company&quot;)&lt;/script&gt;</div><div class="row-location">New York');
     expect(html).toContain("Research &amp; Development");
     expect(html).not.toContain('<script>alert("company")</script>');
   });
@@ -635,14 +635,14 @@ describe("review console views", () => {
     ];
     const html = renderStatusPage(buildStatusView(applications, []));
 
-    expect(html).toContain('<div class="company-line">Notion · San Francisco</div>');
-    expect(html).toContain('<div class="company-line">Notion · New York / Seattle</div>');
-    expect(html).toContain('<div class="company-line">Notion · Washington</div>');
-    expect(html).toContain('<div class="company-line">Notion · San Juan</div>');
-    expect(html).toContain('<div class="company-line">Notion · Pago Pago</div>');
-    expect(html).toContain('<div class="company-line">Notion · Remote, US</div>');
-    expect(html).toContain('<div class="company-line">Notion · London, UK</div>');
-    expect(html).toContain('<div class="company-line">Notion · Fictional, ZZ</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">San Francisco</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">New York / Seattle</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">Washington</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">San Juan</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">Pago Pago</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">Remote, US</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">London, UK</div>');
+    expect(html).toContain('<div class="company-line">Notion</div><div class="row-location">Fictional, ZZ</div>');
   });
 
   test("keeps tracked rows read-only without repeated review links", () => {

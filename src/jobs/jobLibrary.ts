@@ -1,3 +1,4 @@
+import { resumeRecommendationSchema } from "../matching/resumeRecommendation.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { isOpportunityPath, readOpportunities, projectJobs, mergeJobs, transactOpportunities } from "../storage/opportunities.js";
 import { randomUUID } from "node:crypto";
@@ -23,6 +24,7 @@ const recordSchema = z.object({
   firstSeen: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   lastVerified: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   status: z.enum(jobStatuses),
+  resumeRecommendation: resumeRecommendationSchema.optional(),
   note: z.string().refine((value) => !/[\r\n]/.test(value))
 }).strict();
 
@@ -177,6 +179,7 @@ export async function writeJobLibrary(path: string, records: JobRecord[]): Promi
     await transactOpportunities(path, document => mergeJobs(document, records.map(record => validateRecord(record, "invalid_job_library"))));
     return;
   }
+  if (records.some(record => record.resumeRecommendation)) throw new Error("resume_recommendation_requires_opportunity_storage");
   const validated = records.map((record) => validateRecord(record, "invalid_job_library"));
   validated.sort((left, right) => right.firstSeen.localeCompare(left.firstSeen) || left.company.localeCompare(right.company));
   const content = `${jobLibraryHeader}\n${validated.map(serializeRecord).join("\n")}${validated.length > 0 ? "\n" : ""}`;

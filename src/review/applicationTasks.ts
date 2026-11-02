@@ -1,3 +1,5 @@
+import { matchingContext, type MatchingPaths } from "../matching/matching.js";
+import { runPreflight } from "../preflight.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdir, readFile, rename } from "node:fs/promises";
@@ -16,7 +18,7 @@ export const taskRequestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("submit"), requestId: z.string().uuid(), mode: z.enum(["demo", "codex"]), selections: z.array(selectionSchema).min(1).max(25) }).strict()
 ]);
 export type TaskRequest = z.infer<typeof taskRequestSchema>;
-const targetSchema = selectionSchema.extend({ applicationId: z.string(), snapshotId: z.string(), jobId: z.string(), company: z.string(), title: z.string(), contentHash: z.string(), resumeCategory: z.string().min(1).optional() });
+const targetSchema = selectionSchema.extend({ applicationId: z.string(), snapshotId: z.string(), jobId: z.string(), company: z.string(), title: z.string(), contentHash: z.string(), resumeCategory: z.string().min(1).optional(), resumeSha256: z.string().regex(/^[a-f0-9]{64}$/i).optional() });
 const taskSchema = z.object({
   id: z.string().uuid(), requestId: z.string().uuid(), action: z.enum(["prepare", "submit"]),
   mode: z.enum(["demo", "codex"]), target: targetSchema,
@@ -27,7 +29,7 @@ const taskSchema = z.object({
 });
 const documentSchema = z.object({ version: z.literal(1), tasks: z.array(taskSchema) }).strict();
 export type ApplicationTask = z.infer<typeof taskSchema>;
-export interface TaskPaths { reviewPath: string; trackerPath: string; jobsPath: string; taskPath: string }
+export interface TaskPaths { reviewPath: string; trackerPath: string; jobsPath: string; taskPath: string; matchingPaths?: MatchingPaths }
 export interface ChatTaskDispatcher { threadId: string; send(tasks: ApplicationTask[]): Promise<string> }
 export type TaskExecutor = (task: ApplicationTask, paths: TaskPaths, signal: AbortSignal) => Promise<string>;
 export function reviewContentHash(item: ReviewItem): string {
@@ -88,6 +90,15 @@ export async function consumeWebsiteTask(paths: TaskPaths, taskId: string,
   return { source: "website", reference: `website-task:${task.id}`, approvedAt: task.createdAt };
 }
 
+async function assertPreparationResume(task: ApplicationTask, paths: TaskPaths): Promise<void> {
+  if (task.action !== "prepare" || !task.target.resumeSha256) return;
+  const selected = paths.matchingPaths ?? { profile: join(dirname(paths.trackerPath), "candidate.json"), manifest: join(dirname(paths.trackerPath), "resumes.json") };
+  const job = (await readJobLibrary(paths.jobsPath)).find(item => item.jobId === task.target.jobId);
+  if (!job || !task.target.resumeCategory) throw new Error("matching_resume_required");
+  const checked = await runPreflight({ category: task.target.resumeCategory, jobUrl: job.officialUrl, profilePath: selected.profile, manifestPath: selected.manifest });
+  if (checked.cvSha256 !== task.target.resumeSha256) throw new Error("matching_resume_changed");
+}
+
 export class ApplicationTaskService {
   private active?: Promise<void>;
   private stopped = false;
@@ -127,12 +138,13 @@ export class ApplicationTaskService {
       if (duplicate.length) {
         const expected = request.action === "prepare" ? request.jobIds : request.selections.map(s => JSON.stringify(s));
         const actual = duplicate.map(t => request.action === "prepare" ? t.target.jobId : JSON.stringify({ applicationId: t.target.applicationId, snapshotId: t.target.snapshotId, revision: t.target.revision }));
-        if (duplicate.some(t => t.action !== request.action || t.mode !== request.mode || (request.action === "prepare" && t.target.resumeCategory !== request.resumeCategory)) || JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("invalid_request");
+        if (duplicate.some(t => t.action !== request.action || t.mode !== request.mode || (request.action === "prepare" && request.resumeCategory !== undefined && t.target.resumeCategory !== request.resumeCategory)) || JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error("invalid_request");
         return duplicate;
       }
       const [jobs, tracker, review] = await Promise.all([readJobLibrary(this.paths.jobsPath), readApplicationTracker(this.paths.trackerPath), readReviewBatch(this.paths.reviewPath)]);
       const targets: ApplicationTask["target"][] = [];
       if (request.action === "prepare") {
+        const context = this.paths.matchingPaths ? await matchingContext(this.paths.matchingPaths) : undefined;
         for (const jobId of request.jobIds) {
           const record = tracker.applications.find(a => a.jobId === jobId);
           const job = jobs.find(j => j.jobId === jobId && !["closed", "submitted"].includes(j.status) && (record || ["ready", "new"].includes(j.status)) && !j.note.startsWith("user-excluded:"));
@@ -140,7 +152,20 @@ export class ApplicationTaskService {
           if (record && request.resumeCategory && record.category !== request.resumeCategory) throw new Error("task_target_unavailable");
           const existing = review.applications.find(i => i.applicationId === record?.applicationId);
           if (existing && ["approved", "consumed"].includes(existing.decision.state)) throw new Error("task_target_unavailable");
-          targets.push({ ...(request.resumeCategory ? { resumeCategory: request.resumeCategory } : {}), jobId, applicationId: record?.applicationId ?? "", snapshotId: "", revision: 0, contentHash: "", company: job.company, title: job.title });
+          let resumeCategory = record?.category ?? request.resumeCategory;
+          let resumeSha256: string | undefined;
+          if (context && this.paths.matchingPaths && (this.mode === "codex" || job.resumeRecommendation)) {
+            const recommendation = job.resumeRecommendation;
+            if (!record) {
+              if (!recommendation || recommendation.status !== "matched" || !recommendation.profileKey) throw new Error("matching_resume_required");
+              if (recommendation.contextToken !== context.token || (resumeCategory && resumeCategory !== recommendation.profileKey)) throw new Error("matching_resume_changed");
+              resumeCategory = recommendation.profileKey;
+            }
+            const checked = await runPreflight({ category: resumeCategory!, jobUrl: job.officialUrl, profilePath: this.paths.matchingPaths.profile, manifestPath: this.paths.matchingPaths.manifest });
+            resumeSha256 = checked.cvSha256;
+            if (!record && recommendation?.sha256 !== resumeSha256) throw new Error("matching_resume_changed");
+          }
+          targets.push({ ...(resumeCategory ? { resumeCategory } : {}), ...(resumeSha256 ? { resumeSha256 } : {}), jobId, applicationId: record?.applicationId ?? "", snapshotId: "", revision: 0, contentHash: "", company: job.company, title: job.title });
         }
       } else {
         for (const selection of request.selections) {
@@ -216,6 +241,7 @@ export class ApplicationTaskService {
       await this.update(task.id, "running", task.action === "prepare" ? "Preparing application for review" : this.mode === "demo" ? "Running the local submission rehearsal" : "Verifying the reviewed application before submission");
       try {
         if (task.action === "submit") await assertTaskContent(task, this.paths);
+        else await assertPreparationResume(task, this.paths);
         const message = await this.execute(task, this.paths, this.controller.signal);
         if (this.stopped) throw new Error("Runner interrupted. Check the outcome before retrying.");
         const outcome = await completedTaskOutcome(task, this.paths, message);
@@ -266,6 +292,7 @@ export async function claimChatTask(paths: TaskPaths, taskId: string, threadId: 
     try {
       if (task.action === "submit") await assertTaskContent(task, paths);
       else {
+        await assertPreparationResume(task, paths);
         const job = (await readJobLibrary(paths.jobsPath)).find(item => item.jobId === task.target.jobId);
         if (!job || ["closed", "submitted"].includes(job.status) || job.note.startsWith("user-excluded:")) throw new Error("The selected job is no longer available.");
         const record = (await readApplicationTracker(paths.trackerPath)).applications.find(item => item.jobId === task.target.jobId);
@@ -320,7 +347,7 @@ export const demoTaskExecutor: TaskExecutor = async (task, paths) => {
   let record = tracker.applications.find(a => a.jobId === job.jobId);
   if (!record) record = await createApplication(paths.trackerPath, {
     applicationId: `demo-${randomUUID()}`, jobId: job.jobId, company: job.company, title: job.title, location: job.location,
-    ats: "long-tail", jobUrl: job.officialUrl, applicationUrl: job.officialUrl, category: job.category, cvFilename: "demo-resume.pdf"
+    ats: "long-tail", jobUrl: job.officialUrl, applicationUrl: job.officialUrl, category: task.target.resumeCategory ?? job.category, cvFilename: "demo-resume.pdf"
   });
   const existing = (await readReviewBatch(paths.reviewPath)).applications.find(i => i.applicationId === record!.applicationId);
   if (existing) return "Existing draft ready for review";

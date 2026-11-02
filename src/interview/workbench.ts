@@ -1,3 +1,5 @@
+import { readTasks, reviewContentHash } from "../review/applicationTasks.js";
+import { readReviewBatch } from "../review/reviewStore.js";
 import { resolveInterviewPython } from "./pythonRuntime.mjs";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { spawn } from "node:child_process";
@@ -23,8 +25,13 @@ const recordSchema = z.object({ interviewId: id, jobId: id, applicationId: id,
   state: z.enum(["invited", "scheduled", "completed", "cancelled"]), schedule: scheduleSchema.nullable(), association: provenanceSchema,
   expectedRevision: z.number().int().positive().nullable()
 }).strict().refine(value => value.state !== "scheduled" || value.schedule !== null, "scheduled_time_required");
+const demoSubmissionSchema = z.object({ taskId: z.string().uuid(), snapshotId: id,
+  revision: z.number().int().nonnegative(), contentHash: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
+const demoInterviewSchema = z.object({ jobId: id, applicationId: id, taskId: z.string().uuid(), snapshotId: id,
+  revision: z.number().int().nonnegative() }).strict();
 const entrySchema = z.object({ interviewId: id, jobId: id, applicationId: id,
   state: z.enum(["invited", "scheduled", "completed", "cancelled"]), schedule: scheduleSchema.nullable(), association: provenanceSchema,
+  demoSubmission: demoSubmissionSchema.optional(),
   revision: z.number().int().positive(), workspace: z.string().nullable(), updatedAt: z.string().datetime({ offset: true })
 }).strict();
 const registrySchema = z.object({ schemaVersion: z.literal(1), candidateAnchor: anchorSchema, entries: z.array(entrySchema) }).strict();
@@ -63,7 +70,7 @@ export interface InterviewBoardItem {
   company: string; role: string; location: string; officialUrl: string; applicationStage: string;
   snapshot: InterviewSnapshot | null; problem: string | null;
 }
-export interface WorkbenchPaths { trackerPath: string; profilePath: string; interviewPath?: string }
+export interface WorkbenchPaths { trackerPath: string; profilePath: string; interviewPath?: string; taskPath?: string; reviewPath?: string }
 const pythonRoot = resolve(dirname(fileURLToPath(import.meta.url)), "python");
 
 function stable(value: unknown): string {
@@ -87,7 +94,7 @@ async function registry(paths: WorkbenchPaths): Promise<Registry> {
   if (new Set(value.entries.map(entry => entry.interviewId)).size !== value.entries.length) throw new Error("duplicate_interview_identity");
   return value;
 }
-async function mutate<T>(paths: WorkbenchPaths, change: (value: Registry) => Promise<T>): Promise<T> {
+async function mutateLocked<T>(paths: WorkbenchPaths, change: (value: Registry) => Promise<T>): Promise<T> {
   const path = registryPath(paths);
   await mkdir(dirname(path), { recursive: true });
   const unlock = await acquireFileLock(path);
@@ -101,6 +108,52 @@ async function mutate<T>(paths: WorkbenchPaths, change: (value: Registry) => Pro
     return result;
   } finally { await unlock(); }
 }
+const registryQueues = new Map<string, Promise<unknown>>();
+async function mutate<T>(paths: WorkbenchPaths, change: (value: Registry) => Promise<T>): Promise<T> {
+  const key = registryPath(paths);
+  const operation = (registryQueues.get(key) ?? Promise.resolve()).catch(() => undefined).then(() => mutateLocked(paths, change));
+  registryQueues.set(key, operation);
+  try { return await operation; } finally { if (registryQueues.get(key) === operation) registryQueues.delete(key); }
+}
+
+async function assertDemoSubmission(paths: WorkbenchPaths, applicationId: string, binding: { taskId: string; snapshotId: string; revision: number; contentHash?: string }) {
+  const candidate = await loadCandidateProfile(paths.profilePath);
+  const email = String((candidate.contact as { email?: string })?.email ?? "");
+  if (candidate.fictional !== true && !/@(?:.*\.)?example\.(com|org|net)$/i.test(email)) throw new Error("demo_interview_unavailable");
+  const tasks = await readTasks(paths.taskPath ?? join(dirname(paths.trackerPath), "application-tasks.json"));
+  const task = tasks.find(task => task.id === binding.taskId && task.mode === "demo" && task.action === "submit" && task.state === "demo_complete" &&
+    task.target.applicationId === applicationId && task.target.snapshotId === binding.snapshotId && task.target.revision === binding.revision);
+  const draft = (await readReviewBatch(paths.reviewPath ?? join(dirname(paths.trackerPath), "drafts"))).applications.find(item => item.applicationId === applicationId);
+  if (!task || !draft || draft.snapshotId !== binding.snapshotId || (draft.desiredState?.revision ?? 0) !== binding.revision ||
+    draft.decision.state !== "approved" || draft.decision.scope !== "content-only" || task.target.contentHash !== reviewContentHash(draft) ||
+    (binding.contentHash !== undefined && task.target.contentHash !== binding.contentHash) ||
+    tasks.some(task => task.target.applicationId === applicationId && ["queued", "running"].includes(task.state))) throw new Error("demo_interview_changed");
+  return task;
+}
+
+/** A recording-only round derived from a completed local rehearsal; no recruiting evidence is fabricated. */
+export async function linkDemoInterview(paths: WorkbenchPaths, input: unknown) {
+  const command = demoInterviewSchema.parse(input);
+  return mutate(paths, async registry => {
+    const task = await assertDemoSubmission(paths, command.applicationId, command);
+    if (task.target.jobId !== command.jobId) throw new Error("demo_interview_changed");
+    const job = matchJob((await readOpportunities(paths.trackerPath)).opportunities, command.jobId, command.applicationId);
+    if (job.availability === "closed" || job.stage === "closed" || job.application?.hiddenFromStatus) throw new Error("demo_interview_changed");
+    const interviewId = "demo-status-" + sha256(task.id);
+    const existing = registry.entries.find(entry => entry.interviewId === interviewId);
+    if (existing) {
+      if (existing.jobId !== command.jobId || existing.applicationId !== command.applicationId || existing.demoSubmission?.taskId !== task.id) throw new Error("demo_interview_changed");
+      return { status: "demo_interview_linked", interviewId, jobId: command.jobId, applicationId: command.applicationId };
+    }
+    const at = new Date().toISOString();
+    registry.entries.push({ interviewId, jobId: command.jobId, applicationId: command.applicationId, state: "invited", schedule: null,
+      association: { source: "synthetic_test_script", reference: "Demo interview created by the Status button after local submission rehearsal " + task.id + ". No employer invitation, email or calendar action occurred.", verifiedAt: at },
+      demoSubmission: { taskId: task.id, snapshotId: command.snapshotId, revision: command.revision, contentHash: task.target.contentHash },
+      revision: 1, workspace: null, updatedAt: at });
+    return { status: "demo_interview_linked", interviewId, jobId: command.jobId, applicationId: command.applicationId };
+  });
+}
+
 function matchJob(jobs: Opportunity[], jobId: string, applicationId: string) {
   const job = jobs.find(item => item.jobId === jobId);
   if (!job?.application || job.application.applicationId !== applicationId) throw new Error("interview_application_not_found");
@@ -113,6 +166,7 @@ export async function linkInterview(paths: WorkbenchPaths, input: unknown) {
   if (Date.parse(record.association.verifiedAt) > Date.now()) throw new Error("future_interview_evidence");
   return mutate(paths, async value => {
     const existing = value.entries.find(entry => entry.interviewId === record.interviewId);
+    if (existing?.demoSubmission) throw new Error("demo_interview_changed");
     if ((existing?.revision ?? null) !== record.expectedRevision) throw new Error("interview_revision_conflict");
     if (existing && (existing.jobId !== record.jobId || existing.applicationId !== record.applicationId)) throw new Error("interview_identity_changed");
     const document = await readOpportunities(paths.trackerPath);
@@ -175,13 +229,17 @@ export async function readInterviewBoard(paths: WorkbenchPaths, exporter = expor
     let job: Opportunity;
     try { job = matchJob(jobs, entry.jobId, entry.applicationId); }
     catch { continue; } // Removed/reassigned applications never hydrate another candidate's detail.
+    if (entry.demoSubmission) {
+      try { await assertDemoSubmission(paths, entry.applicationId, entry.demoSubmission); }
+      catch { continue; } // Reopened or changed drafts cannot inherit an old demo transition.
+    }
     let snapshot: InterviewSnapshot | null = null, problem: string | null = null;
     if (entry.workspace) {
       try { snapshot = await exporter(entry.workspace); checkSnapshot(snapshot, entry, value.candidateAnchor, job); }
       catch { snapshot = null; problem = "The linked preparation run is unavailable or its identity changed. Reconnect it in chat."; }
     }
     result.push({ entry, company: job.company, role: job.title, location: job.location, officialUrl: job.officialUrl,
-      applicationStage: job.stage, snapshot, problem });
+      applicationStage: entry.demoSubmission ? "interviewing" : job.stage, snapshot, problem });
   }
   if (stable(await candidateAnchor(paths.profilePath)) !== stable(value.candidateAnchor)) throw new Error("interview_candidate_changed");
   return result.sort((a, b) => (a.entry.schedule?.start ?? "9999").localeCompare(b.entry.schedule?.start ?? "9999") || a.entry.interviewId.localeCompare(b.entry.interviewId));

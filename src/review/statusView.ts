@@ -1,10 +1,12 @@
+import type { InterviewBoardItem } from "../interview/workbench.js";
+import type { ResumeRecommendation } from "../matching/resumeRecommendation.js";
 import type { JobRecord } from "../jobs/jobLibrary.js";
 import type { ReviewBatch, ReviewItem } from "./reviewStore.js";
 import type { ApplicationTask } from "./applicationTasks.js";
 import type { ApplicationRecord } from "../tracker.js";
 
 export type StatusViewStatus = "shortlisted" | "preparing" | "submitting" | "submission_failed" | "rehearsal_complete" | ApplicationRecord["status"];
-export interface WorkflowContext { review: ReviewBatch; tasks: readonly ApplicationTask[]; mode?: "demo" | "codex" }
+export interface WorkflowContext { review: ReviewBatch; tasks: readonly ApplicationTask[]; mode?: "demo" | "codex"; demoInterviewEnabled?: boolean; demoInterviews?: readonly InterviewBoardItem[] }
 export const statusLabels: Record<StatusViewStatus, string> = {
   shortlisted: "Shortlisted", preparing: "Preparing…",
   in_review: "In Review", submitting: "Submitting…", submission_failed: "Submission failed",
@@ -24,7 +26,9 @@ function workflowStatus(jobId: string, fallback: StatusViewStatus, applicationId
   const tasks = context.tasks.filter(task => task.target.jobId === jobId);
   const active = tasks.find(task => ["queued", "running"].includes(task.state));
   if (active) return active.action === "prepare" ? "preparing" : "submitting";
-  if (draft && context.mode !== "codex" && tasks.some(task => task.action === "submit" && task.state === "demo_complete" && sameDraft(task, draft))) return "rehearsal_complete";
+  if (draft && context.mode !== "codex" && tasks.some(task => task.action === "submit" && task.state === "demo_complete" && sameDraft(task, draft))) {
+    return context.mode === "demo" && context.demoInterviews?.some(item => item.entry.applicationId === applicationId && item.entry.demoSubmission?.snapshotId === draft.snapshotId && item.entry.demoSubmission.revision === (draft.desiredState?.revision ?? 0)) ? "interviewing" : "rehearsal_complete";
+  }
   if (!draft) return "shortlisted";
   const latestSubmission = tasks.filter(task => task.action === "submit" && sameDraft(task, draft)).at(-1);
   return latestSubmission && ["blocked", "interrupted"].includes(latestSubmission.state) ? "submission_failed" : "in_review";
@@ -44,6 +48,11 @@ export interface StatusViewItem {
   screeningStatus?: "ready" | "new" | "closed";
   screeningNote?: string;
   preparationNeedsRetry?: boolean;
+  resumeRecommendation?: ResumeRecommendation;
+  resumeProfile?: string;
+  resumeStale?: boolean;
+  demoInterviewTarget?: { jobId: string; applicationId: string; taskId: string; snapshotId: string; revision: number };
+  interviewHref?: string;
 }
 
 export function buildStatusView(
@@ -61,6 +70,7 @@ export function buildStatusView(
       title: job.title,
       location: job.location,
       category: job.category,
+      ...(job.resumeRecommendation ? { resumeRecommendation: job.resumeRecommendation } : {}),
       href: job.officialUrl,
       status: job.status === "closed" ? "closed" : "shortlisted",
       screeningStatus: job.status as "ready" | "new" | "closed",
@@ -75,6 +85,7 @@ export function buildStatusView(
     title: application.title,
     location: application.location,
     category: directions.get(application.jobId) ?? application.category,
+    resumeProfile: application.category,
     href: application.applicationUrl ?? application.jobUrl,
     status: application.status,
     dateLabel: application.updatedAt.slice(5, 10),
@@ -85,6 +96,11 @@ export function buildStatusView(
     const status = workflowStatus(item.jobId, item.status, item.applicationId, context);
     const latestPreparation = context.tasks.filter(task => task.target.jobId === item.jobId && task.action === "prepare").at(-1);
     const retry = status === "shortlisted" && latestPreparation && ["blocked", "interrupted"].includes(latestPreparation.state);
-    return { ...item, status, ...(retry ? { preparationNeedsRetry: true } : {}) };
+    const draft = context.review.applications.find(draft => draft.applicationId === item.applicationId);
+    const submission = draft ? context.tasks.find(task => task.mode === "demo" && task.action === "submit" && task.state === "demo_complete" && sameDraft(task, draft)) : undefined;
+    const interview = context.mode === "demo" ? context.demoInterviews?.find(round => round.entry.applicationId === item.applicationId && round.entry.demoSubmission?.taskId === submission?.id) : undefined;
+    const target = context.mode === "demo" && context.demoInterviewEnabled && status === "rehearsal_complete" && submission && draft && draft.decision.state === "approved" && draft.decision.scope === "content-only"
+      ? { jobId: item.jobId, applicationId: draft.applicationId, taskId: submission.id, snapshotId: draft.snapshotId, revision: draft.desiredState?.revision ?? 0 } : undefined;
+    return { ...item, status, ...(target ? { demoInterviewTarget: target } : {}), ...(status === "interviewing" && interview ? { interviewHref: "/interviews?interview=" + encodeURIComponent(interview.entry.interviewId) } : {}), ...(retry ? { preparationNeedsRetry: true } : {}) };
   });
 }

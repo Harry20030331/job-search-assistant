@@ -9,10 +9,10 @@ import { parseReviewServerArgs } from "../cli/reviewServerCli.js";
 const roots: string[] = [], servers: RunningReviewServer[] = [];
 afterEach(async () => { await Promise.all(servers.splice(0).map(server => server.close())); await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
 
-test("all workspace pages have direct Home, Interview and Google connection navigation", () => {
-  for (const page of ["home", "status", "review", "interviews", "account"] as const) {
+test("all workspace pages have direct Status, Interview and Google connection navigation", () => {
+  for (const page of ["profile", "status", "review", "interviews", "account"] as const) {
     const header = workspaceHeader(page);
-    expect(header).toContain('href="/"'); expect(header).toContain('href="/interviews"'); expect(header).toContain('href="/settings/accounts"');
+    expect(header).toContain('href="/status"'); expect(header).toContain('href="/interviews"'); expect(header).toContain('href="/settings/accounts"');
     expect(header.match(/aria-current="page"/g)).toHaveLength(1);
   }
   const home = renderHomePage({ applications: 3, interviews: 2, pendingPlans: 1, practiceReady: 2 });
@@ -24,14 +24,14 @@ test("account setup uses Google authorization and session-CSRF signout rather th
   expect(page).toContain('name="csrf"'); expect(page).not.toContain('type="password"');
   expect(page).toContain("does not import your inbox automatically"); expect(page).toContain("does not revoke Google's saved grant");
 });
-test("server exposes home/account pages and fails safely without configured Google credentials", async () => {
+test("server opens Status by default and exposes account settings and fails safely without configured Google credentials", async () => {
   const root = await mkdtemp(join(tmpdir(), "workspace-home-")); roots.push(root);
   await mkdir(join(root, "drafts"));
   const tracker = join(root, "opportunities.json");
   await writeFile(tracker, JSON.stringify({ schemaVersion: 1, opportunities: [] }));
   await writeFile(join(root, "candidate.json"), JSON.stringify({ schemaVersion: 2, identity: { fullName: "Fictional Candidate" } }));
   const server = await startReviewServer({ trackerPath: tracker, jobsPath: tracker, reviewPath: join(root, "drafts"), port: 0 }); servers.push(server);
-  expect(await (await fetch(server.address + "/")).text()).toContain("<h1>Workspace</h1>");
+  expect(await (await fetch(server.address + "/")).text()).toContain("<h1>Applications</h1>");
   expect(await (await fetch(server.address + "/settings/accounts")).text()).toContain("Connect Google");
   const status = await (await fetch(server.address + "/google/status")).json();
   expect(status).toMatchObject({ connected: false, configured: false, account: null });

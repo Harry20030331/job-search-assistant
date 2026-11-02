@@ -18,7 +18,7 @@ If nothing was supplied, show `npm run matching -- sources`, inviting a designat
 
 ## Complete search inputs and confirm
 
-Collect a name/alias, education or experience, core skills, target roles with an explicit user-confirmed direction (not a closed occupational enum), locations/work modes, seniority, start timing and batch/company limits. Ask only for missing search-critical information in one concise question. Preserve unknown relocation, work-authorization and personal answers. Missing/unreadable sections are not explicit answers of none, not applicable or prefer not to disclose.
+Collect a name/alias, education or experience, core skills, a user-confirmed direction or explicit flexible-direction choice (no manually enumerated job titles required), specific or explicitly flexible locations, work modes, seniority, start timing and batch/company limits. Ask only for missing search-critical information in one concise question. Preserve unknown relocation, work-authorization and personal answers. Missing/unreadable sections are not explicit answers of none, not applicable or prefer not to disclose.
 
 Show an English summary of the facts and search constraints for confirmation. Already confirmed, explicitly selected inputs do not require duplicate confirmation. Do not infer facts from chat memory or treat the fictional example as the user's identity. For the distinction between search input and full application-required inputs, use [evaluation's candidate section](../../../docs/evaluation.md); full application completeness validation remains pending.
 

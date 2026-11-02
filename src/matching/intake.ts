@@ -12,7 +12,7 @@ import { jobDirectionSchema } from "../classification.js";
 
 const line = z.string().trim().min(1).max(2000);
 const rules = z.object({
-  categories: z.array(jobDirectionSchema).min(1),
+  categories: z.array(jobDirectionSchema),
   workModes: z.array(z.enum(["remote", "hybrid", "onsite"])).min(1),
   locations: z.array(line), excludedCompanies: z.array(line), excludedJobIds: z.array(line),
   limit: z.number().int().min(1).max(25), perCompany: z.number().int().min(1).max(25)
@@ -51,7 +51,7 @@ export async function createMatchingWorkspace(directory: string, input: unknown,
       _meta: { ...metadata, intake: { reference: parsed.reference, confirmedAt: new Date().toISOString() } }
     }, null, 2) + "\n", { mode: 0o600, flag: "wx" });
     await writeFile(paths.preferences, "# Candidate search preferences\n\n" + parsed.preferences + "\n", { mode: 0o600, flag: "wx" });
-    // Search needs an explicit category, but does not need an approved application attachment.
+    // An explicitly flexible direction uses an empty category filter; search needs no approved attachment.
     await writeFile(paths.manifest, "[]\n", { mode: 0o600, flag: "wx" });
     const initial = await matchingContext(paths);
     await saveMatchingPreferences(paths, { expectedToken: initial.token, initialRules: parsed.rules,

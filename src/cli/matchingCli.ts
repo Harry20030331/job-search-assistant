@@ -1,7 +1,8 @@
+import { publishJevMatchingRound, jevReadiness } from "../matching/jev.js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { matchingContext, publishMatchingRound, saveMatchingPreferences, type MatchingPaths } from "../matching/matching.js";
+import { matchingContext, saveMatchingPreferences, type MatchingPaths } from "../matching/matching.js";
 import { createExampleSearchWorkspace, createMatchingWorkspace, readIntakeFile, workspaceMatchingPaths } from "../matching/intake.js";
 import { backgroundSourcePrompt, matchingWelcome } from "../matching/welcome.js";
 import { listMatchingWorkspaces, rememberWorkspace } from "../matching/workspaces.js";
@@ -11,6 +12,10 @@ import { loadCandidateProfile } from "../profile.js";
 
 export async function runMatchingCli(args: string[]) {
   const [operation, ...rest] = args;
+  if (operation === "provider-status") {
+    if (rest.length) throw new Error("invalid_arguments");
+    return jevReadiness();
+  }
   if (operation === "sources") {
     if (rest.length) throw new Error("invalid_arguments");
     return backgroundSourcePrompt;
@@ -72,7 +77,7 @@ export async function runMatchingCli(args: string[]) {
   }
   if (!options.has("--input")) throw new Error("invalid_arguments");
   const input: unknown = JSON.parse(await readFile(resolve(options.get("--input")!), "utf8"));
-  return operation === "feedback" ? saveMatchingPreferences(paths, input) : publishMatchingRound(paths, input);
+  return operation === "feedback" ? saveMatchingPreferences(paths, input) : publishJevMatchingRound(paths, input);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

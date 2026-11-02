@@ -243,7 +243,7 @@ test("integrated navigation preserves the separate Apply and Submit controls", (
   const review = withWorkflowControls(renderReviewPage({ schemaVersion: 1, batchId: "navigation-test", createdAt: "2026-10-30T12:00:00Z", applications: [] }), "demo");
   const status = withWorkflowControls(renderUsStatusPage([]), "demo");
   for (const html of [review, status]) {
-    for (const path of ["/", "/review", "/status", "/interviews", "/settings/accounts"]) expect(html).toContain(`href="${path}"`);
+    for (const path of ["/profile", "/review", "/status", "/interviews", "/settings/accounts"]) expect(html).toContain(`href="${path}"`);
   }
   expect(review).toContain('id="submit-applications"');
   expect(review).not.toContain('id="run-selected"');
@@ -251,12 +251,10 @@ test("integrated navigation preserves the separate Apply and Submit controls", (
   expect(status).not.toContain('id="submit-applications"');
 });
 
-test("live website preparation requires explicit resume selection and escapes configured profile labels", () => {
+test("live website preparation uses per-job Matching results without a batch resume picker", () => {
   const html = withWorkflowControls('<html><head></head><body><header></header><main></main></body></html>', "codex", "", ["pm_general", '<script>bad</script>']);
-  expect(html).toContain('id="application-resume"');
-  expect(html).toContain("Choose an approved resume");
-  expect(html).toContain('&lt;script>bad&lt;/script>');
+  expect(html).not.toContain('id="application-resume"');
   expect(html).not.toContain('<script>bad</script>');
-  expect(html).toContain('resumeCategory:resumePicker.value');
-  expect(withWorkflowControls('<main></main>', "demo", "", ["pm_general"])).not.toContain('id="application-resume"');
+  expect(html).not.toContain('resumeCategory:resumePicker.value');
+  expect(html).toContain("resumeReady==='false'");
 });
