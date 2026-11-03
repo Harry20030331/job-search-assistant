@@ -353,10 +353,12 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
         response.writeHead(302, { location: "/status", "cache-control": "no-store" }); response.end(); return;
       }
       if (request.method === "GET" && url.pathname === "/interviews") {
-        const items = await readInterviewBoard(interviewPaths);
+        const applicationId = url.searchParams.get("application");
+        const items = (await readInterviewBoard(interviewPaths)).filter(item => !applicationId || item.entry.applicationId === applicationId);
+        const selectedInterviewId = url.searchParams.get("interview") ?? (applicationId ? items[0]?.entry.interviewId : undefined);
         const generatingPlanIds = (await interviewRequestHistory(workspaceRoot)).filter(request => request.action === "preparation" && ["delivered", "running"].includes(request.state)).map(request => request.interviewId);
-        send(response, 200, withInterviewRequests(renderInterviewPage(items, url.searchParams.get("interview") ?? undefined,
-          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all", generatingPlanIds), (await readApplicationTracker(options.trackerPath)).applications, url.searchParams.get("interview") ?? ""), "text/html; charset=utf-8");
+        send(response, 200, withInterviewRequests(renderInterviewPage(items, selectedInterviewId,
+          url.searchParams.get("view") ?? "overview", url.searchParams.get("filter") ?? "all", generatingPlanIds), (await readApplicationTracker(options.trackerPath)).applications.filter(item => !applicationId || item.applicationId === applicationId), selectedInterviewId ?? ""), "text/html; charset=utf-8");
         return;
       }
       if (request.method === "GET" && url.pathname === "/review") {

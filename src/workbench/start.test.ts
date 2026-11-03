@@ -25,7 +25,7 @@ test("welcome starts without selecting or writing candidate data; new setup is i
  expect((await post(base+"/api/start/new",input,"https://attacker.invalid")).status).toBe(403);
  const r=await post(base+"/api/start/new",input);expect(r.status).toBe(200);const result=await r.json();
  const repeat=await post(base+"/api/start/new",input);expect((await repeat.json()).url).toBe(result.url);
- const html=await(await fetch(result.url)).text();expect(html).toContain("Background & skills");expect(html).toContain('href="/interviews"');
+ const html=await(await fetch(result.url)).text();expect(html).toContain("Background & skills");expect(html).toContain('href="/settings/accounts"');
  const selected=new URL(result.url).origin;
  for(const path of ["/status/us","/review","/interviews"]){expect((await fetch(selected+path)).status).toBe(200)}
  expect(await readdir(join(root,"local/workspaces"))).toHaveLength(1);

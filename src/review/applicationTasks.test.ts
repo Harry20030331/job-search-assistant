@@ -172,7 +172,7 @@ test("approvals automatically form the submission batch without executing until 
   expect(statusHtml).not.toContain('id="submit-applications"');
   expect(statusHtml).not.toContain('class="job-select"');
   expect(statusHtml).not.toContain('Review answers');
-  expect(statusHtml).toContain('id="review-count"');
+  expect(statusHtml).not.toContain('id="review-count"');
   expect((await state()).tasks.map((task: {action: string}) => task.action)).toEqual(["prepare"]);
   const html = await (await fetch(server.address + "/review")).text();
   expect(html).not.toContain('class="submit-select"');

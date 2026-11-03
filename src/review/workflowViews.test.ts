@@ -21,7 +21,7 @@ test("both workflow variants contain valid scripts and show only unavailable run
       } else {
         expect(html).not.toContain('id="submit-applications"');
         expect(html).toContain('disabled>Apply ');
-        expect(html).toContain('id="review-count"');
+        expect(html).not.toContain('id="review-count"');
       }
     }
   }
@@ -243,7 +243,7 @@ test("integrated navigation preserves the separate Apply and Submit controls", (
   const review = withWorkflowControls(renderReviewPage({ schemaVersion: 1, batchId: "navigation-test", createdAt: "2026-10-30T12:00:00Z", applications: [] }), "demo");
   const status = withWorkflowControls(renderUsStatusPage([]), "demo");
   for (const html of [review, status]) {
-    for (const path of ["/profile", "/review", "/status", "/interviews", "/settings/accounts"]) expect(html).toContain(`href="${path}"`);
+    for (const path of ["/profile", "/status"]) expect(html).toContain(`href="${path}"`);
   }
   expect(review).toContain('id="submit-applications"');
   expect(review).not.toContain('id="run-selected"');

@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdir, readFile } from "node:fs/promises";
+import { link, mkdir, readFile, rm } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { writePrivateFile } from "../storage/privateFiles.js";
 import { join } from "node:path";
 import { z } from "zod";
@@ -24,8 +25,12 @@ export async function connectCurrentChat(root: string, environment: NodeJS.Proce
   if (!thread.success) return undefined;
   const config = configSchema.parse({ version: 1, threadId: thread.data, executable: environment.CODEX_CLI_PATH || "codex" });
   await mkdir(join(root, "data"), { recursive: true, mode: 0o700 });
-  try { await writePrivateFile(join(root, "data/chat-runner.json"), JSON.stringify(config), { flag: "wx" }); }
-  catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
+  const temporary = join(root, "data", `.chat-runner-${randomUUID()}.tmp`);
+  try {
+    await writePrivateFile(temporary, JSON.stringify(config), { flag: "wx" });
+    try { await link(temporary, join(root, "data/chat-runner.json")); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
+  } finally { await rm(temporary, { force: true }); }
   return readChatTaskConfig(root);
 }
 

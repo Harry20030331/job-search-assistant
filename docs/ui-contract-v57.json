@@ -1,0 +1,28 @@
+{
+  "version": 57,
+  "establishedAt": "2026-11-03",
+  "authorization": "User requested Profile/Status-only primary navigation, contextual Review/Interview tasks through Status, and Settings under Profile. User requested naming candidates before a rename; branding remains unchanged. No commit or push authorized.",
+  "validation": "591 tests across 56 files; TypeScript, boundary and distribution checks passed. Browser followed contextual review/interview and settings return flows, verified 20 route/width combinations with two primary links and no document overflow. Team v55/v56 interview behavior preserved. See docs/ui-redesign-v57.md.",
+  "files": {
+    "src/review/reviewViews.ts": "76c49fcfe135349f62102d42b19ab12eeaa79f1e9055ff740e1ac9c4e6dcd7c9",
+    "src/review/statusView.ts": "abdb5380ca9906d2b97833cb318157d46423aa7099ee1a51b624c2dbfd96b6c3",
+    "src/review/workflowViews.ts": "0486280d4a944c43f709e046631da58aa682d1c73e2ab58e4aaebc0a9bb7178d",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "e96f6e871182938c4b198d61e3c3ef0540c9f772c0344f9d4712f24206b41879",
+    "src/interview/interviewView.ts": "40517762a7eb5a13b44da71e9173f2b7b16ce453dd8f2455b3e4b1653135716e",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "3b06dd60f002dcc1c0c5e6ccb4857660e5c147924b047ff7269ab0c1e768e2bd",
+    "src/workbench/start.ts": "6df8952d6912e8685a36dfc17c762b6142dcb93280bc5ba09cf876a0a78c2bdf",
+    "src/workbench/interviewRequests.ts": "fe2667a18806df1ab1919caec2b8941732cbeb5a3482b997f73dc4a4187b7a55",
+    "src/workbench/intakeView.ts": "2ab9b512dcf849771dd0c85070e0a9d2914aee9b6aa8431b91a62d5e992b707a",
+    "src/workbench/searchRefreshView.ts": "f35f05e765b573b15ab4806e9678dde8e52e07f4987d3a9ceb5d840a5338764f",
+    "src/workbench/designSystem.ts": "7e8625d70c22c3deeafc51268926b70e52a83aa83239868fadc97e99e394222d",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "d800b1d6b7af08b4e849ba567e1b2b4e5a1fc083054ba153cfb7ca3cbda1cd94",
+    "src/workbench/profileStore.ts": "bb3b0303fcf618f87c2d03fd9020fc6c8d2bfbbaf0dc4ce3885b883ec3646acc",
+    "src/workbench/intakeRequests.ts": "d28caab742c8bc6376ab3c135963e876bc10f54010fe34747887369f7eb8f6b2",
+    "src/workbench/workspaceTheme.ts": "bda3b1e8bb5132e948e3703f95ffa5f387337c35eb96267fe4da6d2bb58dc48a"
+  }
+}

@@ -134,4 +134,22 @@ body.welcome-shell .intake-shell :is(input:not([type=checkbox]):not([type=file])
  body:not(.welcome-shell) .section-title{flex-wrap:wrap;gap:8px}
  body.welcome-shell .intake-shell h1{font-size:36px}
 }
+/* Two primary destinations; task pages retain their place inside Status. */
+.task-context{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 28px;font:550 14px/1.6 var(--font);color:#202020}
+.task-context a{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;color:#202020}
+.task-context a:hover{text-decoration:underline;text-underline-offset:4px}
+body .review-layout>.task-context{grid-column:1 / -1;margin:0}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:940px;margin:0 0 32px}
+body .page-heading h1{font:650 clamp(32px,3vw,42px)/1.15 var(--font);letter-spacing:-.045em;margin:0;color:#202020}
+.settings-link{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 14px;border:1px solid #dce2e8;border-radius:8px;background:#fff;color:#202020;text-decoration:none;font:550 14px/1.5 var(--font);white-space:nowrap}
+.settings-link:hover{background:#f3f5f7}
+.row-task-link{display:inline-flex;align-items:center;gap:5px;min-height:40px;margin-top:4px;font:600 14px/1.6 var(--font);color:#202020;text-decoration:none}
+.row-task-link:hover{text-decoration:underline;text-underline-offset:3px}
+body.status-workspace .status-overview dd{display:flex;align-items:center;min-height:44px}
+body.status-workspace .overview-task-link{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:underline;text-decoration-color:#edc9a8;text-decoration-thickness:2px;text-underline-offset:8px}
+body.status-workspace .overview-task-link:hover{text-decoration-color:#ee9148}
+.stage-task-link{display:inline-flex;align-items:center;gap:8px;margin-left:auto;min-height:44px;padding:8px 12px;font:600 13px/1.5 var(--font);text-decoration:none;color:#202020;background:#fff0df;border:1px solid #f2d3b2;border-radius:7px}
+.stage-task-link:hover{background:#ffe7cc}
+body.status-workspace .pipeline-heading{flex-wrap:wrap}
+@media(max-width:700px){body .review-layout>.task-context{margin-bottom:22px}.page-heading{flex-wrap:wrap;gap:16px}.task-context{margin-bottom:22px}body .page-heading h1{font-size:36px}.stage-task-link{margin-left:0}.row-task-link{font-size:13px}}
 `;

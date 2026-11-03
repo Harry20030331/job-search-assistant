@@ -54,3 +54,6 @@ Select a saved checkpoint with `example:shortlist` or `example:review` while the
 The full directory tree and startup/loading commands are maintained in the repository README. The candidate bundle is copied as a unit; its README is documentation, not runtime input. Progress is loaded from the selected example when provided, otherwise starts empty, and then accumulates around that candidate. Working data is not a log of the examples directory. Deliberately improving the shareable fictional baseline is a separate reviewed change.
 
 Snapshot loading preserves only the host-local chat routing file across resets; old task and approval history remains in the backup. A running website runner is rejected before loading. Shared checkpoints are never updated by ordinary runtime edits.
+
+
+Maintenance — 2026-11-03: Working primary navigation is Profile / Status. Review and interview routes remain contextual Status tasks with return links; the Google connection route is presented as Settings under Profile. No storage ownership or directory layout changed.

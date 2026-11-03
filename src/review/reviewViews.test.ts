@@ -735,3 +735,13 @@ test("uses Status order for the sidebar, picker and next-review sequence regardl
   expect(items.map((item: { applicationId: string }) => item.applicationId)).toEqual(["application-2", "application-3", "application-1"]);
   expect(html).toContain('data-detail="application-3" >');
 });
+
+
+test("Status opens review and interview tasks by stable application identity and task views return to Status",()=>{
+ const base={jobId:"fictional-job",applicationId:"fictional/app one",company:"Example Co",title:"Example role",location:"Remote",category:"Research",href:"https://example.com/job",dateLabel:"11-03",dateTime:"2026-11-03T00:00:00Z"};
+ const html=renderUsStatusPage([{...base,status:"in_review"},{...base,jobId:"fictional-interview",applicationId:"fictional-interview-app",status:"interviewing"}]);
+ expect(html).toContain('href="/review?application=fictional%2Fapp%20one"');expect(html).toContain('href="/interviews?application=fictional-interview-app&amp;view=preparation"');
+ expect(html).toContain('data-stage-task="in_review"');expect(html).toContain('data-stage-task="interviewing"');
+ expect(html).toContain('aria-label="Review 1 application"');
+ expect(renderReviewPage(batch(false))).toContain('href="/status/us?stage=in_review"');
+});

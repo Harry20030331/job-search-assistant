@@ -144,7 +144,7 @@ body.welcome-shell{background:#fff}body.welcome-shell>header{background:#fff;bor
 @media(max-width:900px){body> :is(.workspace-top,.status-top,.review-top){background:#24476b;border-bottom-color:#1e3e5f}body.welcome-shell>header{background:#fff}}
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}button:not(:disabled):active{transform:none}}
-/* BeyondAutofill lockup: Lucide Compass, sourced through the 21st.dev icon catalog. */
+/* CareerOS Frame mark: the user-selected geometric C silhouette. */
 body>header>.workspace-brand{flex-direction:row;align-items:center;gap:9px;max-width:none;padding-left:8px;padding-right:0;font-size:15px;letter-spacing:-.035em}
 body .workspace-brand .brand-mark{flex:0 0 28px;width:28px;height:28px;border-radius:0;background:transparent;color:#f89344}
 body,button,input,textarea,select,code,pre,kbd,samp{font-family:var(--font)}

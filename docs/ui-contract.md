@@ -1,4 +1,4 @@
-# Application UI contract — version 56
+# Application UI contract — version 60
 
 Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
@@ -20,7 +20,7 @@ Integration, 2026-10-30: The user requested integration of all team modules. V29
 - Mark short factual questions with `inputType: "short-text"` (at most 300 characters, no newlines). A failed save restores the prior answer. Saved local answers may be approved before live-form synchronization; synchronization is required before execution can submit.
 - One application-level Approve content control, independent of live ATS/CV readiness but disabled while required answers are missing, edits are unsaved, or a save has failed. Blank optional questions do not block approval. Successful saves recompute availability from saved content; clearing a required answer disables it again. Saving temporarily disables controls. A successful content approval stays visible and read-only with a compact Reviewed label. Preserve the shared Status order after approval; automatically select the next pending item, wrapping to earlier pending items if needed. If none remain, stay on the just-reviewed item.
 - Content approval binds the exact local snapshot and desired revision with `decision.scope: "content-only"`. It does not authorize execution/submission; the user starts a selected batch separately. Live verification gates remain on execution. Approved applications automatically join the submission batch; there are no Review selection checkboxes. Edit answers generates a new snapshot, removes the item from the batch, and requires fresh approval. The final Submit applications count comes from saved approvals rather than browser selection state.
-- Status provides checkboxes and Apply for shortlisted jobs and failed preparations without a ready draft. Tracked rows have no repeated Review answers links. A completed fictional demo submission may show Simulate interview and then Interview prep, as described below. The navigation has a compact Review (N) count of pending, visible review items; approved items do not contribute to this attention count. The Apply bar is hidden when there are no shortlisted jobs or another lifecycle filter is selected. Only Review has the final pinned Submit applications (N) control. Failed preparation can be retried with Apply from Shortlisted. The final control submits the approved batch only when explicitly clicked. Already running or completed requests are excluded from its count. These actions create durable requests for one executor (the configured existing chat or background runner); Task history stays internal. Display current application stages and concise actionable errors, with no Activity panel or technical event log. The HTTP server has no direct ATS client. Data publication never grants execution authorization.
+- Status provides checkboxes and Apply for shortlisted jobs and failed preparations without a ready draft. Tracked rows may offer a contextual Review or Interview prep link using stable application/round IDs; content editing and approval remain on the task page. A completed fictional demo submission may show Simulate interview and then Interview prep, as described below. Primary navigation contains only Profile and Status. Review and interview preparation are contextual tasks entered through Status counts, stage actions or stable application/round links; task pages keep Status selected and return to the corresponding Status filter. Settings is reached from Profile and keeps Profile selected. The Apply bar is hidden when there are no shortlisted jobs or another lifecycle filter is selected. Only Review has the final pinned Submit applications (N) control. Failed preparation can be retried with Apply from Shortlisted. The final control submits the approved batch only when explicitly clicked. Already running or completed requests are excluded from its count. These actions create durable requests for one executor (the configured existing chat or background runner); Task history stays internal. Display current application stages and concise actionable errors, with no Activity panel or technical event log. The HTTP server has no direct ATS client. Data publication never grants execution authorization.
 - The default Demo mode contacts no employers; its footer label is omitted at the user’s request. A successful rehearsal is grouped under Submitted and labeled Submitted in Status at the user’s request. It leaves active Review without changing the stored opportunity to Submitted or deleting its saved draft. After the entire batch requested from a Review tab completes successfully, that tab opens `/status/us?stage=submitted`; retain the pending request across reloads. Blocked/interrupted batches remain in Review, and unsaved edits or active saves defer navigation. Completion applies only to the same snapshot and revision. Reopened content returns to Review. Verified real submissions leave Review and display the evidence-backed lifecycle. Failed submissions remain in Review. The optional Codex adapter fails visibly when disconnected or configured with fixtures. Requests bind the page’s configured mode so a stale Demo page cannot trigger live execution.
 
 ## Fixed data entry points
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v56.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v60.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -270,3 +270,23 @@ The user requested that Simulate interview start Interview Coordination automati
 ## Maintenance — 2026-11-02 (v56)
 
 At the user’s request, a missing Plan with a delivered/running preparation request for that exact interview displays “Please wait, generating preparation plan...” instead of asking the user to ask Codex. Without an active request, the empty state points to the website request form. Pending-delivery uncertainty and blocked requests do not claim that generation is running. Existing Plan content and approval behavior are unchanged. Preserve v55 as history.
+
+
+## Status-centered navigation — 2026-11-03
+
+User-directed v57 reduces primary navigation to Profile and Status. Status retains its lifecycle filters and adds direct task entries in actionable counts, matching stage actions and job rows. Review and interview pages keep Status selected and provide Back to Status, restoring the corresponding filter. Profile provides Settings; the existing Google connection route is retained with a Settings title and Back to Profile. Existing saved URLs continue to work. Application-scoped interview entry cannot select another job's round or request target. The team's v55/v56 simulated-interview dispatch and scoped Plan waiting state remain intact. Product naming/logo changes are deferred until the user selects a proposed name. See [v57 review notes](ui-redesign-v57.md).
+
+
+## Product name — 2026-11-03
+
+User-directed v58 adopts CareerOS across shared navigation, setup/welcome branding and browser titles. The existing Compass icon, Sans-serif typography, layout and workflow behavior remain unchanged. Historical manifests retain their original branding.
+
+
+## Original CareerOS mark — 2026-11-03
+
+User-directed v59 replaces the stock Compass with an original SVG: an open C orbit and an ascending arrow. The warm orange mark uses rounded strokes and remains legible at the existing 28px sidebar size. The standalone vector is src/workbench/assets/careeros-mark.svg. Naming, layout and application behavior remain unchanged.
+
+
+## Frame identity — 2026-11-03
+
+User selected Frame from three reviewed original SVG concepts. V60 applies the exact approved dark geometric C to shared workspace navigation and the standalone SVG asset. The CareerOS wordmark, layout and application behavior remain unchanged.

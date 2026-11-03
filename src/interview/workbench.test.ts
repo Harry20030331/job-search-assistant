@@ -170,3 +170,15 @@ test("practice asks the question directly and keeps guidance and code in the ans
   expect(page).toContain("your 30-minute plan stays the same"); expect(page).toContain("Python solution");
   expect(page).toContain("def free_time(start, end):");
 });
+
+
+test("application-scoped preparation opens only that application's round and returns to Status",async()=>{
+ const {paths,root}=await setup();await linkInterview(paths,link());
+ const server=await startReviewServer({...paths,reviewPath:join(root,"drafts"),jobsPath:paths.trackerPath,port:0});servers.push(server);
+ const exact=await(await fetch(server.address+"/interviews?application=application-1&view=preparation")).text();
+ expect(exact).toContain('name="interviewId" value="interview-1"');expect(exact).toContain('href="/status/us?stage=interviewing"');
+ expect(exact).not.toContain('<option value="application-2">');
+ const other=await(await fetch(server.address+"/interviews?application=application-2&view=preparation")).text();
+ expect(other).not.toContain('name="interviewId" value="interview-1"');expect(other).not.toContain('class="interview-card"');
+ const primary=exact.match(/<nav aria-label="Primary">([\s\S]*?)<\/nav>/)![1]!;expect(primary).toContain('href="/status" aria-current="page"');expect(primary.match(/<a /g)).toHaveLength(2);
+});

@@ -9,10 +9,13 @@ import { parseReviewServerArgs } from "../cli/reviewServerCli.js";
 const roots: string[] = [], servers: RunningReviewServer[] = [];
 afterEach(async () => { await Promise.all(servers.splice(0).map(server => server.close())); await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))); });
 
-test("all workspace pages have direct Status, Interview and Google connection navigation", () => {
+test("primary navigation contains only Profile and Status, with task pages grouped under Status", () => {
   for (const page of ["profile", "status", "review", "interviews", "account"] as const) {
     const header = workspaceHeader(page);
-    expect(header).toContain('href="/status"'); expect(header).toContain('href="/interviews"'); expect(header).toContain('href="/settings/accounts"');
+    const primary=header.match(/<nav aria-label="Primary">([\s\S]*?)<\/nav>/)![1]!;
+    expect(primary.match(/<a /g)).toHaveLength(2);expect(primary).toContain('href="/profile"');expect(primary).toContain('href="/status"');
+    expect(primary).not.toContain('/interviews');expect(primary).not.toContain('/review');expect(primary).not.toContain('/settings/accounts');
+    const section=["review","interviews","status"].includes(page)?"status":"profile";expect(primary).toContain(`href="/${section}" aria-current="page"`);
     expect(header.match(/aria-current="page"/g)).toHaveLength(1);
   }
   const home = renderHomePage({ applications: 3, interviews: 2, pendingPlans: 1, practiceReady: 2 });

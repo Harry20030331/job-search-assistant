@@ -18,7 +18,7 @@ import { writePrivateFile } from "../storage/privateFiles.js";
 import { page as workspacePage, escapeText } from "./views.js";
 
 function page(...args: Parameters<typeof workspacePage>) {
-  return workspacePage(...args).replace("<body>", '<body class="welcome-shell">').replace(/<header[\s\S]*?<\/header>/, '<header class="workspace-top"><a class="workspace-brand" href="/welcome">BeyondAutofill</a><nav aria-label="Primary"><a href="/welcome" aria-current="page">Home</a></nav></header>')
+  return workspacePage(...args).replace("<body>", '<body class="welcome-shell">').replace(/<header[\s\S]*?<\/header>/, '<header class="workspace-top"><a class="workspace-brand" href="/welcome">CareerOS</a><nav aria-label="Primary"><a href="/welcome" aria-current="page">Home</a></nav></header>')
     .replace('</body>', `<script>for(const form of document.querySelectorAll('form[method="post"]'))form.addEventListener('submit',async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;let message=form.querySelector('[role=status]');if(!message){message=document.createElement('p');message.setAttribute('role','status');form.append(message)}message.textContent='Opening your workspace…';try{const r=await fetch(form.action,{method:'POST',body:new URLSearchParams(new FormData(form))});const d=await r.json();if(!r.ok)throw Error(d.message||'Could not open this workspace.');location.assign(d.url)}catch(e){message.textContent=e.message;button.disabled=false}});</script></body>`);
 }
 

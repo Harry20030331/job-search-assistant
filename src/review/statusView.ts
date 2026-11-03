@@ -101,6 +101,6 @@ export function buildStatusView(
     const interview = context.mode === "demo" ? context.demoInterviews?.find(round => round.entry.applicationId === item.applicationId && round.entry.demoSubmission?.taskId === submission?.id) : undefined;
     const target = context.mode === "demo" && context.demoInterviewEnabled && status === "rehearsal_complete" && submission && draft && draft.decision.state === "approved" && draft.decision.scope === "content-only"
       ? { jobId: item.jobId, applicationId: draft.applicationId, taskId: submission.id, snapshotId: draft.snapshotId, revision: draft.desiredState?.revision ?? 0 } : undefined;
-    return { ...item, status, ...(target ? { demoInterviewTarget: target } : {}), ...(status === "interviewing" && interview ? { interviewHref: "/interviews?interview=" + encodeURIComponent(interview.entry.interviewId) } : {}), ...(retry ? { preparationNeedsRetry: true } : {}) };
+    return { ...item, status, ...(target ? { demoInterviewTarget: target } : {}), ...(status === "interviewing" && interview ? { interviewHref: "/interviews?interview=" + encodeURIComponent(interview.entry.interviewId) + "&view=preparation" } : {}), ...(retry ? { preparationNeedsRetry: true } : {}) };
   });
 }

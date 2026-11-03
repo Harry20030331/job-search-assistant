@@ -87,6 +87,5 @@ async function refresh(){
 }
 void refresh();setInterval(()=>{if(!document.hidden)void refresh()},2500);
 })();</script>`;
-  if (!review) html = html.replace('>Review</a>', '>Review <span id="review-count" aria-live="polite"></span></a>');
   return html.replace("</head>", `${styles}</head>`).replace("</main>", `</main>${bar}`).replace("</body>", `${script}</body>`);
 }

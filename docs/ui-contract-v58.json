@@ -1,0 +1,28 @@
+{
+  "version": 58,
+  "establishedAt": "2026-11-03",
+  "authorization": "User selected CareerOS as the product name. Replace visible branding and browser titles; retain the existing icon and workflow.",
+  "validation": "TypeScript and 64 tests across four relevant view suites passed. Actual Status browser preview verified CareerOS lockup and title; existing layout preserved.",
+  "files": {
+    "src/review/reviewViews.ts": "51041b0fcc76a46c71af7213727d6159b681458a12cf8bfb6af1fb688f78ab9a",
+    "src/review/statusView.ts": "abdb5380ca9906d2b97833cb318157d46423aa7099ee1a51b624c2dbfd96b6c3",
+    "src/review/workflowViews.ts": "0486280d4a944c43f709e046631da58aa682d1c73e2ab58e4aaebc0a9bb7178d",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "f7cc93f21b83eaa83934a5ddcf44be110914805d3f1d50de1052511674da4a35",
+    "src/interview/interviewView.ts": "b4d9e3e553fbe5b2a0dc08ec7defd91f5ca6664eff84f160e784e8ff640e36e6",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "3b06dd60f002dcc1c0c5e6ccb4857660e5c147924b047ff7269ab0c1e768e2bd",
+    "src/workbench/start.ts": "5262ffcc53eae9755e4245d6d7fa256ca1887dbe40ed5b138ae82ad16939f0f8",
+    "src/workbench/interviewRequests.ts": "fe2667a18806df1ab1919caec2b8941732cbeb5a3482b997f73dc4a4187b7a55",
+    "src/workbench/intakeView.ts": "956ab0949143b6af15a3613ddeeacd88074154d312732a420327a7bbcd998e46",
+    "src/workbench/searchRefreshView.ts": "f35f05e765b573b15ab4806e9678dde8e52e07f4987d3a9ceb5d840a5338764f",
+    "src/workbench/designSystem.ts": "cac2fb245b4582981b823956f0232b8aedc0a14cb84496e9e7e5775f28883aaf",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "d800b1d6b7af08b4e849ba567e1b2b4e5a1fc083054ba153cfb7ca3cbda1cd94",
+    "src/workbench/profileStore.ts": "bb3b0303fcf618f87c2d03fd9020fc6c8d2bfbbaf0dc4ce3885b883ec3646acc",
+    "src/workbench/intakeRequests.ts": "d28caab742c8bc6376ab3c135963e876bc10f54010fe34747887369f7eb8f6b2",
+    "src/workbench/workspaceTheme.ts": "bda3b1e8bb5132e948e3703f95ffa5f387337c35eb96267fe4da6d2bb58dc48a"
+  }
+}
