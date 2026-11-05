@@ -143,13 +143,45 @@ body .review-layout>.task-context{grid-column:1 / -1;margin:0}
 body .page-heading h1{font:650 clamp(32px,3vw,42px)/1.15 var(--font);letter-spacing:-.045em;margin:0;color:#202020}
 .settings-link{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 14px;border:1px solid #dce2e8;border-radius:8px;background:#fff;color:#202020;text-decoration:none;font:550 14px/1.5 var(--font);white-space:nowrap}
 .settings-link:hover{background:#f3f5f7}
-.row-task-link{display:inline-flex;align-items:center;gap:5px;min-height:40px;margin-top:4px;font:600 14px/1.6 var(--font);color:#202020;text-decoration:none}
-.row-task-link:hover{text-decoration:underline;text-underline-offset:3px}
 body.status-workspace .status-overview dd{display:flex;align-items:center;min-height:44px}
 body.status-workspace .overview-task-link{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:underline;text-decoration-color:#edc9a8;text-decoration-thickness:2px;text-underline-offset:8px}
 body.status-workspace .overview-task-link:hover{text-decoration-color:#ee9148}
 .stage-task-link{display:inline-flex;align-items:center;gap:8px;margin-left:auto;min-height:44px;padding:8px 12px;font:600 13px/1.5 var(--font);text-decoration:none;color:#202020;background:#fff0df;border:1px solid #f2d3b2;border-radius:7px}
 .stage-task-link:hover{background:#ffe7cc}
-body.status-workspace .pipeline-heading{flex-wrap:wrap}
-@media(max-width:700px){body .review-layout>.task-context{margin-bottom:22px}.page-heading{flex-wrap:wrap;gap:16px}.task-context{margin-bottom:22px}body .page-heading h1{font-size:36px}.stage-task-link{margin-left:0}.row-task-link{font-size:13px}}
+body.status-workspace .pipeline-heading{display:grid;grid-template-columns:auto 1fr minmax(180px,auto);gap:12px;align-items:center}
+body.status-workspace .pipeline-actions{display:grid;min-height:44px;align-items:center;justify-items:end}
+body.status-workspace .pipeline-actions .stage-task-link{grid-area:1/1;margin:0;white-space:nowrap}
+body.status-workspace :is(.row-interview-link,.demo-interview-button){display:inline-flex;align-items:center;gap:6px;min-height:40px;margin:8px 0 0;padding:8px 12px;border:1px solid #dce2e8;border-radius:7px;background:#fff;color:#202020;font:600 13px/1.5 var(--font);text-decoration:none}
+body.status-workspace :is(.row-interview-link,.demo-interview-button):hover{background:#f3f5f7;border-color:#cbd2da}
+body.status-workspace .row-demo-actions{margin-top:0}
+@media(max-width:700px){body.status-workspace .pipeline-heading{grid-template-columns:1fr auto}body.status-workspace .pipeline-actions{grid-column:1/-1;justify-items:start}}
+@media(max-width:700px){body .review-layout>.task-context{margin-bottom:22px}.page-heading{flex-wrap:wrap;gap:16px}.task-context{margin-bottom:22px}body .page-heading h1{font-size:36px}.stage-task-link{margin-left:0}}
+/* Single-user setup and optional example share one entry shell. */
+body.welcome-shell .entry-shell{max-width:800px;margin:0 auto}
+body.welcome-shell .entry-shell h1{font:650 40px/1.1 var(--font);letter-spacing:-.045em;color:#202020;margin:10px 0 32px}
+body.welcome-shell .entry-card{padding:32px;background:#fff;border:1px solid #e0e4e8;border-radius:12px}
+body.welcome-shell .entry-card h2{font-size:22px;font-weight:600;color:#202020;margin:0 0 12px}
+body.welcome-shell .entry-card p{font-size:16px;line-height:1.65;color:#202020;margin:0 0 16px;max-width:60ch}
+body.welcome-shell .entry-card .entry-note{font-size:14px;color:#5b6068}
+body.welcome-shell .entry-card .primary{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:16px;font-weight:600;color:#202020;min-height:44px}
+@media(max-width:520px){body.welcome-shell .entry-card{padding:24px}body.welcome-shell .entry-shell{margin-top:8px}}
+/* Entry navigation is a quiet text action, not a filled button. */
+body.welcome-shell>header nav a.setup-nav-link{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:10px 12px;border:0;border-radius:6px;background:transparent;box-shadow:none;color:#202020;font:600 15px/1.4 var(--font);text-decoration:none;white-space:nowrap}
+body.welcome-shell>header nav a.setup-nav-link:hover{background:#e5e8ec;color:#202020}
+body.welcome-shell>header nav a.setup-nav-link:focus-visible{outline:2px solid #202020;outline-offset:3px}
+body.welcome-shell>header nav a.setup-nav-link svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* Stable review actions: save feedback never participates in button placement. */
+body .detail-actions{display:grid;grid-template-columns:minmax(0,1fr) 240px;grid-template-rows:auto minmax(24px,auto);align-items:start;gap:8px 24px;text-align:left}
+body .detail-actions .application-link{grid-column:1;grid-row:1}
+body .detail-actions .decision-dock{grid-column:2;grid-row:1/3;width:240px;max-width:none;min-width:0;align-self:start}
+body .detail-actions .save-status{display:block;grid-column:1;grid-row:2;min-height:24px;margin:0}
+body .detail-actions .approval-reason{display:block;min-height:44px}
+body .workspace>aside{padding:20px 16px;border:1px solid #e4e9ee;border-radius:12px;background:#fff;align-self:start}
+body .workspace .list-heading{padding:0 4px 16px;margin:0}
+body .interview-request-disclosure{border:1px solid #e0e4e8;border-radius:10px;background:#fff;padding:0 20px}
+body .interview-request-disclosure>summary{padding:18px 0;min-height:56px;font:600 15px/1.5 var(--font);color:#202020;cursor:pointer}
+body .interview-request-disclosure .request-explanation{font:500 14px/1.7 var(--font);margin:0 0 20px;color:#555b62}
+body .interview-request-disclosure fieldset{border:0;padding:0;margin:0 0 20px}
+body .interview-request-disclosure legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:700px){body .detail-actions{grid-template-columns:1fr;gap:8px}body .detail-actions .application-link{grid-column:1;grid-row:1}body .detail-actions .decision-dock{grid-column:1;grid-row:2;width:100%;max-width:none}body .detail-actions .save-status{grid-column:1;grid-row:3}}
 `;

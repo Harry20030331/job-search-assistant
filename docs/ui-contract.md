@@ -1,4 +1,4 @@
-# Application UI contract — version 60
+# Application UI contract — version 65
 
 Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v60.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v65.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -290,3 +290,28 @@ User-directed v59 replaces the stock Compass with an original SVG: an open C orb
 ## Frame identity — 2026-11-03
 
 User selected Frame from three reviewed original SVG concepts. V60 applies the exact approved dark geometric C to shared workspace navigation and the standalone SVG asset. The CareerOS wordmark, layout and application behavior remain unchanged.
+
+
+## Stable Status stages — 2026-11-04
+
+User-directed v61 reserves an always-present action slot in the pipeline heading so switching stages does not move the filters or table header. Mobile uses a consistent second action row. Per-job Review links are removed; the stage and overview Review entries remain. Job-specific interview preparation and simulation share neutral outlined controls with consistent typography and spacing. Browser measurements across all six filters at desktop, 768px and 390px confirm invariant heading height and table position within each viewport, with no narrow-screen document overflow. TypeScript and 37 renderer tests passed. Workflow authorization and canonical data are unchanged.
+
+
+## Single-user entry cleanup — 2026-11-04
+
+User-directed v62 removes the Welcome selection page and redirects its legacy URL to the root, which opens Create profile for first use or Status for the remembered real user. Setup retains one Try example link. The isolated example uses the same Frame lockup, content width, black Sans-serif hierarchy and card styling, with Back to CareerOS returning to the root. Recovery remains available for an unavailable saved workspace. No intake is saved without confirmation; examples never replace the remembered user. TypeScript and 52 related tests passed; browser checked setup, example and legacy redirect navigation.
+
+
+## Entry navigation links — 2026-11-04
+
+User-directed v63 replaces the filled Try example and Back to CareerOS blocks with transparent, semibold neutral text navigation, directional SVG arrows, balanced horizontal padding and 44px minimum targets. Hover and keyboard focus remain visible. Browser checked both entry pages and the example link; TypeScript passed.
+
+
+## Interview clarity and stable approval — 2026-11-04
+
+User-directed v64 removes per-job interview preparation links from Status while retaining stage/overview entries and simulation controls. Interview requests are disclosed on demand with explanatory copy; request history stays visible. The interview list has padded card boundaries. Review actions use fixed grid placement so save feedback and approval reasons cannot displace Approve content. TypeScript and 55 relevant tests passed. An isolated fictional radio-answer save changed approval readiness while its button retained identical x/y/width. Browser inspected the interview layout; no approval, request dispatch or employer submission occurred.
+
+
+## Practice completion updates — 2026-11-04
+
+User-directed v65 gives Practice an independent round-bound state marker and checks generation every three seconds. Changed state fetches the current server-rendered page and replaces only the matching practice content, preserving unsent request input. The initial comparison uses rendered state so completion before the first poll is detected. Failed fetches preserve content and retry; mismatched round content is rejected. Existing exact-plan approval gates remain. TypeScript and 15 focused tests passed without a model generation call.

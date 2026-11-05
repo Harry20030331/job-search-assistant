@@ -20,6 +20,9 @@ const post=(url:string,body:unknown,origin=new URL(url).origin)=>fetch(url,{meth
 test("welcome starts without selecting or writing candidate data; new setup is isolated and idempotent",async()=>{
  const root=await temporary();const s=await startWorkbench(root,{temporaryRoots:[]});servers.push(s);const base=new URL(s.address).origin;
  expect(await(await fetch(s.address)).text()).toContain("Create profile");expect(await readdir(root)).toEqual([]);
+ const legacy=await fetch(base+"/welcome",{redirect:"manual"});expect(legacy.status).toBe(302);expect(legacy.headers.get("location")).toBe("/");
+ const setup=await(await fetch(base+"/")).text();expect(setup).not.toContain("Explore a fictional example");expect(setup.match(/href="\/example"/g)).toHaveLength(1);expect(setup).not.toContain("Continue a search");
+ const example=await(await fetch(base+"/example")).text();expect(example).toContain("Back to CareerOS");expect(example).not.toContain('href="/welcome"');expect(example).toContain('class="brand-mark"');
  expect(await(await fetch(base+"/existing")).text()).toContain("No saved search results");
  const input={requestId:randomUUID(),fullName:fields.fullName,email:fields.email,summary:fields.summary,skills:"Research",institution:"Example School",degree:"BS",company:"",title:"",directions:"Research",locations:"",preferences:"Remote roles",confirmed:true};
  expect((await post(base+"/api/start/new",input,"https://attacker.invalid")).status).toBe(403);

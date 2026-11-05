@@ -30,6 +30,24 @@ export const interviewBrowserScript = String.raw`
           dismiss.addEventListener('click', async () => { dismiss.disabled = true; try { await post('/api/interviews/dismiss', {notificationId:notice.id}); await refresh(); } catch { dismiss.disabled = false; } });
         }
       }
+      // Practice has no approval button; watch its own server-rendered state.
+      const practice = document.querySelector('[data-practice-round]');
+      if (practice) {
+        const round = state.rounds.find(round => round.id === practice.dataset.practiceRound);
+        if (round) {
+          const signature = JSON.stringify([round.revision, round.proposalId ?? null, round.current, round.materialReady, round.generation?.status ?? null]);
+          if (signature !== practice.dataset.practiceState) {
+            const page = await fetch(location.href, {credentials:'same-origin',cache:'no-store'});
+            if (page.ok) {
+              const next = new DOMParser().parseFromString(await page.text(), 'text/html').querySelector('[data-practice-round]');
+              if (next && next.dataset.practiceRound === practice.dataset.practiceRound) {
+                practice.replaceChildren(...Array.from(next.childNodes));
+                practice.dataset.practiceState = next.dataset.practiceState;
+              }
+            }
+          }
+        }
+      }
       if (button) {
         const command = JSON.parse(button.dataset.planDecision);
         const round = state.rounds.find(round => round.id === command.interviewId);
@@ -55,5 +73,5 @@ export const interviewBrowserScript = String.raw`
       } catch (error) { if (message) message.textContent = error.message; busy = false; button.disabled = false; }
     });
   }
-  refresh(); setInterval(refresh, 30000);
+  refresh(); setInterval(refresh, 3000);
 })();`;
