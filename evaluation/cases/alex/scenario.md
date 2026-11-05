@@ -1,8 +1,8 @@
-# Alex's three sessions
+# Alex pilot: Memory across three job-search sessions
 
 CareerOS normally finds and screens jobs. This pilot supplies ten fictional roles so each run sees the same choices. CareerOS makes the recommendations; Alex reviews them.
 
-For the interactive website preview, use `npm run demo:alex`. For a scored run, use Node.js 22+, install dependencies with `npm ci`, and sign in to the local Codex CLI. From the repository root on macOS, create a fresh evaluation workspace:
+For the interactive website preview, start CareerOS and select **Try example**. [Quick start](../../../README.md#quick-start) For a scored run, use Node.js 22+, install dependencies with `npm ci`, and sign in to the local Codex CLI. From the repository root on macOS, create a fresh evaluation workspace:
 
 ```sh
 mkdir -p evaluation/runs/alex
@@ -42,3 +42,14 @@ BS/MS, 0–2 years; July 2027 start. Python retrieval pipelines and testing. Ons
 
 B5 — Research Scientist, Foundation Models | Northstar Research (fictional) | US Remote — Washington eligible
 July 2027 start. Requires completed PhD, peer-reviewed first-author publications and large-scale distributed pretraining expertise. Lead novel model architecture research.
+
+## Worked pilot
+
+In recorded run `alex-20261105012509055`, each session used a separate execution thread and shared the same run data. S1/T2 supplied both the two retained jobs and the reason for passing on the third: “I like the New York role’s work, but I don’t want to move to New York right now.”
+
+| Checkpoint | First observable result | Independent verdict |
+| --- | --- | --- |
+| S1 → S2, job progress | Asked for “the two jobs we kept last time,” the agent prepared A1 Cedar Search and A2 Raincloud Systems. The first unified review had two reviewable local drafts and no extra draft. | Pass |
+| S1 → S3, screening preference | B1 required New York residence and was excluded. B2 had New York headquarters but permitted work from Seattle and was shortlisted. The first reply distinguished the two before Alex gave feedback. | Pass |
+
+The unit of evidence is the first action. For S2 inspect the saved first-review drafts alongside the reply. For S3 inspect `data/sessions/S3.json#/turns/0/assistant`, then follow `core://S1/T2` to the original words. The local run’s `results/scores.json` records 2/2. A fresh checkout contains the seed and rubric; generated run outputs stay local. This single run supports feasibility. Comparing strategies requires repeated runs on shared checkpoints. [Evaluation protocol](../../../docs/memory-evaluation.md)

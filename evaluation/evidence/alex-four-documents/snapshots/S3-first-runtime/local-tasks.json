@@ -1,0 +1,232 @@
+{
+  "version": 1,
+  "fictional": true,
+  "jobs": [
+    {
+      "id": "A1",
+      "title": "Software Engineer, Retrieval — New Grad",
+      "company": "Cedar Search (fictional)",
+      "city": "Seattle, WA",
+      "description": "Full-time July 2027 start. Seattle hybrid, 3 days onsite. BS/MS, 0–2 years. Build Python document ingestion, hybrid retrieval and citation evaluation; production experience preferred, not required.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "A2",
+      "title": "Software Engineer, Agent Infrastructure — New Grad",
+      "company": "Raincloud Systems (fictional)",
+      "city": "US Remote — Washington eligible",
+      "description": "Full-time July 2027 start. Remote from Washington accepted; no relocation. BS/MS, 0–2 years. Build Python tool validation, REST APIs, task replay and backend tests. Docker familiarity preferred.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "A3",
+      "title": "Applied LLM Engineer — New Grad",
+      "company": "Hudson AI (fictional)",
+      "city": "New York, NY",
+      "description": "Full-time July 2027 start. Must relocate to New York; onsite 4 days/week, no remote exception. BS/MS, 0–2 years. Retrieval evaluation, Python and citation grounded assistants.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "A4",
+      "title": "Staff ML Platform Engineer",
+      "company": "Summit Platform (fictional)",
+      "city": "Seattle, WA",
+      "description": "Requires 6+ years professional full-time experience and engineering leadership. Production Kubernetes, large distributed training systems.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "A5",
+      "title": "Software Engineer, Search — New Grad",
+      "company": "Harbor Index (fictional)",
+      "city": "Seattle, WA",
+      "description": "Full-time July 2027 start. BS/MS, 0–2 years. Python search indexing and relevance tests; Seattle hybrid.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "B1",
+      "title": "Applied LLM Engineer — New Grad",
+      "company": "Eastbridge Intelligence (fictional)",
+      "city": "New York, NY",
+      "description": "BS/MS, 0–2 years; July 2027 start. Build Python retrieval assistants, grounded citations and evaluation suites. Onsite Manhattan 4 days/week. Employees must reside in the NYC area; relocation required for out-of-area hires, no remote option.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "B2",
+      "title": "Software Engineer, Agent Reliability — New Grad",
+      "company": "Metro Agent Tools (fictional)",
+      "city": "New York headquarters; US distributed team",
+      "description": "BS/MS, 0–2 years; July 2027 start. Python tool validation, task replay, REST APIs and regression testing. Role is fully remote in approved US states, including Washington. Working from Seattle is permitted; no relocation or New York office attendance required.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "B3",
+      "title": "Backend Engineer, Search — New Grad",
+      "company": "Lakeview Documents (fictional)",
+      "city": "Seattle, WA",
+      "description": "BS/MS, 0–2 years; July 2027 start. Seattle hybrid 2 days/week. Python document indexing, SQL APIs, retrieval evaluation. Cloud familiarity preferred; mentorship provided.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "B4",
+      "title": "Software Engineer, Retrieval Platform — New Grad",
+      "company": "Peninsula Retrieval (fictional)",
+      "city": "Sunnyvale, CA",
+      "description": "BS/MS, 0–2 years; July 2027 start. Python retrieval pipelines and testing. Onsite Sunnyvale 3 days/week; remote allowed only from California. Candidate must relocate to California if currently elsewhere.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    },
+    {
+      "id": "B5",
+      "title": "Research Scientist, Foundation Models",
+      "company": "Northstar Research (fictional)",
+      "city": "US Remote — Washington eligible",
+      "description": "July 2027 start. Requires completed PhD, peer-reviewed first-author publications and large-scale distributed pretraining expertise. Lead novel model architecture research.",
+      "provenance": "simulated-jd",
+      "verification": "Supplied fictional local JD; not an observed employer posting."
+    }
+  ],
+  "shortlist": [
+    "A1",
+    "A2",
+    "B2",
+    "B3"
+  ],
+  "pending": [
+    "B4"
+  ],
+  "actions": [
+    {
+      "sessionId": "S1",
+      "requestId": "S1-T1",
+      "decisions": [
+        {
+          "jobId": "A1",
+          "disposition": "shortlist",
+          "reason": "Strong match to Python ingestion, hybrid retrieval and citation evaluation; production experience is preferred, not required."
+        },
+        {
+          "jobId": "A2",
+          "disposition": "shortlist",
+          "reason": "Matches tool validation, replay, APIs and tests; Washington remote fits and basic Docker meets a familiarity preference."
+        },
+        {
+          "jobId": "A3",
+          "disposition": "confirm",
+          "reason": "Technical fit, but mandatory New York relocation requires confirmation; relocation willingness is undecided."
+        },
+        {
+          "jobId": "A4",
+          "disposition": "exclude",
+          "reason": "Requires 6+ professional full-time years and leadership, plus production Kubernetes and distributed training not claimed."
+        },
+        {
+          "jobId": "A5",
+          "disposition": "shortlist",
+          "reason": "Seattle new-grad Python indexing and relevance testing align with retrieval experience."
+        }
+      ]
+    },
+    {
+      "sessionId": "S1",
+      "requestId": "S1-T2",
+      "decisions": [
+        {
+          "jobId": "A1",
+          "disposition": "shortlist",
+          "reason": "Alex explicitly selected the Seattle retrieval role."
+        },
+        {
+          "jobId": "A2",
+          "disposition": "shortlist",
+          "reason": "Alex explicitly selected the Washington remote engineering role."
+        },
+        {
+          "jobId": "A3",
+          "disposition": "exclude",
+          "reason": "Alex likes the work but does not want to move to New York right now; the role requires relocation."
+        }
+      ]
+    },
+    {
+      "sessionId": "S1",
+      "requestId": "S1-T3",
+      "decisions": [
+        {
+          "jobId": "A1",
+          "disposition": "shortlist",
+          "reason": "Alex confirmed proceeding with the Seattle retrieval role."
+        },
+        {
+          "jobId": "A2",
+          "disposition": "shortlist",
+          "reason": "Alex confirmed proceeding with the Washington remote engineering role."
+        },
+        {
+          "jobId": "A4",
+          "disposition": "exclude",
+          "reason": "Alex confirmed not having the six years of experience required by the Staff role."
+        },
+        {
+          "jobId": "A5",
+          "disposition": "exclude",
+          "reason": "Alex reported already applying to the Harbor Index search role last week; exclude from new applications."
+        }
+      ]
+    },
+    {
+      "sessionId": "S3",
+      "requestId": "S3-T1",
+      "decisions": [
+        {
+          "jobId": "B1",
+          "disposition": "exclude",
+          "reason": "Requires NYC residence and relocation, which Alex currently excludes."
+        },
+        {
+          "jobId": "B2",
+          "disposition": "shortlist",
+          "reason": "Washington-eligible remote role permits Seattle without relocation; Python tool validation, replay and testing match Alex's project ownership. REST APIs are a working skill."
+        },
+        {
+          "jobId": "B3",
+          "disposition": "shortlist",
+          "reason": "Seattle hybrid entry-level role matches Python indexing, SQL and retrieval evaluation; cloud familiarity is preferred, and Alex has basic cloud deployment experience."
+        },
+        {
+          "jobId": "B4",
+          "disposition": "confirm",
+          "reason": "Retrieval pipelines and testing fit, but California residence and relocation are mandatory; Alex's California relocation willingness is unconfirmed."
+        },
+        {
+          "jobId": "B5",
+          "disposition": "exclude",
+          "reason": "Requires a completed PhD, publications and distributed pretraining expertise absent from Alex's record."
+        }
+      ]
+    }
+  ],
+  "drafts": [
+    {
+      "jobId": "A1",
+      "status": "blocked",
+      "fields": [],
+      "blocker": "Simulated-JD provenance only; no employer form observed. Separate simulated draft: CS329Z/alex-memory-run/documents-20261104-w07/local-drafts/A1.md; consolidated review: CS329Z/alex-memory-run/documents-20261104-w07/local-drafts/review.md. S2/T2: salary intentionally unanswered; optional demographics Decline to answer for these two local drafts. A1 ownership revised; A2 project answer retained. Awaiting unified review; no submission authorized.",
+      "observedAt": "2026-11-04"
+    },
+    {
+      "jobId": "A2",
+      "status": "blocked",
+      "fields": [],
+      "blocker": "Simulated-JD provenance only; no employer form observed. Separate simulated draft: CS329Z/alex-memory-run/documents-20261104-w07/local-drafts/A2.md; consolidated review: CS329Z/alex-memory-run/documents-20261104-w07/local-drafts/review.md. S2/T2: salary intentionally unanswered; optional demographics Decline to answer for these two local drafts. A1 ownership revised; A2 project answer retained. Awaiting unified review; no submission authorized.",
+      "observedAt": "2026-11-04"
+    }
+  ]
+}

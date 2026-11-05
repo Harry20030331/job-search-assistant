@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-11-04",
+  "mainPassed": true,
+  "sourceThreadBindingsPassed": true,
+  "distinctActualThreads": [
+    {
+      "session": "S1",
+      "threadId": "01a1a8ed-227d-7b70-8542-7049f2212afb"
+    },
+    {
+      "session": "S2",
+      "threadId": "01a1a8ef-8fff-7db0-bf5f-111bffa9eebc"
+    },
+    {
+      "session": "S3",
+      "threadId": "01a1a8f1-2928-7cb0-93d0-96d92434135e"
+    }
+  ],
+  "sources": [
+    "core://S1/T1",
+    "core://S1/T2",
+    "core://S2/T1",
+    "core://S2/T2",
+    "core://S3/T1"
+  ],
+  "finalReplyMatches": [
+    {
+      "session": "S1",
+      "exactAppFinalReplyMatches": 2
+    },
+    {
+      "session": "S2",
+      "exactAppFinalReplyMatches": 2
+    },
+    {
+      "session": "S3",
+      "exactAppFinalReplyMatches": 1
+    }
+  ],
+  "s2FirstRecoveredJobs": [
+    "K11",
+    "K22",
+    "K35"
+  ],
+  "s2Drafts": [
+    {
+      "jobId": "K22",
+      "status": "blocked",
+      "fields": 0,
+      "blocker": "Simulated JD only; no real vacancy, official URL or employer questions. Preparation: retrieval-focused resume using Example Labs ingestion/hybrid retrieval/citation checks, 180 synthetic questions and Recall@5 0.64→0.79 on fixed 60-question development split only; Study Search ingestion/evaluation/local interface. Prepare error-analysis and sparse-vs-dense retrieval examples. Seattle and July 1 2027 fit; production deployment/cloud depth remain gaps. No employer-form answers invented."
+    },
+    {
+      "jobId": "K35",
+      "status": "blocked",
+      "fields": 0,
+      "blocker": "Simulated JD only; no real vacancy, official URL or employer questions. Preparation: agent-infrastructure resume emphasizing Agent Task Bench tool validation/failure analysis, explicit approval gates, replayable synthetic tasks and pytest; do not claim teammates scheduling/frontend work. Prepare adapter-validation, regression-testing and failure-recovery examples. Washington eligibility and July 1 2027 fit supplied JD; large-scale production operations not established. No employer-form answers invented."
+    },
+    {
+      "jobId": "K11",
+      "status": "local-review",
+      "fields": 9,
+      "blocker": "Partial first-step local draft only. Referral/source answer, street/postal address and extension not supplied; missing address values intentionally left blank per Alex, core://S2/T2. No later employer questions observed; no Next clicked. Confirm July 2027-or-later start and LLM/retrieval/agent team scope. Prepare resume emphasizing Python, testing/debugging, internship evaluation ownership and June 2027 MS graduation; no production-impact claim."
+    }
+  ],
+  "s3FirstActualDecision": {
+    "sessionId": "S3",
+    "requestId": "S3-T1-five-new-jobs-20261104-a",
+    "decisions": [
+      {
+        "jobId": "J17",
+        "disposition": "shortlist",
+        "reason": "Seattle is approved; entry-level retrieval evaluation and tool adapters match Alex’s Python/TypeScript, retrieval and validation experience, with a July 1 2027 start."
+      },
+      {
+        "jobId": "J24",
+        "disposition": "shortlist",
+        "reason": "Onsite New York is explicitly approved for full-time screening; entry-level retrieval/agent tools and July 1 2027 start match Alex’s profile."
+      },
+      {
+        "jobId": "J31",
+        "disposition": "confirm",
+        "reason": "Qualifications and July 1 2027 start fit, but onsite Boston requires relocation confirmation before advancing."
+      },
+      {
+        "jobId": "J42",
+        "disposition": "shortlist",
+        "reason": "Remote work explicitly accepts Washington residents; entry-level retrieval/agent tools match Alex’s experience and July 1 2027 availability."
+      },
+      {
+        "jobId": "J55",
+        "disposition": "confirm",
+        "reason": "Qualifications and July 1 2027 start fit, but onsite Chicago requires relocation confirmation before advancing."
+      }
+    ]
+  },
+  "s3ShortlistDelta": [
+    "J17",
+    "J24",
+    "J42"
+  ],
+  "s3Pending": [
+    "J31",
+    "J55"
+  ],
+  "s3ZeroUpdates": true,
+  "duplicateReplay": "All complete turns, closes, review receipts and decisions replayed; memory and task bytes unchanged.",
+  "memorySha256": "2babc617967a024522bfe8163711d1122355003e827e67abcf91471ff3261817",
+  "taskSha256": "7cb83cb2e139d66ea8d4cda575edf38e0fbe04d82518a3a0760a349709b0eb73",
+  "limitations": [
+    "Only Adobe first page observed; later questions not read without employer data entry.",
+    "Exact Adobe employment start and team not established.",
+    "Other roles are explicitly simulated.",
+    "No independent blind judge; this is a single local trajectory, not the complete baseline study."
+  ],
+  "employerWrites": false
+}

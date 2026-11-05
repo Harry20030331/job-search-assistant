@@ -1,0 +1,21 @@
+{
+  "sessionId": "S1",
+  "threadId": "01a1a912-af49-7ef1-a288-19f79f164b89",
+  "turns": [
+    {
+      "id": "T1",
+      "user": "Help me look at these five jobs. Which are worth applying for? Give one short reason for each and show me your recommendation for review.",
+      "assistant": "I recommend shortlisting **A1, A2 and A5** for your review.\n\n| Job | Recommendation | Short reason |\n|---|---|---|\n| A1 · Cedar Search | Apply | Strong match for your Python ingestion, hybrid retrieval and citation evaluation; production experience is optional. |\n| A2 · Raincloud Systems | Apply | Your tool validation, replay and backend testing fit well; Washington remote works and Docker is only preferred. |\n| A3 · Hudson AI | Hold for confirmation | Good technical fit, but mandatory New York relocation needs your confirmation. |\n| A4 · Summit Platform | Skip | Requires 6+ years and senior leadership, beyond your experience. |\n| A5 · Harbor Index | Apply | Seattle new-grad search work aligns with your Python and relevance evaluation experience. |\n\nThese recommendations are saved locally for review; no applications have been submitted."
+    },
+    {
+      "id": "T2",
+      "user": "Keep the Seattle retrieval role and the Washington remote engineering role. I like the New York role's work, but I don't want to move to New York right now. Save those choices.",
+      "assistant": "Saved: **A1 · Cedar Search** and **A2 · Raincloud Systems** are kept on your shortlist. **A3 · Hudson AI** is excluded because you don’t want to relocate to New York right now."
+    },
+    {
+      "id": "T3",
+      "user": "For the other two: the Staff role needs six years of experience, which I don't have, and I already applied to the Harbor Index search role last week. Let's go with just the two we kept.",
+      "assistant": "Saved—your shortlist now contains only **A1 · Cedar Search** and **A2 · Raincloud Systems**. The Staff role is excluded for its experience requirement, and Harbor Index is excluded from new applications because you already applied last week."
+    }
+  ]
+}
