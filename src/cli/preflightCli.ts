@@ -1,7 +1,8 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { constants } from "node:fs";
 import { open } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { z } from "zod";
 import {
   runBatchPreflight,
@@ -100,8 +101,8 @@ export async function runPreflightCli(
   try {
     const args = parsePreflightArgs(argv);
     const canonicalPaths = {
-      manifestPath: args.manifestPath ? resolve(args.manifestPath) : join(projectRoot, "data/resumes.json"),
-      profilePath: args.profilePath ? resolve(args.profilePath) : join(projectRoot, "data/candidate.json")
+      manifestPath: args.manifestPath ? resolve(args.manifestPath) : userFiles(projectRoot).manifest,
+      profilePath: args.profilePath ? resolve(args.profilePath) : userFiles(projectRoot).profile
     };
     if ("batchPath" in args) {
       const parsedItems = batchFileSchema.safeParse(JSON.parse(await readBoundedBatchJson(args.batchPath)));

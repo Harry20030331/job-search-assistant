@@ -1,3 +1,4 @@
+import { dataForTracker, filesInData } from "../storage/userWorkspace.js";
 import { loadCandidateProfile } from "../profile.js";
 import { startDemoInterviewPreparation } from "../interview/demoPreparation.js";
 import { matchingContext } from "../matching/matching.js";
@@ -253,10 +254,10 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
     if (options.welcomeUrl && contentType.startsWith("text/html")) body = body.replaceAll('href="/"', `href="${options.welcomeUrl}"`);
     sendResponse(response, status, body, contentType);
   };
-  const workspaceRoot = options.workspaceRoot ?? dirname(dirname(options.trackerPath));
-  const refresh = options.workspaceRoot || basename(dirname(options.trackerPath)) === "data" ? new SearchRefreshService(workspaceRoot, options.repositoryRoot ?? workspaceRoot, options.searchRefresh ?? { automatic: false }) : undefined;
-  const google = new GoogleBridge(options.googleRoot ?? join(dirname(options.trackerPath), ".google-local"));
-  const interviewPaths = { taskPath: options.tasks?.paths.taskPath, reviewPath: options.reviewPath, trackerPath: options.trackerPath, profilePath: options.profilePath ?? join(dirname(options.trackerPath), "candidate.json") };
+  const workspaceRoot = options.workspaceRoot ?? dirname(dataForTracker(options.trackerPath));
+  const refresh = options.workspaceRoot || basename(dataForTracker(options.trackerPath)) === "data" ? new SearchRefreshService(workspaceRoot, options.repositoryRoot ?? workspaceRoot, options.searchRefresh ?? { automatic: false }) : undefined;
+  const google = new GoogleBridge(options.googleRoot ?? join(dataForTracker(options.trackerPath), ".google-local"));
+  const interviewPaths = { taskPath: options.tasks?.paths.taskPath, reviewPath: options.reviewPath, trackerPath: options.trackerPath, profilePath: options.profilePath ?? filesInData(dataForTracker(options.trackerPath)).profile };
   const interviewCsrf = randomBytes(32).toString("hex");
   const decorate = async (html: string, version = "") => {
     let resumes: string[] | undefined;

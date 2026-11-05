@@ -1,4 +1,4 @@
-# Application UI contract — version 65
+# Application UI contract — version 78
 
 Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v65.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v78.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -315,3 +315,15 @@ User-directed v64 removes per-job interview preparation links from Status while 
 ## Practice completion updates — 2026-11-04
 
 User-directed v65 gives Practice an independent round-bound state marker and checks generation every three seconds. Changed state fetches the current server-rendered page and replaces only the matching practice content, preserving unsent request input. The initial comparison uses rendered state so completion before the first poll is detected. Failed fetches preserve content and retry; mismatched round content is rejected. Existing exact-plan approval gates remain. TypeScript and 15 focused tests passed without a model generation call.
+## Workspace storage — 2026-11-04
+
+V62 routes the workbench runner and task queues through the selected runtime directory and saves approved attachments with the candidate. V61 records the prior storage integration.
+
+## Alex pilot entry — 2026-11-04
+
+Choosing the website example opens Status with an isolated copy of the five pre-screening roles from the memory pilot.
+
+
+## Integrated UI and personal workspace — 2026-11-04
+
+The user authorized merging and pushing the local UI fixes with the remote personal-workspace and Alex memory-demo changes. V78 preserves the remote storage interfaces, preference inputs and interactive example routes while integrating stable Status action slots, stage-level task entry, single-user Welcome redirect, readable setup navigation, collapsed interview requests, stable content approval and automatic Practice updates. The example Apply control occupies the same reserved action slot and is hidden outside All/Shortlisted. Historical local v61-v65 manifests are preserved as ui-contract-v61-ui-branch.json through ui-contract-v65-ui-branch.json because the remote branch independently used those version numbers; the remote numbered history remains intact.

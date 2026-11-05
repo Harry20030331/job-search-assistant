@@ -184,4 +184,5 @@ body .interview-request-disclosure .request-explanation{font:500 14px/1.7 var(--
 body .interview-request-disclosure fieldset{border:0;padding:0;margin:0 0 20px}
 body .interview-request-disclosure legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(max-width:700px){body .detail-actions{grid-template-columns:1fr;gap:8px}body .detail-actions .application-link{grid-column:1;grid-row:1}body .detail-actions .decision-dock{grid-column:1;grid-row:2;width:100%;max-width:none}body .detail-actions .save-status{grid-column:1;grid-row:3}}
+body.status-workspace .pipeline-actions #snapshot-apply{grid-area:1/1;margin:0}
 `;

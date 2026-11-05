@@ -1,3 +1,4 @@
+import { dataForTracker, filesInData } from "../storage/userWorkspace.js";
 import { existsSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -62,7 +63,7 @@ const modulePath = fileURLToPath(import.meta.url);
 const defaultProjectRoot = resolve(dirname(modulePath), "../..");
 
 export function reviewWorkspaceRoot(trackerPath: string, fallback: string) {
-  return basename(dirname(trackerPath)) === "data" ? dirname(dirname(trackerPath)) : fallback;
+  return basename(dataForTracker(trackerPath)) === "data" ? dirname(dataForTracker(trackerPath)) : fallback;
 }
 
 export async function runReviewServerCli(argv: readonly string[], projectRoot = defaultProjectRoot): Promise<void> {
@@ -71,7 +72,8 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
     projectRoot = resolve(argv[1]);
     argv = [];
   }
-  if (argv.length === 0) await ensureExampleData(projectRoot, resolve(defaultProjectRoot, "examples"));
+  if (argv.length === 0 && projectRoot !== defaultProjectRoot) await ensureExampleData(projectRoot);
+  if (argv.length === 0 && !existsSync(resolve(projectRoot, "data"))) throw new Error("Run npm start to set up your profile or try Alex.");
   const recovered = argv.length === 0 ? await resolveRecoveryInputs(projectRoot) : undefined;
   const parsed = recovered ?? parseReviewServerArgs(argv);
   const reviewPath = resolve(parsed.reviewPath);
@@ -89,10 +91,11 @@ export async function runReviewServerCli(argv: readonly string[], projectRoot = 
   if (mode === "codex") await assertLiveCandidate(workspaceRoot);
   const chat = await connectCurrentChat(workspaceRoot);
   const dispatchToChat = mode === "codex" && Boolean(chat);
-  const tasks = new ApplicationTaskService({ reviewPath, trackerPath, jobsPath, taskPath: resolve(dirname(trackerPath), "application-tasks.json"),
-    ...(existsSync(resolve(dirname(trackerPath), "resumes.json")) ? { matchingPaths: {
-      profile: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : resolve(dirname(trackerPath), "candidate.json"),
-      preferences: resolve(dirname(trackerPath), "preferences.md"), manifest: resolve(dirname(trackerPath), "resumes.json"), opportunities: trackerPath
+  const files = filesInData(dataForTracker(trackerPath));
+  const tasks = new ApplicationTaskService({ reviewPath, trackerPath, jobsPath, taskPath: files.tasks,
+    ...(existsSync(files.manifest) ? { matchingPaths: {
+      profile: "profilePath" in parsed && parsed.profilePath ? resolve(parsed.profilePath) : files.profile,
+      preferences: files.preferences, manifest: files.manifest, opportunities: trackerPath
     } } : {}) },
     mode, mode === "demo" ? demoTaskExecutor : codexTaskExecutor(projectRoot, process.env.CODEX_CLI_PATH ?? "codex"), dispatchToChat ? createChatTaskDispatcher(workspaceRoot, chat!) : undefined);
   await tasks.start();

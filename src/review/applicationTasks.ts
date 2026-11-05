@@ -1,3 +1,4 @@
+import { dataForTracker, filesInData } from "../storage/userWorkspace.js";
 import { matchingContext, type MatchingPaths } from "../matching/matching.js";
 import { runPreflight } from "../preflight.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
@@ -92,7 +93,7 @@ export async function consumeWebsiteTask(paths: TaskPaths, taskId: string,
 
 async function assertPreparationResume(task: ApplicationTask, paths: TaskPaths): Promise<void> {
   if (task.action !== "prepare" || !task.target.resumeSha256) return;
-  const selected = paths.matchingPaths ?? { profile: join(dirname(paths.trackerPath), "candidate.json"), manifest: join(dirname(paths.trackerPath), "resumes.json") };
+  const selected = paths.matchingPaths ?? filesInData(dataForTracker(paths.trackerPath));
   const job = (await readJobLibrary(paths.jobsPath)).find(item => item.jobId === task.target.jobId);
   if (!job || !task.target.resumeCategory) throw new Error("matching_resume_required");
   const checked = await runPreflight({ category: task.target.resumeCategory, jobUrl: job.officialUrl, profilePath: selected.profile, manifestPath: selected.manifest });

@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-11-04",
+  "pairedLocationFlipPassed": true,
+  "sameClosedReviewedS1": true,
+  "S1SnapshotSha256": "ea394c24c581ff45550eb0ac833316683320a257c83113b80183f755989560df",
+  "sameS2Opening": true,
+  "soleS2UserInputChange": "\u7ebd\u7ea6 -> \u6ce2\u58eb\u987f",
+  "sameS3Request": true,
+  "sameNewJobsAndOrder": true,
+  "newBatchDisjointFromInitialFive": true,
+  "actualThreadsDistinct": 5,
+  "mainAdded": [
+    "J17",
+    "J24",
+    "J42"
+  ],
+  "mainPending": [
+    "J31",
+    "J55"
+  ],
+  "pairedAdded": [
+    "J17",
+    "J31",
+    "J42"
+  ],
+  "pairedPending": [
+    "J24",
+    "J55"
+  ],
+  "correctionBeforeFirstResults": false,
+  "sourceThreadBindingPassed": true,
+  "allAppCoreFinalRepliesMatched": true,
+  "generatedDraftsIdentical": false,
+  "generatedDraftsNote": "Independent S2 runs produced different draft coverage/wording (main initially 8 answered fields, pair initially 15 fields including unknowns). These differences were retained, not normalized; job identities, starting S1 state, user inputs apart from city, and new JD batch were controlled.",
+  "employerWrites": false,
+  "limitations": [
+    "Single paired pilot, not full baseline/repeat evaluation.",
+    "Only first Adobe form page observed.",
+    "Exact employment start date and team remain unknown."
+  ]
+}

@@ -2,7 +2,7 @@ import { resumeRecommendationSchema } from "./resumeRecommendation.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, realpath, rename } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { loadCandidateProfile } from "../profile.js";
 import { acquireFileLock } from "../recordLock.js";
@@ -29,6 +29,7 @@ const feedbackSchema = z.object({
 }).strict();
 const policySchema = z.object({
   version: z.literal(1), rules: rulesSchema,
+  integratedWebsiteFeedbackCount: z.number().int().nonnegative().optional(),
   feedback: z.array(feedbackSchema)
 }).strict();
 const begin = "<!-- matching-policy:v1 -->";
@@ -46,13 +47,53 @@ function readPolicy(markdown: string) {
   return policySchema.parse(JSON.parse(markdown.slice(start, stop).trim()));
 }
 
+const policyHeading = "## Confirmed Matching preferences";
+const defaultTitle = "# Job selection";
+
+/** Expose the prose in the editor and carry forward feedback from older web clients. */
+export function searchNotesEditor(markdown: string) {
+  const policy = readPolicy(markdown);
+  const before = policy ? markdown.slice(0, markdown.indexOf(begin)).replace(/(?:^|\n\n)## Confirmed Matching preferences\s*$/, "") : markdown;
+  const after = policy ? markdown.slice(markdown.indexOf(end) + end.length).trim() : "";
+  const title = before.match(/^# [^\n]+/)?.[0] ?? defaultTitle;
+  let prose = before.replace(/^# [^\n]+(?:\r?\n){0,2}/, "");
+  if (!policy) prose = prose.replace(/\r?\n$/, "");
+  if (after) prose += (prose ? "\n\n" : "") + after;
+  const paragraphs = [prose];
+  for (const item of policy?.feedback.slice(policy.integratedWebsiteFeedbackCount ?? 0) ?? []) {
+    if (item.reference === "Confirmed on Profile & preferences" && item.text !== "Updated search preferences on the website" && !paragraphs.includes(item.text)) paragraphs.push(item.text);
+  }
+  return { content: paragraphs.filter(Boolean).join("\n\n"), revision: hash(markdown), title };
+}
+
+export async function replaceSearchNotes(paths: MatchingPaths, revision: string, content: string) {
+  if (content.includes(begin) || content.includes(end)) throw new Error("invalid_request");
+  await withPreferences(paths.preferences, async () => {
+    const current = await readFile(paths.preferences, "utf8");
+    const editor = searchNotesEditor(current);
+    if (revision !== editor.revision) throw new Error("profile_changed");
+    const policy = readPolicy(current);
+    const notes = editor.title + "\n\n" + content;
+    if (policy) policy.integratedWebsiteFeedbackCount = policy.feedback.length;
+    const next = policy ? notes + `\n\n${policyHeading}\n\n${begin}\n${JSON.stringify(policy, null, 2)}\n${end}\n` : notes + "\n";
+    const temporary = join(dirname(paths.preferences), `.${randomUUID()}.tmp`);
+    await writeFile(temporary, next, { mode: 0o600 });
+    await rename(temporary, paths.preferences);
+  });
+}
+
 export interface MatchingPaths { profile: string; preferences: string; manifest: string; opportunities: string }
 
 /** The agent must read all inputs; a hash binds its analysis to this exact context. */
 export async function matchingContext(paths: MatchingPaths) {
-  const [candidate, preferences, manifestText] = await Promise.all([
-    loadCandidateProfile(paths.profile), readFile(paths.preferences, "utf8"), readFile(paths.manifest, "utf8")
+  const [profile, preferences] = await Promise.all([
+    loadCandidateProfile(paths.profile), readFile(paths.preferences, "utf8")
   ]);
+  // Keep the matching token independent of moving the same list inside candidate.json.
+  const embedded = resolve(paths.manifest) === resolve(paths.profile);
+  const { resumes, ...facts } = profile;
+  const candidate = embedded ? facts : profile;
+  const manifestText = embedded ? JSON.stringify(resumes, null, 2) + "\n" : await readFile(paths.manifest, "utf8");
   const manifest = z.array(z.object({ category: z.string(), path: z.string(), sha256: z.string() })).parse(JSON.parse(manifestText));
   const policy = readPolicy(preferences);
   return { token: hash(JSON.stringify({ candidate, preferences, manifestText })), candidate, preferences, manifest, policy,
@@ -84,7 +125,7 @@ export async function saveMatchingPreferences(paths: MatchingPaths, input: unkno
     if (previous?.feedback.some(f => f.id === command.feedback.id)) throw new Error("duplicate_feedback_id");
     if (previous && command.initialRules) throw new Error("matching_policy_already_exists");
     if (!previous && !command.initialRules) throw new Error("matching_initial_rules_required");
-    const policy = policySchema.parse({ version: 1,
+    const policy = policySchema.parse({ ...previous, version: 1,
       rules: { ...(previous?.rules ?? command.initialRules), ...command.feedback.patch },
       feedback: [...(previous?.feedback ?? []), command.feedback]
     });

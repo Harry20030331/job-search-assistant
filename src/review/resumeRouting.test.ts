@@ -20,11 +20,11 @@ async function fixture(mode:"codex"|"demo"="codex") {
  const paths=workspaceMatchingPaths(root),manifest=[];
  for(const category of ["engineering","product"]) {
   const bytes=Buffer.from("%PDF-1.4\nAuthored fictional fixture "+category+"\n%%EOF");const sha256=createHash("sha256").update(bytes).digest("hex");
-  await writeFile(join(root,"data",category+".pdf"),bytes);manifest.push({category,path:category+".pdf",sha256});
+  await writeFile(join(root,"data/profile",category+".pdf"),bytes);manifest.push({category,path:category+".pdf",sha256});
  }
- await writeFile(paths.manifest,JSON.stringify(manifest));const context=await matchingContext(paths);
+ await writeFile(paths.profile,JSON.stringify({ ...JSON.parse(await readFile(paths.profile,"utf8")), resumes: manifest }));const context=await matchingContext(paths);
  for(let i=0;i<2;i++)await upsertJob(paths.opportunities,{jobId:"role-"+i,company:"Example "+i,title:"Graduate Engineer",location:"Remote",category:"Engineering",officialUrl:"https://example.com/roles/"+i,sources:["user-provided"],firstSeen:"2026-11-01",lastVerified:"2026-11-01",note:"Fictional fixture",status:"ready",resumeRecommendation:{profileKey:manifest[i]!.category,sha256:manifest[i]!.sha256,status:"matched",confidence:.9,contextToken:context.token,evaluatedAt:"2026-11-01T18:00:00Z"}});
- const threadId=randomUUID(),taskPaths={reviewPath:join(root,"data/drafts"),trackerPath:paths.opportunities,jobsPath:paths.opportunities,taskPath:join(root,"data/application-tasks.json"),matchingPaths:paths};
+ const threadId=randomUUID(),taskPaths={reviewPath:join(root,"data/opportunities"),trackerPath:paths.opportunities,jobsPath:paths.opportunities,taskPath:join(root,"data/runtime/application-tasks.json"),matchingPaths:paths};
  const service=new ApplicationTaskService(taskPaths,mode,demoTaskExecutor,mode==="codex"?{threadId,send:async()=>"fictional-message"}:undefined);services.push(service);await service.start();
  const command={action:"prepare",mode,requestId:randomUUID(),jobIds:["role-0","role-1"]};
  return {root,paths,manifest,context,threadId,taskPaths,service,command};
@@ -40,7 +40,7 @@ test("one Apply batch pins each job's own Jev-selected resume and is idempotent 
 test.each(["stale-context","changed-pdf","no-match","missing-match","conflicting-selection"])("%s rejects the entire Apply batch",async(kind)=>{
  const f=await fixture();
  if(kind==="stale-context")await writeFile(f.paths.preferences,await readFile(f.paths.preferences,"utf8")+"\nChanged fictional preference.\n");
- if(kind==="changed-pdf")await writeFile(join(f.root,"data/product.pdf"),"%PDF-1.4 changed attachment");
+ if(kind==="changed-pdf")await writeFile(join(f.root,"data/profile/product.pdf"),"%PDF-1.4 changed attachment");
  if(kind==="no-match"||kind==="missing-match") {
   const job=(await readJobLibrary(f.paths.opportunities))[1]!;
   await upsertJob(f.paths.opportunities,{...job,status:"ready",resumeRecommendation:kind==="missing-match"?undefined:{...job.resumeRecommendation!,profileKey:null,sha256:null,status:"no_match"}});
@@ -49,7 +49,7 @@ test.each(["stale-context","changed-pdf","no-match","missing-match","conflicting
  await expect(f.service.enqueue(command)).rejects.toThrow();expect(await f.service.list()).toEqual([]);
 });
 test("queued tasks recheck the pinned PDF before an existing chat can claim them",async()=>{
- const f=await fixture(),tasks=await f.service.enqueue(f.command);await writeFile(join(f.root,"data/engineering.pdf"),"%PDF-1.4 altered after queueing");
+ const f=await fixture(),tasks=await f.service.enqueue(f.command);await writeFile(join(f.root,"data/profile/engineering.pdf"),"%PDF-1.4 altered after queueing");
  await expect(claimChatTask(f.taskPaths,tasks[0]!.id,f.threadId)).rejects.toThrow("approved_cv_hash_mismatch");
  expect((await f.service.list())[0]?.state).toBe("blocked");expect((await f.service.list())[1]?.state).toBe("queued");
 });
@@ -72,7 +72,7 @@ test("a started application keeps its original bound PDF and is protected from l
 
 test("a changed approved PDF produces an actionable website conflict instead of a generic server error",async()=>{
  const f=await fixture(),server=await startReviewServer({...f.taskPaths,tasks:f.service,workspaceRoot:f.root,port:0});servers.push(server);
- await writeFile(join(f.root,"data/product.pdf"),"%PDF-1.4 changed fictional attachment");
+ await writeFile(join(f.root,"data/profile/product.pdf"),"%PDF-1.4 changed fictional attachment");
  const response=await fetch(server.address+"/api/tasks",{method:"POST",headers:{origin:server.address,"content-type":"application/json"},body:JSON.stringify(f.command)});
  expect(response.status).toBe(409);expect(await response.json()).toMatchObject({error:"matching_resume_changed"});expect(await f.service.list()).toEqual([]);
 });

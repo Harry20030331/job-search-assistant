@@ -56,7 +56,7 @@ test("the orange recording action appears only after a completed local submissio
  expect((await readFile(f.deliveryPath,"utf8")).trim().split("\n")).toHaveLength(1);
  expect(await readFile(f.paths.trackerPath,"utf8")).toBe(before); // No submission evidence or real lifecycle is fabricated.
  const board=await readInterviewBoard(f.boardPaths);expect(board).toHaveLength(1);expect(board[0]).toMatchObject({applicationStage:"interviewing",entry:{interviewId:result.interviewId,jobId:target.jobId,applicationId:target.applicationId,state:"invited",schedule:null,association:{source:"synthetic_test_script"},demoSubmission:{taskId:target.taskId}}});
- const status=await(await fetch(server.address+"/status/us?stage=interviewing")).text();expect(status).toContain('data-job="job-0" data-status="interviewing"');expect(status).not.toContain('data-demo-interview="');expect(status).toContain('>Interview prep ');
+ const status=await(await fetch(server.address+"/status/us?stage=interviewing")).text();expect(status).toContain('data-job="job-0" data-status="interviewing"');expect(status).not.toContain('data-demo-interview="');expect(status).toContain('data-stage-task="interviewing"');expect(status).not.toContain('class="row-interview-link"');
  const interviews=await(await fetch(server.address+"/interviews?interview="+result.interviewId+"&view=preparation")).text();expect(interviews).toContain("Fictional Employer 0");expect(interviews).toContain("Fictional preview");expect(interviews).toContain("Please wait, generating preparation plan...");
  const restart=await f.serve();expect(await(await fetch(restart.address+"/status/us")).text()).toContain('data-job="job-0" data-status="interviewing"');
 });

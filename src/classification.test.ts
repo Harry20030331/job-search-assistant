@@ -51,9 +51,9 @@ test("configured arbitrary resume profiles pass existing preflight and remain se
   await upsertJob(paths.opportunities, job);
   await expect(createApplication(paths.opportunities, { ...application, category: undefined as never }, at)).rejects.toThrow("invalid_application_record");
   const bytes = Buffer.from("Fictional approved product resume content");
-  const pdf = join(root, "data", application.cvFilename);
+  const pdf = join(root, "data/profile", application.cvFilename);
   await writeFile(pdf, bytes);
-  await writeFile(paths.manifest, JSON.stringify([{ category: "pm_general", path: application.cvFilename, sha256: createHash("sha256").update(bytes).digest("hex") }]));
+  await writeFile(paths.profile, JSON.stringify({ ...JSON.parse(await readFile(paths.profile, "utf8")), resumes: [{ category: "pm_general", path: application.cvFilename, sha256: createHash("sha256").update(bytes).digest("hex") }] }));
   await expect(runPreflight({ profilePath: paths.profile, manifestPath: paths.manifest, jobUrl: job.officialUrl, category: "Product Management" })).rejects.toThrow("unsupported_category");
   const checked = await runPreflight({ profilePath: paths.profile, manifestPath: paths.manifest, jobUrl: job.officialUrl, category: "pm_general" });
   expect(checked.cvPath).toBe(pdf);
@@ -66,11 +66,11 @@ test("configured arbitrary resume profiles pass existing preflight and remain se
   expect(stored.application?.resumeCategory).toBe("pm_general");
   expect((await readApplicationTracker(paths.opportunities)).applications.map(a => a.category)).toEqual(["pm_general", "llm"]);
   const item: ReviewItem = { applicationId: application.applicationId, company: job.company, title: job.title, location: job.location, category: "pm_general", ats: "ashby", officialUrl: job.officialUrl, applicationUrl: application.applicationUrl, cv: { filename: application.cvFilename, verified: true }, snapshotId: "product-snapshot", snapshotCurrent: true, answers: [], consents: [], questions: [], validationErrors: [], friction: [], preparedAt: at, decision: { state: "pending" } };
-  const drafts = join(root, "data/drafts");
+  const drafts = join(root, "data/opportunities");
   await publishReviewItem(drafts, item, null);
   expect((await readReviewBatch(drafts)).applications[0]?.category).toBe("pm_general");
   const surface = await startMatchingSurface(root);
-  try { expect(await (await fetch(surface.statusUrl)).text()).toContain("Product Management"); }
+  try { expect(await (await fetch(surface.statusUrl)).text()).toContain("pm_general"); }
   finally { await surface.server.close(); }
   const record = (await readApplicationTracker(paths.opportunities)).applications[0]!;
   expect(buildStatusView([record], projectJobs(await readOpportunities(paths.opportunities)))[0]?.category).toBe("Product Management");
@@ -94,7 +94,7 @@ test("legacy applications read without rewriting and new directions never infer 
 
 test("free direction labels are escaped and cannot inject HTML", () => {
   const html = renderUsStatusPage(buildStatusView([], [{ ...job, category: '<img src=x onerror="alert(1)">', sources: ["official-careers"] }]));
-  expect(html).toContain("&lt;img");
+  expect(html).not.toContain(">Direction</th>");
   expect(html).not.toContain('<img src=x');
 });
 

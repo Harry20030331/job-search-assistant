@@ -37,9 +37,9 @@ Apply all accepted edits to the actual form and verify the complete live state a
 
 ## Working data and closeout
 
-Read `data/candidate.json` through the profile loader, `data/preferences.md`, and `data/resumes.json`. Use the exact role in `data/opportunities.json`; filling advances the same record, never a separate tracker. Publish working answers, unresolved questions and actual approval state through the data API to `data/drafts/`. The adapters hydrate role headers from the opportunity.
+Read the selected profile through the loader, its approved resume manifest and the application-answer preferences. Resolve the paths from the task or [workspace layout](../../docs/structure.md#single-user-workspace). Use the exact role in the opportunity ledger; filling advances the same record, never a separate tracker. Publish working answers, unresolved questions and actual approval state through the data API to the selected draft store. The adapters hydrate role headers from the opportunity.
 
-After observing explicit success, save its time and short official-page/email reference through the lifecycle interface. Working drafts can then be removed with `npm run drafts -- prune --path data/drafts`. A click or approval is not success. Keep unresolved and uncertain attempts recoverable. No permanent screenshot or daily ledger is required; never put passwords, OTPs, raw DOM or raw email in data.
+After observing explicit success, save its time and short official-page/email reference through the lifecycle interface. Working drafts can then be removed with `npm run drafts -- prune --path <selected-draft-store>`. A click or approval is not success. Keep unresolved and uncertain attempts recoverable. No permanent screenshot or daily ledger is required; never put passwords, OTPs, raw DOM or raw email in data.
 
 Use truthful, resume-backed structured skills when supported. Personal links come from the resolved profile. Respect unresolved education conflicts. An absent exercise URL stays a review question, never an invented link.
 

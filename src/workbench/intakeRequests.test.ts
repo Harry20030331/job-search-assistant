@@ -20,7 +20,7 @@ test("three accessible source choices replace the upfront form and all inline sc
 test("pasted text is staged without candidate creation, delivered once and confirmed only after a reviewed preview",async()=>{
  const f=await setup(),requestId=randomUUID(),source={requestId,kind:"text",value:"Fictional Casey studies at Example University and builds research prototypes."};
  expect(await beginIntakeRequest(f.root,f.chat,source,f.run)).toMatchObject({state:"delivered",revision:0});await beginIntakeRequest(f.root,f.chat,source,f.run);expect(f.calls).toHaveLength(1);expect(f.calls[0]?.at(-1)).toBe("--resume");
- await expect(readdir(join(f.root,"local/workspaces"))).rejects.toMatchObject({code:"ENOENT"});
+ await expect(readdir(join(f.root,"data"))).rejects.toMatchObject({code:"ENOENT"});
  await expect(confirmIntakeRequest(f.root,requestId,preferences)).rejects.toThrow("intake_preview_required");
  await expect(workIntakeRequest(f.root,requestId,0,randomUUID(),"claim")).rejects.toThrow("wrong_chat_thread");
  expect(await workIntakeRequest(f.root,requestId,0,f.chat.threadId,"claim")).toMatchObject({sourceValue:source.value,state:"running"});
@@ -28,8 +28,8 @@ test("pasted text is staged without candidate creation, delivered once and confi
  await workIntakeRequest(f.root,requestId,0,f.chat.threadId,"preview",preview);
  const publicState=await readIntakeRequest(f.root,requestId);expect(publicState).toMatchObject({state:"preview_ready",preview:{candidate:{identity:candidate.identity}}});expect(JSON.stringify(publicState)).not.toContain(f.chat.threadId);expect(JSON.stringify(publicState)).not.toContain("sourceValue");
  await expect(confirmIntakeRequest(f.root,requestId,{...preferences,confirmed:false})).rejects.toThrow();
- const workspace=await confirmIntakeRequest(f.root,requestId,preferences);expect(await confirmIntakeRequest(f.root,requestId,{revision:0,confirmed:true})).toBe(workspace);
- expect(JSON.parse(await readFile(join(workspace,"data/candidate.json"),"utf8"))).toMatchObject({identity:candidate.identity,_meta:{websiteIntake:{requestId,kind:"text"}}});expect(JSON.parse(await readFile(join(workspace,"data/resumes.json"),"utf8"))).toEqual([]);
+ const workspace=await confirmIntakeRequest(f.root,requestId,preferences);expect(workspace).toBe(f.root);expect(await confirmIntakeRequest(f.root,requestId,{revision:0,confirmed:true})).toBe(workspace);
+ expect(JSON.parse(await readFile(join(workspace,"data/profile/candidate.json"),"utf8"))).toMatchObject({identity:candidate.identity,_meta:{websiteIntake:{requestId,kind:"text"}}});expect(JSON.parse(await readFile(join(workspace,"data/profile/candidate.json"),"utf8")).resumes).toEqual([]);
 });
 
 test("PDF upload is stored privately with a fixed filename and never silently becomes an approved resume",async()=>{const f=await setup(),requestId=randomUUID();await beginIntakeRequest(f.root,f.chat,{requestId,kind:"pdf",filename:"../../example.pdf",base64:Buffer.from("%PDF-1.4\nfictional fixture\n%%EOF").toString("base64")},f.run);expect(await readFile(join(intakeDirectory(f.root,requestId),"source.pdf"),"utf8")).toContain("%PDF");const claimed=await workIntakeRequest(f.root,requestId,0,f.chat.threadId,"claim");expect(claimed).toMatchObject({sourcePath:join(intakeDirectory(f.root,requestId),"source.pdf")});await expect(beginIntakeRequest(f.root,f.chat,{requestId:randomUUID(),kind:"pdf",filename:"example.pdf",base64:Buffer.from("not a pdf").toString("base64")},f.run)).rejects.toThrow("invalid_pdf");await expect(beginIntakeRequest(f.root,undefined,{requestId:randomUUID(),kind:"text",value:"Fictional text with no connected reader."},f.run)).rejects.toThrow("runner_unavailable")});
@@ -46,7 +46,7 @@ test("LinkedIn previews must match observed facts and retain source confirmation
  await expect(workIntakeRequest(f.root,requestId,0,f.chat.threadId,"preview",{...preview,candidate:{...linkedCandidate,summary:"Invented unsupported headline"},observation})).rejects.toThrow("linkedin_facts_not_observed");
  await workIntakeRequest(f.root,requestId,0,f.chat.threadId,"preview",{...preview,candidate:linkedCandidate,observation});
  const root=await confirmIntakeRequest(f.root,requestId,preferences);
- expect(JSON.parse(await readFile(join(root,"data/candidate.json"),"utf8"))).toMatchObject({_meta:{linkedinImport:{sourceUrl,state:"confirmed"}}});
+ expect(JSON.parse(await readFile(join(root,"data/profile/candidate.json"),"utf8"))).toMatchObject({_meta:{linkedinImport:{sourceUrl,state:"confirmed"}}});
 });
 
 
@@ -56,6 +56,6 @@ test("confirmed flexible intake needs no direction list or location list and kee
  await workIntakeRequest(f.root,id,0,f.chat.threadId,"claim");await workIntakeRequest(f.root,id,0,f.chat.threadId,"preview",preview);
  await expect(confirmIntakeRequest(f.root,id,{...preferences,directions:[],flexibleDirection:false})).rejects.toThrow("intake_direction_required");
  const root=await confirmIntakeRequest(f.root,id,{...preferences,directions:[],flexibleDirection:true});
- const policy=await readFile(join(root,"data/preferences.md"),"utf8");expect(policy).toContain('"categories": []');expect(policy).toContain('"locations": []');
- expect(JSON.parse(await readFile(join(root,"data/candidate.json"),"utf8")).identity).toEqual(candidate.identity);
+ const policy=await readFile(join(root,"data/profile/preferences/job-selection.md"),"utf8");expect(policy).toContain('"categories": []');expect(policy).toContain('"locations": []');
+ expect(JSON.parse(await readFile(join(root,"data/profile/candidate.json"),"utf8")).identity).toEqual(candidate.identity);
 });

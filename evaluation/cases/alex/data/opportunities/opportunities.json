@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "opportunities": [
+    {
+      "jobId": "A1",
+      "company": "Cedar Search (fictional)",
+      "title": "Software Engineer, Retrieval — New Grad",
+      "location": "Seattle, WA",
+      "category": "llm",
+      "officialUrl": "https://example.invalid/jobs/A1",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-11-04",
+      "lastVerified": "2026-11-04",
+      "availability": "unknown",
+      "stage": "new",
+      "note": "Supplied fictional listing. Full-time July 2027 start. Seattle hybrid, 3 days onsite. BS/MS, 0–2 years. Build Python document ingestion, hybrid retrieval and citation evaluation; production experience preferred, not required."
+    },
+    {
+      "jobId": "A2",
+      "company": "Raincloud Systems (fictional)",
+      "title": "Software Engineer, Agent Infrastructure — New Grad",
+      "location": "US Remote — Washington eligible",
+      "category": "llm",
+      "officialUrl": "https://example.invalid/jobs/A2",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-11-04",
+      "lastVerified": "2026-11-04",
+      "availability": "unknown",
+      "stage": "new",
+      "note": "Supplied fictional listing. Full-time July 2027 start. Remote from Washington accepted; no relocation. BS/MS, 0–2 years. Build Python tool validation, REST APIs, task replay and backend tests. Docker familiarity preferred."
+    },
+    {
+      "jobId": "A3",
+      "company": "Hudson AI (fictional)",
+      "title": "Applied LLM Engineer — New Grad",
+      "location": "New York, NY",
+      "category": "llm",
+      "officialUrl": "https://example.invalid/jobs/A3",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-11-04",
+      "lastVerified": "2026-11-04",
+      "availability": "unknown",
+      "stage": "new",
+      "note": "Supplied fictional listing. Full-time July 2027 start. Must relocate to New York; onsite 4 days/week, no remote exception. BS/MS, 0–2 years. Retrieval evaluation, Python and citation grounded assistants."
+    },
+    {
+      "jobId": "A4",
+      "company": "Summit Platform (fictional)",
+      "title": "Staff ML Platform Engineer",
+      "location": "Seattle, WA",
+      "category": "llm",
+      "officialUrl": "https://example.invalid/jobs/A4",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-11-04",
+      "lastVerified": "2026-11-04",
+      "availability": "unknown",
+      "stage": "new",
+      "note": "Supplied fictional listing. Requires 6+ years professional full-time experience and engineering leadership. Production Kubernetes, large distributed training systems."
+    },
+    {
+      "jobId": "A5",
+      "company": "Harbor Index (fictional)",
+      "title": "Software Engineer, Search — New Grad",
+      "location": "Seattle, WA",
+      "category": "llm",
+      "officialUrl": "https://example.invalid/jobs/A5",
+      "sources": [
+        "user-provided"
+      ],
+      "firstSeen": "2026-11-04",
+      "lastVerified": "2026-11-04",
+      "availability": "unknown",
+      "stage": "new",
+      "note": "Supplied fictional listing. Full-time July 2027 start. BS/MS, 0–2 years. Python search indexing and relevance tests; Seattle hybrid."
+    }
+  ]
+}

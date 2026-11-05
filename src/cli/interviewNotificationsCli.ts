@@ -1,3 +1,4 @@
+import { filesForRuntime } from "../storage/userWorkspace.js";
 import { resolve, join } from "node:path";
 import { acknowledgeNotice, pendingNotices } from "../interview/notifications.js";
 
@@ -12,7 +13,7 @@ for (let i = 0; i < args.length; i++) {
 }
 if (!["pending", "ack"].includes(action ?? "") || !values.has("--runtime-dir")) throw new Error("invalid_notification_arguments");
 const root = resolve(values.get("--runtime-dir")!);
-const paths = { trackerPath: join(root, "opportunities.json"), profilePath: resolve(values.get("--profile") ?? join(root, "candidate.json")) };
+const paths = { trackerPath: filesForRuntime(root).opportunities, profilePath: resolve(values.get("--profile") ?? filesForRuntime(root).profile) };
 if (action === "pending") {
   const notifications = (await pendingNotices(paths, "chat")).filter(item => includeSynthetic || !item.synthetic);
   process.stdout.write(JSON.stringify({ notifications }) + "\n");

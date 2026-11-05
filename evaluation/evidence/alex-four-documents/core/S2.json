@@ -1,0 +1,16 @@
+{
+  "sessionId": "S2",
+  "threadId": "01a1a914-a34e-7f32-b17f-254e03a2cf02",
+  "turns": [
+    {
+      "id": "T1",
+      "user": "Help me prepare applications for the two jobs we kept last time. Bring both local drafts and any unanswered items together for one review.",
+      "assistant": "Both drafts are ready in one [unified review](../local-drafts/review.md): Cedar Search’s Seattle retrieval role and Raincloud Systems’ Washington remote agent infrastructure role.\n\nEach includes your confirmed facts and proposed project and motivation answers. Please review both together and provide:\n\n- Desired salary, including currency and pay period.\n- Optional demographic choices, or whether to skip them.\n- Whether Cedar’s three onsite days per week work for you.\n\nBoth are labeled **SIMULATED LOCAL FORM — NOT AN EMPLOYER FORM**. Nothing has been submitted."
+    },
+    {
+      "id": "T2",
+      "user": "In the first draft, keep Study Search but make my ownership of ingestion, evaluation and deterministic regression checks more prominent. The second draft's project answer is fine. Leave salary unanswered, and choose 'Decline to answer' for optional demographic questions in these two local drafts. Please revise both together for my review; do not submit.",
+      "assistant": "Both [revised drafts are together for review](../local-drafts/review.md).\n\n- **Cedar Search:** the Study Search answer now leads with your ownership of ingestion, evaluation and deterministic regression checks.\n- **Raincloud Systems:** the project answer is unchanged.\n- **Both:** salary remains unanswered; optional demographic responses are “Decline to answer,” scoped to these two drafts.\n\nCedar’s three onsite days per week remain unconfirmed. Both drafts remain simulated local forms awaiting your review. Nothing has been submitted."
+    }
+  ]
+}

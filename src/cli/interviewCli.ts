@@ -1,3 +1,6 @@
+import { mkdir } from "node:fs/promises";
+import { makePrivate } from "../storage/privateFiles.js";
+import { filesForRuntime, jobFolder } from "../storage/userWorkspace.js";
 import { resolveInterviewPython } from "../interview/pythonRuntime.mjs";
 import { spawn } from "node:child_process";
 import { dirname, resolve } from "node:path";
@@ -39,18 +42,30 @@ export async function runInterviewCli(args: string[]) {
   if (!["--settings", "--invitation", "--job-id"].every(key => flags.has(key))) throw new Error("invalid_arguments");
   if (flags.has("--workspace") && ["--profile", "--preferences", "--opportunities"].some(key => flags.has(key))) throw new Error("invalid_arguments");
   if (operation === "context" && (flags.has("--output") || flags.has("--expected-token"))) throw new Error("invalid_arguments");
-  if (operation === "stage" && (!flags.has("--expected-token") || !flags.has("--output"))) throw new Error("invalid_arguments");
+  if (operation === "stage" && (!flags.has("--expected-token") || (!flags.has("--output") && !flags.has("--workspace")))) throw new Error("invalid_arguments");
   const base = resolve(flags.get("--workspace") ?? "data");
+  const files = filesForRuntime(base);
   const paths: InterviewPaths = {
-    profile: resolve(flags.get("--profile") ?? resolve(base, "candidate.json")),
-    preferences: resolve(flags.get("--preferences") ?? resolve(base, "preferences.md")),
-    opportunities: resolve(flags.get("--opportunities") ?? resolve(base, "opportunities.json")),
+    profile: resolve(flags.get("--profile") ?? files.profile),
+    preferences: resolve(flags.get("--preferences") ?? (files.grouped ? files.interview : files.preferences)),
+    opportunities: resolve(flags.get("--opportunities") ?? files.opportunities),
     settings: resolve(flags.get("--settings")!), invitation: resolve(flags.get("--invitation")!)
   };
   const bundle = await interviewHandoff(paths, flags.get("--job-id")!);
   if (operation === "context") return bundle;
   if (flags.get("--expected-token") !== bundle.token) throw new Error("interview_stale_context");
-  return stageInterview(bundle, flags.get("--output")!);
+  const output = flags.get("--output") ?? (files.grouped
+    ? resolve(jobFolder(dirname(files.opportunities), flags.get("--job-id")!), "interviews", "round-" + encodeURIComponent(bundle.application.interview_id))
+    : undefined);
+  if (!output) throw new Error("invalid_arguments");
+  if (files.grouped && !flags.has("--output")) {
+    const role = dirname(dirname(output));
+    await mkdir(role, { recursive: true, mode: 0o700 });
+    await makePrivate(role);
+    await mkdir(dirname(output), { recursive: true, mode: 0o700 });
+    await makePrivate(dirname(output));
+  }
+  return stageInterview(bundle, output);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {

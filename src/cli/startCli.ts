@@ -1,3 +1,4 @@
+import { execFile } from "node:child_process";
 import { jevReadiness } from "../matching/jev.js";
 import { probeInterviewPython } from "../interview/pythonRuntime.mjs";
 import { dirname, resolve } from "node:path";
@@ -13,4 +14,15 @@ process.stdout.write(`interview_runtime=${interview.coreReady?"ready":"unavailab
 if(!interview.coreReady)process.stderr.write("Interview preparation needs setup: run npm run interview:setup. Matching and application review remain available.\n");
 const server=await startWorkbench(root,{chat:thread.success?{version:1,threadId:thread.data,executable:process.env.CODEX_CLI_PATH??"codex"}:undefined});
 process.stdout.write(`workspace_url=${server.address}\nwelcome_url=${server.address}\n`);
+// Inside Codex the hosting thread opens its in-app browser.
+if (!thread.success) {
+  const launchers: Partial<Record<NodeJS.Platform, string>> = { darwin: "open", win32: "rundll32.exe", linux: "xdg-open" };
+  const launcher = launchers[process.platform];
+  if (launcher) {
+    const args = process.platform === "win32" ? ["url.dll,FileProtocolHandler", server.address] : [server.address];
+    execFile(launcher, args, error => {
+      if (error) process.stderr.write(`Open CareerOS in your browser: ${server.address}\n`);
+    });
+  }
+}
 for(const signal of ["SIGINT","SIGTERM"] as const)process.once(signal,()=>{void server.close().then(()=>process.exit(0))});

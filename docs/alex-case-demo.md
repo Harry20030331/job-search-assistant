@@ -1,4 +1,4 @@
-# Alex Liu five-role demo
+# Legacy application and interview checkpoints
 
 Maintenance date: 2026-10-31. Use the original fictional profile, resume, five saved roles and role-specific review questions in `examples/`. This walkthrough preserves those files and creates separate working copies. It is an integration demonstration, not a benchmark score or evidence of employer submissions.
 
@@ -51,7 +51,7 @@ Validation for this repair: `npm run verify` passed 47 test files, 497 tests, th
 
 ## Normal-start rehearsal — 2026-10-31
 
-Run `npm run interview:setup` once before the demo. Start normally and choose the existing fictional example on Welcome. Example application preparation and submission execute locally even when this chat is connected; they do not wait for live browser execution. Select the saved Nooks and Adobe roles, answer the required review questions, approve each exact draft and submit the local rehearsal. The guarded `demo:alex:interviews` checkpoint may then stage fictional invitations in that same isolated workspace. Reuse it once created; never replace the user's working case or treat its synthetic receipts as real submissions.
+Run `npm run interview:setup` once before the demo. Use the explicit legacy review snapshot command above. Example application preparation and submission execute locally even when this chat is connected; they do not wait for live browser execution. Select the saved Nooks and Adobe roles, answer the required review questions, approve each exact draft and submit the local rehearsal. The guarded `demo:alex:interviews` checkpoint may then stage fictional invitations in that same isolated workspace. Reuse it once created; never replace the user's working case or treat its synthetic receipts as real submissions.
 
 Interview requests retain the demo mode in their host prompt and require local-only handling. Share invitations, preparation requests and debriefs through the website. The connected Codex chat handles the owning domain tools and returns results to that page. Preparation still requires the exact current Plan approval before model-backed Practice generation. A failed generation is retained and needs explicit retry. Existing preauthored checkpoints and fresh model output must be described separately. This is a local product rehearsal; real employer forms, Gmail and Google Calendar are outside its scope. See the [current verification report](interview-current-integration.md) for observed results and limits.
 

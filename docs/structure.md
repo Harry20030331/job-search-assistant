@@ -16,7 +16,34 @@ examples/                  fictional inputs only
 docs/                      current contracts
 ```
 
-A private runtime has `data/opportunities.json`, `data/drafts/<job-id>.json` and `data/discovery-state.json`. The default development workspace stores its copied candidate inputs beside those records in `data/`. Explicitly selected candidate, preference and resume paths may also be external. There is no required CV directory or symlink.
+## Single-user workspace
+
+Start CareerOS with `npm start`. After confirmation, the website saves your profile directly in the repository. Personal files under `data/`:
+
+```text
+profile/
+  candidate.json                  Confirmed facts and the approved resumes array
+  resumes/                        Approved PDFs referenced by candidate.json
+  preferences/
+    job-selection.md              Search notes, structured filters and feedback
+    application-answers.md        How the user wants application questions answered
+    interview-preparation.md      How the user wants to practice
+sessions/
+  <session-id>.json               Verbatim user/assistant turns and close receipt
+opportunities/
+  opportunities.json              Current snapshot of all jobs and application stages
+  job-<encoded-job-id>/
+    draft.json                    Working application answers and review state
+    interviews/                   Staged preparation for this role
+  interviews/registry.json        Cross-role interview round index, created on demand
+runtime/                          Discovery checkpoints, task queues, chat binding and runner locks
+```
+
+The Profile page exposes the three preferences. Closing a recorded session runs Dreaming and links a reusable preference to the originating turn. Domain actions update the shared opportunity snapshot when the work advances. A comment about interview practice can therefore be preserved in a session, shape future preparation, and accompany progress on a particular job. The chat itself cannot mark a job submitted. Shared procedural knowledge lives in the repository's `skills/`. Runtime files belong to this workspace and are separate from the job ledger. Earlier workspaces retain their existing paths.
+
+### Earlier workspaces and fictional examples
+
+A flat private runtime has `data/opportunities.json`, `data/drafts/<job-id>.json` and `data/discovery-state.json`. The default development workspace stores its copied candidate inputs beside those records in `data/`. Explicitly selected candidate, preference and resume paths may also be external. There is no required CV directory or symlink.
 
 | Data | Owner and lifetime |
 | --- | --- |
@@ -39,17 +66,17 @@ The source workflow's private archive and runtime are excluded. Inert regional a
 
 See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contract](ui-contract.md), and [workflow contract](workflow-contract.md).
 
-Ignored `local/active-workspace.json` stores only the explicitly confirmed/resumed real user path for direct Status startup; fictional examples never update it. Ignored `local/search-workspaces.json` indexes known workspace paths only; it is not a second job store. Matching intake and fictional workspace creation register paths for resume discovery. See [saved searches](workspaces.md).
+The website loads the repository’s `data/` on startup. Older installations can resume their previously selected profile through their saved pointer. The website example reads the authored Alex case directly.
 
 ## Example and local workspace
 
-`examples/` contains shared fictional candidate inputs and two progress checkpoints under `snapshots/shortlist/` and `snapshots/review/`. `data/` is the current working state. `npm run review` opens existing data; when data is absent, it supplies the default Alex case. `npm run example:load` replaces current data with the default example; `--from <directory>` selects another bundle, and `--dir <workspace>` selects the destination workspace. Stop Review and other writers before loading.
+`examples/` contains shared fictional candidate inputs and two progress checkpoints under `snapshots/shortlist/` and `snapshots/review/`. `data/` is the current working state. `npm run review` opens existing personal data. On first use, run `npm start` to set up a profile or try Alex separately. `npm run example:load` replaces current data with the Alex memory pilot seed; `--from <directory>` selects another bundle, and `--dir <workspace>` selects the destination workspace. Stop Review and other writers before loading.
 
 The loader validates a staged copy before switching. It preserves previous data under ignored `local/example-backups/` and reports that path. It copies candidate facts, preferences and all manifest-referenced PDFs, plus optional opportunity, draft and discovery records. If progress files are omitted, those stores start empty. It never merges two candidates. Examples remain unchanged as working data evolves.
 
-`src/` contains application behavior, including initialization. `scripts/` contains development checks; it does not store candidate state. `src/demo/` is an optional fixed submission test with a simulated employer, separate from normal workbench startup. The web UI contains the fixed Status/Review pages and an Interview page with exact plan acceptance and debrief reminders, without a candidate editor or workspace switcher.
+`src/` contains application behavior, including initialization. `scripts/` contains development checks; it does not store candidate state. `src/demo/` is an optional fixed submission test with a simulated employer, separate from normal workbench startup. The web UI contains the fixed Status/Review pages and an Interview page with exact plan acceptance and debrief reminders, with a separate Profile editor for supported user-owned inputs.
 
-Select a saved checkpoint with `example:shortlist` or `example:review` while the service is stopped.
+For the older application and interview integration fixtures, select a saved checkpoint with `example:shortlist` or `example:review` while the service is stopped.
 
 The full directory tree and startup/loading commands are maintained in the repository README. The candidate bundle is copied as a unit; its README is documentation, not runtime input. Progress is loaded from the selected example when provided, otherwise starts empty, and then accumulates around that candidate. Working data is not a log of the examples directory. Deliberately improving the shareable fictional baseline is a separate reviewed change.
 
@@ -57,3 +84,5 @@ Snapshot loading preserves only the host-local chat routing file across resets; 
 
 
 Maintenance — 2026-11-03: Working primary navigation is Profile / Status. Review and interview routes remain contextual Status tasks with return links; the Google connection route is presented as Settings under Profile. No storage ownership or directory layout changed.
+
+Maintenance — 2026-11-04: `src/memory/` owns the opt-in [session-memory research interface](session-memory.md). The isolated research root is independent of the selected user workspace; the product adapter uses the same source-link convention.
