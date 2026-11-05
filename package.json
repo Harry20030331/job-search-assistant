@@ -59,6 +59,7 @@
     "example:load": "tsx src/cli/exampleLoadCli.ts",
     "example:shortlist": "tsx src/cli/exampleLoadCli.ts --snapshot shortlist",
     "example:review": "tsx src/cli/exampleLoadCli.ts --snapshot review",
+    "session": "tsx src/cli/sessionMemoryCli.ts",
     "start": "tsx src/cli/startCli.ts",
     "search:request": "tsx src/cli/searchRequestCli.ts",
     "interview:request": "tsx src/cli/interviewRequestCli.ts",

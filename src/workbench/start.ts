@@ -1,21 +1,21 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { serveWorkspaceFont } from "./assets.js";
 import { renderNewCandidate } from "./intakeView.js";
 import { beginIntakeRequest, readIntakeRequest, reviseIntakeRequest, confirmIntakeRequest } from "./intakeRequests.js";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { randomUUID } from "node:crypto";
-import { mkdir, realpath, readFile, rename } from "node:fs/promises";
+import { renderExampleSnapshot } from "./exampleSnapshot.js";
+import { lstat, realpath, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { listMatchingWorkspaces } from "../matching/workspaces.js";
-import { workspaceMatchingPaths, createMatchingWorkspace, createExampleSearchWorkspace } from "../matching/intake.js";
+import { workspaceMatchingPaths, createPersonalWorkspace } from "../matching/intake.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
 import { startReviewServer, type RunningReviewServer } from "../review/reviewServer.js";
 import { ApplicationTaskService, demoTaskExecutor } from "../review/applicationTasks.js";
 import { createChatTaskDispatcher, type ChatTaskConfig } from "../review/chatTaskBridge.js";
 import { loadCandidateProfile } from "../profile.js";
 import { writePrivateFile } from "../storage/privateFiles.js";
-import { page as workspacePage, escapeText } from "./views.js";
+import { page as workspacePage } from "./views.js";
 
 function page(...args: Parameters<typeof workspacePage>) {
   return workspacePage(...args).replace("<body>", '<body class="welcome-shell">').replace(/<header[\s\S]*?<\/header>/, '<header class="workspace-top"><a class="workspace-brand" href="/welcome">CareerOS</a><nav aria-label="Primary"><a href="/welcome" aria-current="page">Home</a></nav></header>')
@@ -25,48 +25,36 @@ function page(...args: Parameters<typeof workspacePage>) {
 function welcome() {
   const icons = [
     '<circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',
-    '<path d="M3 7V5h6l2 2h10v13H3z"/>',
     '<path d="M14 3H5v18h14V8zM14 3v5h5M8 13h8M8 17h6"/>'
   ];
   const options = [
-    ["/new", "New candidate", "Build a profile and find roles that fit.", "Get started"],
-    ["/existing", "Continue a search", "Pick up where you left off.", "Open saved searches"],
+    ["/new", "Your profile", "Set up or open your job search.", "Open profile"],
     ["/example", "Try example", "Explore the workflow with a fictional candidate.", "Explore example"]
   ];
   return page("Welcome", "home", `<section class="welcome-page"><div class="welcome-copy"><div class="welcome-tag"><span aria-hidden="true"></span>From first search to next chapter</div><h1>Your next role.<br>A clearer path.</h1><p class="welcome-intro">Find the right opportunities, give every application your best, and walk into interviews prepared.</p><div class="journey" aria-label="Your application journey"><span>Discover</span><i aria-hidden="true"></i><span>Apply</span><i aria-hidden="true"></i><span>Prepare</span></div><p class="welcome-note">Your search, with you in control.</p></div><div class="welcome-options">${options.map(([url,label,description,action],i)=>`<a class="welcome-option" href="${url}"><span class="welcome-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[i]}</svg></span><span class="welcome-option-copy"><strong>${label}</strong><span>${description}</span><span class="welcome-action">${action}<span aria-hidden="true"> ↗</span></span></span></a>`).join("")}</div></section>`);
 }
 /** A candidate-free launch page. Explicit selection alone opens a candidate service. */
 export async function startWorkbench(repository: string, options: { port?: number; chat?: ChatTaskConfig; temporaryRoots?: string[] } = {}) {
-  const registry = join(repository, "local/search-workspaces.json");
   const activePath = join(repository, "local/active-workspace.json");
-  const running = new Map<string, { server: RunningReviewServer; tasks?: ApplicationTaskService; real: boolean }>();
+  const running = new Map<string, { server: RunningReviewServer; tasks?: ApplicationTaskService }>();
   const opening = new Map<string, Promise<string>>();
   const creations = new Map<string, Promise<string>>();
-  const choices = new Map<string, string>();
-  async function rememberActive(root: string) {
-    await mkdir(join(repository, "local"), { recursive: true, mode: 0o700 });
-    const temporary = join(repository, "local", `.${randomUUID()}.tmp`);
-    await writePrivateFile(temporary, JSON.stringify({ version: 1, workspace: root, selectedAt: new Date().toISOString() }));
-    await rename(temporary, activePath);
-  }
   async function open(workspace: string) {
     const root = await realpath(workspace);
-    if (running.has(root)) { if (running.get(root)!.real) await rememberActive(root); return running.get(root)!.server.address + "/profile"; }
+    if (running.has(root)) return running.get(root)!.server.address + "/profile";
     if (opening.has(root)) return opening.get(root)!;
     const promise = (async () => {
       const inputs = await resolveRecoveryInputs(root);
-      const candidate = await loadCandidateProfile(join(root, "data/candidate.json"));
+      const candidate = await loadCandidateProfile(userFiles(root).profile);
       const email = String((candidate.contact as { email?: string })?.email ?? "");
       const mode = candidate.fictional === true || /@(?:.*\.)?example\.(com|org|net)$/i.test(email) ? "demo" : "codex";
-      const tasks = options.chat || mode === "demo" ? new ApplicationTaskService({ ...inputs, taskPath: join(root,"data/application-tasks.json"), matchingPaths: workspaceMatchingPaths(root) }, mode,
+      const tasks = options.chat || mode === "demo" ? new ApplicationTaskService({ ...inputs, taskPath: userFiles(root).tasks, matchingPaths: workspaceMatchingPaths(root) }, mode,
         mode === "demo" ? demoTaskExecutor : async () => { throw new Error("runner_unavailable"); }, mode === "codex" && options.chat ? createChatTaskDispatcher(root, options.chat) : undefined) : undefined;
       await tasks?.start();
       try {
-        if (options.chat) await writePrivateFile(join(root,"data/chat-runner.json"),JSON.stringify(options.chat));
-        const selectedServer = await startReviewServer({ ...inputs, port: 0, profilePath: join(root,"data/candidate.json"), workspaceRoot: root, repositoryRoot: repository, welcomeUrl: `http://127.0.0.1:${(server.address() as AddressInfo).port}/welcome`, searchRefresh: { automatic: mode === "codex", ...(mode === "demo" ? { pausedReason: "Demo · automatic updates paused." } : {}) }, tasks });
-        try { if (mode === "codex") await rememberActive(root); }
-        catch (error) { await selectedServer.close(); throw error; }
-        running.set(root, { server: selectedServer, tasks, real: mode === "codex" });
+        if (options.chat) await writePrivateFile(userFiles(root).chat,JSON.stringify(options.chat));
+        const selectedServer = await startReviewServer({ ...inputs, port: 0, profilePath: userFiles(root).profile, workspaceRoot: root, repositoryRoot: repository, welcomeUrl: `http://127.0.0.1:${(server.address() as AddressInfo).port}/welcome`, searchRefresh: { automatic: mode === "codex", ...(mode === "demo" ? { pausedReason: "Demo · automatic updates paused." } : {}) }, tasks });
+        running.set(root, { server: selectedServer, tasks });
         return selectedServer.address + "/profile";
       } catch(error) { await tasks?.close(); throw error; }
     })();
@@ -84,20 +72,27 @@ export async function startWorkbench(repository: string, options: { port?: numbe
       if (![ `127.0.0.1:${address.port}`, `localhost:${address.port}` ].includes(request.headers.host ?? "")) {send(403,"Invalid host");return;}
       if(request.method==="POST" && (request.headers["sec-fetch-site"] === "cross-site" || request.headers.origin !== `http://${request.headers.host}`)){send(403,"Invalid origin");return;}
       if (request.method === "GET" && url.pathname === "/assets/InterVariable.woff2") { await serveWorkspaceFont(response); return; }
-      if (request.method === "GET" && url.pathname === "/") {
-        let active: { version: 1; workspace: string } | undefined;
-        try { active = z.object({ version: z.literal(1), workspace: z.string().min(1), selectedAt: z.string().datetime() }).strict().parse(JSON.parse(await readFile(activePath, "utf8"))); }
+      if (request.method === "GET" && ["/", "/existing", "/new"].includes(url.pathname)) {
+        let root = repository;
+        try { await lstat(join(repository, "data")); }
         catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== "ENOENT") { send(200, page("Restore workspace", "home", '<h1>Restore your workspace</h1><p class="intro">Your saved workspace could not be read. Choose your existing search to reconnect it.</p><a class="primary" href="/existing">Restore saved search</a>')); return; }
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+          // Older installs may still have an explicitly selected profile.
+          try { root = z.object({ workspace: z.string().min(1) }).parse(JSON.parse(await readFile(activePath, "utf8"))).workspace; }
+          catch (legacyError) {
+            if ((legacyError as NodeJS.ErrnoException).code !== "ENOENT") throw legacyError;
+            send(200, renderNewCandidate()); return;
+          }
         }
-        if (active) {
-          try { const target = (await open(active.workspace)).replace(/\/profile$/, "/status"); response.writeHead(302, { location: target, "cache-control": "no-store" }); response.end(); }
-          catch { send(200, page("Restore workspace", "home", '<h1>Restore your workspace</h1><p class="intro">Your saved workspace is unavailable. Reconnect your existing search to continue.</p><a class="primary" href="/existing">Restore saved search</a>')); }
-        } else send(200, renderNewCandidate());
+        try {
+          const target = new URL("/status", await open(root));
+          response.writeHead(302, { location: target.href, "cache-control": "no-store" }); response.end();
+        } catch {
+          send(409, page("Restore profile", "home", "<h1>Restore your profile</h1><p>Check your saved data directory and reload this page.</p>"));
+        }
         return;
       }
       if(request.method==="GET" && url.pathname==="/welcome"){send(200,welcome());return;}
-      if(request.method==="GET" && url.pathname==="/new"){send(200,renderNewCandidate());return;}
       const intakeMatch = /^\/api\/intake\/([0-9a-f-]{36})(?:\/(revise|confirm))?$/.exec(url.pathname);
       if (request.method === "GET" && intakeMatch && !intakeMatch[2]) {
         send(200, JSON.stringify(await readIntakeRequest(repository, intakeMatch[1]!)), "application/json; charset=utf-8"); return;
@@ -114,26 +109,23 @@ export async function startWorkbench(repository: string, options: { port?: numbe
         if (intakeMatch![2] === "confirm") { const root = await confirmIntakeRequest(repository, intakeMatch![1]!, input); send(200, JSON.stringify({ url: await open(root) }), "application/json; charset=utf-8"); return; }
         send(404, "Not found"); return;
       }
-      if(request.method==="GET" && url.pathname==="/example"){send(200,page("Fictional example","home",`<h1>Fictional example</h1><p class="intro">Alex Liu · Local demo. No employer submissions.</p><form method="post" action="/api/start/example"><button class="primary">Open fictional example</button></form>`));return;}
-      if(request.method==="GET" && url.pathname==="/existing"){
-        const list=await listMatchingWorkspaces({project:repository,registry,temporaryRoots:options.temporaryRoots});
-        const entries=[...list.searches,...list.emptyWorkspaces];
-        send(200,page("Saved searches","home",`<h1>Saved searches</h1>${entries.length ? "" : `<p>${escapeText(list.message)}</p>`}<div class="tiles saved-searches">${entries.map(w=>{let id=[...choices].find(([,p])=>p===w.path)?.[0];if(!id){id=randomUUID();choices.set(id,w.path)}return `<form class="tile" method="post" action="/api/start/existing"><h2>${escapeText(w.candidate??"Unnamed candidate")}</h2><p>${w.activeJobs} active · ${w.totalJobs} total jobs${!w.hasResults?' · No search results yet':''}</p><p>Updated ${escapeText(w.lastActivity?.slice(0,10)??"—")}</p><details><summary>Location</summary><p class="workspace-location">${escapeText(w.path)}</p></details><input type="hidden" name="selection" value="${id}"><button class="primary">Continue →</button></form>`}).join("")}</div>${list.diagnostics.map(d=>`<p role="status">Could not check ${escapeText(d.path)} (${escapeText(d.error)})</p>`).join("")}<a class="primary" href="/new">Set up a new candidate</a>`));return;
+      if (request.method === "GET" && (url.pathname === "/example" || url.pathname.startsWith("/example/"))) {
+        const snapshot = await renderExampleSnapshot(url);
+        send(snapshot ? 200 : 404, snapshot ?? "Not found"); return;
       }
       if(request.method==="POST" && ["/api/start/new","/api/start/existing","/api/start/example"].includes(url.pathname)){
         let payload="";for await(const chunk of request){payload+=chunk.toString();if(Buffer.byteLength(payload)>65536){send(413,"Request too large");return;}}
         let location:string;
         if(url.pathname==="/api/start/existing"){
-          const id=new URLSearchParams(payload).get("selection")??"";const selected=choices.get(id);if(!selected)throw Error("Choose an available saved search.");location=(await open(selected)).replace(/\/profile$/, "/status");
+          location = new URL("/status", await open(repository)).href;
         }else{
-          const base=join(repository,"local/workspaces");await mkdir(base,{recursive:true,mode:0o700});
           if(url.pathname==="/api/start/example"){
-            const root=join(base,`example-${randomUUID()}`);await createExampleSearchWorkspace(root,registry);location=await open(root);
+            location = "/example";
           }else{
             const f=z.object({requestId:z.string().uuid(),fullName:z.string().trim().min(1),email:z.union([z.literal(""),z.string().email()]),summary:z.string().trim().min(1),skills:z.string().trim().min(1),institution:z.string(),degree:z.string(),company:z.string(),title:z.string(),directions:z.string().trim().min(1),locations:z.string(),preferences:z.string().trim().min(1),confirmed:z.literal(true)}).strict().parse(JSON.parse(payload));
             if(!creations.has(f.requestId)){
-              const work=(async()=>{const root=join(base,`candidate-${f.requestId}`);const lines=(s:string)=>s.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-                await createMatchingWorkspace(root,{confirmed:true,reference:"Candidate confirmed on Welcome webpage",candidate:{schemaVersion:2,identity:{fullName:f.fullName},contact:{email:f.email},summary:f.summary,skills:lines(f.skills),education:f.institution||f.degree?[{institution:f.institution,degree:f.degree}]:[],experiences:f.company||f.title?[{employer:f.company,title:f.title}]:[]},preferences:f.preferences,rules:{categories:lines(f.directions),locations:lines(f.locations),workModes:["remote","hybrid","onsite"],excludedCompanies:[],excludedJobIds:[],limit:10,perCompany:2}},registry);return root;})();
+              const work=(async()=>{const lines=(s:string)=>s.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+                return createPersonalWorkspace(repository,{confirmed:true,reference:"Candidate confirmed on Welcome webpage",candidate:{schemaVersion:2,_meta:{websiteIntake:{requestId:f.requestId}},identity:{fullName:f.fullName},contact:{email:f.email},summary:f.summary,skills:lines(f.skills),education:f.institution||f.degree?[{institution:f.institution,degree:f.degree}]:[],experiences:f.company||f.title?[{employer:f.company,title:f.title}]:[]},preferences:f.preferences,rules:{categories:lines(f.directions),locations:lines(f.locations),workModes:["remote","hybrid","onsite"],excludedCompanies:[],excludedJobIds:[],limit:10,perCompany:2}},f.requestId);})();
               creations.set(f.requestId,work);work.catch(()=>creations.delete(f.requestId));
             }
             location=await open(await creations.get(f.requestId)!);
@@ -145,6 +137,7 @@ export async function startWorkbench(repository: string, options: { port?: numbe
       send(404,"Not found");
     } catch(error) {
       const code = error instanceof Error ? error.message : "request_failed";
+      if (code === "profile_already_exists") { send(409, JSON.stringify({ message: "Your profile already exists. Open CareerOS to continue." }), "application/json"); return; }
       const publicCodes = new Set(["runner_unavailable", "invalid_pdf", "linkedin_profile_url_required", "intake_request_changed", "intake_preview_required", "intake_location_required", "intake_direction_required"]);
       if (publicCodes.has(code)) { send(code === "runner_unavailable" ? 503 : code === "intake_request_changed" ? 409 : 422, JSON.stringify({ error: code }), "application/json; charset=utf-8"); return; }
       send((error as NodeJS.ErrnoException).code === "ENOENT" ? 404 : 400, JSON.stringify({ message: code === "matching_background_required" ? "Add an education or experience entry to continue." : "Could not open this request. Check your input or choose another background source." }), "application/json; charset=utf-8");

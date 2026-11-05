@@ -1,4 +1,4 @@
-# Application UI contract — version 60
+# Application UI contract — version 77
 
 Website-led application workflow, requested by the user on 2026-10-30. The current user-directed successor redesigns the candidate-free entry and shared workspace while preserving exact application and interview approval gates. Routine recruiting work changes data through the interfaces below, never the renderer, layout, CSS, interaction script, or display rules.
 
@@ -61,7 +61,7 @@ Tracker and review mutations use atomic file replacement, restrictive file permi
 
 ## Verification and controlled UI changes
 
-`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v60.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
+`npm run ui:check` verifies the versioned SHA-256 baseline in `ui-contract-v77.json` for the Application renderer and styles, workflow controls, Status projection, shared navigation, Interview renderer and practice formatter. It is included in `npm run verify`. Existing view and interaction tests remain the behavioral checks. Data content, counts and timestamps are intentionally not frozen.
 
 A baseline failure is a signal to inspect the change, not a reason to regenerate hashes. Only explicit user direction to change layout/interaction can authorize a new UI version. For such a change: describe the requested difference, implement it narrowly, run tests, verify the real page, preserve the prior manifest, and record a reviewed successor baseline. Routine data requests never authorize changing this baseline.
 
@@ -290,3 +290,11 @@ User-directed v59 replaces the stock Compass with an original SVG: an open C orb
 ## Frame identity — 2026-11-03
 
 User selected Frame from three reviewed original SVG concepts. V60 applies the exact approved dark geometric C to shared workspace navigation and the standalone SVG asset. The CareerOS wordmark, layout and application behavior remain unchanged.
+
+## Workspace storage — 2026-11-04
+
+V62 routes the workbench runner and task queues through the selected runtime directory and saves approved attachments with the candidate. V61 records the prior storage integration.
+
+## Alex pilot entry — 2026-11-04
+
+Choosing the website example opens Status with an isolated copy of the five pre-screening roles from the memory pilot.

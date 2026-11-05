@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -31,7 +32,7 @@ export interface SearchExecution {
   now?: () => number;
   execute?: (executable: string, args: string[], options: { cwd: string; timeout: number; maxBuffer: number }) => Promise<{ stdout: string }>;
 }
-const directoryFor = (root: string) => join(root, "data/search-requests");
+const directoryFor = (root: string) => join(userFiles(root).runtime, "search-requests");
 async function requests(root: string): Promise<SearchRequest[]> {
   let names: string[];
   try { names = (await readdir(directoryFor(root))).filter(name => /^[0-9a-f-]{36}\.json$/.test(name)); }

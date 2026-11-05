@@ -35,18 +35,19 @@ body.status-workspace .lifecycle-stages{gap:22px;min-width:max-content;border-ra
 body.status-workspace .status-filter{position:relative;min-height:54px;padding:13px 0 15px;border:0;border-radius:0;background:transparent;color:#202020;font:550 13px/1.5 var(--font)}
 body.status-workspace .status-filter:hover{background:transparent;color:#202020}
 body.status-workspace .status-filter[aria-pressed=true]{background:transparent;color:#202020;box-shadow:inset 0 -2px #ee9148;font-weight:600}
-body.status-workspace .status-table{min-width:800px;width:100%;table-layout:fixed}
+body.status-workspace .status-table{min-width:880px;width:100%;table-layout:fixed}
 body.status-workspace .status-table th{background:#f8fafb;border-top:1px solid #e9edf1;border-bottom:1px solid #e9edf1;padding:13px 12px;font-size:12px;letter-spacing:.015em;font-weight:600;color:#202020}
 body.status-workspace .status-table th:first-child{width:38px;padding-left:14px}
 body.status-workspace .status-table th:nth-child(2){width:42px}
 body.status-workspace .status-table th:nth-child(3){width:24%}
-body.status-workspace .status-table th:nth-child(5){width:80px}
+body.status-workspace .status-table th:nth-child(5){width:130px}
 body.status-workspace .status-table th:nth-child(6){width:116px}
 body.status-workspace .status-table th:last-child{width:70px}
 body.status-workspace .status-table td{padding:20px 12px;border-bottom:1px solid #eef1f4;vertical-align:middle}
 body.status-workspace .status-table tr:last-child td{border-bottom:0}
 body.status-workspace .company-line{font-size:15px;font-weight:600;line-height:1.5;color:#202020}
 body.status-workspace .row-location{font-size:12px;line-height:1.6;margin-top:5px;color:#202020}
+body.status-workspace .row-stage{display:inline-block;padding:2px 7px;border-radius:4px;background:#edf0f3;color:#37424a;font:550 12px/1.5 var(--font)}
 body.status-workspace .row-role .role{font-size:14px;font-weight:500;line-height:1.65;color:#202020;text-decoration:none}
 body.status-workspace .row-role .role:hover{color:#202020;text-decoration:underline;text-underline-offset:3px}
 body.status-workspace .row-link{font-size:12px;color:#202020}

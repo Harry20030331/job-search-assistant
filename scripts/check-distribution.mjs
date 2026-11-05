@@ -13,6 +13,11 @@ async function walk(dir){for(const entry of await readdir(dir,{withFileTypes:tru
  if(entry.isSymbolicLink())throw new Error(`symlink_in_distribution:${path}`);
  if(entry.isDirectory()){if(entry.name==='archive')throw new Error('archive_in_distribution');await walk(file);continue;}
  if(path===relative(root,fileURLToPath(import.meta.url)))continue;
+ // Reviewed public preview of the fictional pilot; all other screenshots stay private.
+ if(path==='docs/alex-workspace.png'){
+   if(createHash('sha256').update(await readFile(file)).digest('hex')!=='6adce2a32e83504319c001ec85fa15368a3972f552e689c09d4700468764ef0e')throw new Error('unreviewed_demo_preview');
+   continue;
+ }
  if(/\.(png|jpg|jpeg|docx)$/.test(path)||/\.local\.json$/.test(path))throw new Error(`private_artifact_type:${path}`);
  const bytes=await readFile(file);if(path.endsWith('.pdf')){if(path!=='examples/alex-liu-resume.pdf')throw new Error(`unexpected_pdf:${path}`);continue;}
  // Bundled official Inter font is binary; verify the reviewed asset rather than decoding it as authored text.

@@ -12,7 +12,7 @@ export function parseRuntimeInitArgs(args: readonly string[]): string {
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   try {
     const root = parseRuntimeInitArgs(process.argv.slice(2));
-    await initializeRuntime(root);
+    await initializeRuntime(root, new Date(), true);
     process.stdout.write(JSON.stringify({ ok: true, runtimeDirectory: root, applications: 0 }) + "\n");
   } catch {
     process.stderr.write("runtime_initialization_failed: use a new directory with an existing writable parent; existing storage is never overwritten\n");

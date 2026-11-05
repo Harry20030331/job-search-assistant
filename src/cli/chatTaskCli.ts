@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
@@ -27,7 +28,7 @@ export async function runChatTaskCli(argv: readonly string[], root = resolve(dir
   const config = await readChatTaskConfig(root);
   if (!threadId || config?.threadId !== threadId) throw new Error("wrong_chat_thread");
   const recovered = await resolveRecoveryInputs(root);
-  const paths: TaskPaths = { reviewPath: resolve(recovered.reviewPath), trackerPath: resolve(recovered.trackerPath), jobsPath: resolve(recovered.jobsPath), taskPath: resolve(dirname(recovered.trackerPath), "application-tasks.json") };
+  const paths: TaskPaths = { reviewPath: resolve(recovered.reviewPath), trackerPath: resolve(recovered.trackerPath), jobsPath: resolve(recovered.jobsPath), taskPath: userFiles(root).tasks, matchingPaths: userFiles(root) };
   const task = (await readTasks(paths.taskPath)).find(item => item.id === id);
   if (!task || task.chatDelivery?.threadId !== threadId) throw new Error("chat_task_unavailable");
   if (!["queued", "running"].includes(task.state)) {

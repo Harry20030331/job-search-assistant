@@ -6,9 +6,9 @@ The first message is the trigger. Opening a folder alone does not run a model tu
 
 ## Single-user entry and four shared pages
 
-Normal startup opens the root URL returned as `workspace_url` (also returned as `welcome_url` for older clients). With no confirmed active user, the root opens source-first Create profile directly: LinkedIn, pasted text or a PDF, then source review and explicit confirmation. After a real profile is confirmed or an existing real workspace is explicitly resumed, the service privately remembers its path in `local/active-workspace.json`. Subsequent visits and restarts open that user's Status page directly, including a valid empty shortlist. There is no recurring candidate selection or Home dashboard. A missing/unreadable remembered workspace shows Restore your workspace without switching identities or creating another profile.
+On first launch, confirm your profile from LinkedIn, pasted text, or a PDF. CareerOS writes your profile to the repository’s `data/profile/candidate.json` and reopens your Status page on later launches. Try example opens Alex’s pilot shortlist. Select jobs, choose Apply to review prepared answers, then approve the snapshot to see Submitted and open an interview. These steps navigate preset pages. My workspace returns to the personal workspace.
 
-Profile remains available for later edits and multiple approved PDF versions. Initial setup still opens Profile once; returning visits open Status. The explicit `/welcome`, `/existing` and `/example` routes remain compatibility/recovery/demo surfaces. Fictional examples never replace a remembered real user and never become the automatic startup target. Opening a folder does not create the active-user pointer. No unconfirmed source preview is persisted as a user selection.
+Profile remains available for later edits and multiple approved PDF versions. Initial setup still opens Profile once; returning visits open Status. The explicit `/welcome`, `/existing` and `/example` routes remain compatibility/recovery/demo surfaces. Fictional examples never replace a remembered real user and never become the automatic startup target. No unconfirmed source preview is persisted as a user selection.
 
 The selected workspace has four main pages:
 

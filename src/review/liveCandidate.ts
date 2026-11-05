@@ -1,9 +1,9 @@
-import { join } from "node:path";
+import { userFiles } from "../storage/userWorkspace.js";
 import { loadCandidateProfile } from "../profile.js";
 
 /** Check fresh, composed inputs for both chat and background execution. */
 export async function assertLiveCandidate(projectRoot: string): Promise<void> {
-  const candidate = await loadCandidateProfile(join(projectRoot, "data/candidate.json"));
+  const candidate = await loadCandidateProfile(userFiles(projectRoot).profile);
   const contact = candidate.contact as { email?: unknown } | undefined;
   const email = typeof contact?.email === "string" ? contact.email.trim() : "";
   const domain = email.split("@")[1]?.toLowerCase();

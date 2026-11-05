@@ -1,3 +1,4 @@
+import { dataForTracker, filesInData } from "../storage/userWorkspace.js";
 import { readTasks, reviewContentHash } from "../review/applicationTasks.js";
 import { readReviewBatch } from "../review/reviewStore.js";
 import { resolveInterviewPython } from "./pythonRuntime.mjs";
@@ -120,10 +121,10 @@ async function assertDemoSubmission(paths: WorkbenchPaths, applicationId: string
   const candidate = await loadCandidateProfile(paths.profilePath);
   const email = String((candidate.contact as { email?: string })?.email ?? "");
   if (candidate.fictional !== true && !/@(?:.*\.)?example\.(com|org|net)$/i.test(email)) throw new Error("demo_interview_unavailable");
-  const tasks = await readTasks(paths.taskPath ?? join(dirname(paths.trackerPath), "application-tasks.json"));
+  const tasks = await readTasks(paths.taskPath ?? filesInData(dataForTracker(paths.trackerPath)).tasks);
   const task = tasks.find(task => task.id === binding.taskId && task.mode === "demo" && task.action === "submit" && task.state === "demo_complete" &&
     task.target.applicationId === applicationId && task.target.snapshotId === binding.snapshotId && task.target.revision === binding.revision);
-  const draft = (await readReviewBatch(paths.reviewPath ?? join(dirname(paths.trackerPath), "drafts"))).applications.find(item => item.applicationId === applicationId);
+  const draft = (await readReviewBatch(paths.reviewPath ?? filesInData(dataForTracker(paths.trackerPath)).drafts)).applications.find(item => item.applicationId === applicationId);
   if (!task || !draft || draft.snapshotId !== binding.snapshotId || (draft.desiredState?.revision ?? 0) !== binding.revision ||
     draft.decision.state !== "approved" || draft.decision.scope !== "content-only" || task.target.contentHash !== reviewContentHash(draft) ||
     (binding.contentHash !== undefined && task.target.contentHash !== binding.contentHash) ||

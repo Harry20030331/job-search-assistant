@@ -1,0 +1,29 @@
+{
+  "version": 62,
+  "establishedAt": "2026-11-04",
+  "authorization": "Store runtime requests separately from opportunities and save approved resume entries inside the grouped candidate record.",
+  "validation": "Storage-only changes to the workbench launcher, interview request store and profile editor persistence. Existing rendering files retain their verified digests.",
+  "files": {
+    "src/review/reviewViews.ts": "51041b0fcc76a46c71af7213727d6159b681458a12cf8bfb6af1fb688f78ab9a",
+    "src/review/statusView.ts": "abdb5380ca9906d2b97833cb318157d46423aa7099ee1a51b624c2dbfd96b6c3",
+    "src/review/workflowViews.ts": "0486280d4a944c43f709e046631da58aa682d1c73e2ab58e4aaebc0a9bb7178d",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "7ee3dea90de870e34c591c847f6c8c971f575d996b3abf2ae748fe31cc0232eb",
+    "src/interview/interviewView.ts": "b4d9e3e553fbe5b2a0dc08ec7defd91f5ca6664eff84f160e784e8ff640e36e6",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "01d22b085209c817c3557d1ee04a73809a8f85382859c0412eef2b8f13316395",
+    "src/workbench/profileView.ts": "ed5a1c3890c6339dcabc2d8a87e074fc2e73f62256ee51ca18ea24a06478ccc9",
+    "src/workbench/start.ts": "3ba9a70a1611192fd82fed40b14691e495c669434083094256e4da9d70ed5669",
+    "src/workbench/interviewRequests.ts": "cd58d9557e0794f755edd87f0f9cb13cf29a7355e9db656ec37c45f51eeb88d4",
+    "src/workbench/intakeView.ts": "0c9009366e181e1608dbac9e6f86df6436f4c7e7de1d0b91d5956b4d4c5a47e8",
+    "src/workbench/searchRefreshView.ts": "f35f05e765b573b15ab4806e9678dde8e52e07f4987d3a9ceb5d840a5338764f",
+    "src/workbench/designSystem.ts": "53c9ca7cffa370a3842207d4a91a377e21fd5ab79afc1451008d31a581372d63",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "d800b1d6b7af08b4e849ba567e1b2b4e5a1fc083054ba153cfb7ca3cbda1cd94",
+    "src/workbench/profileStore.ts": "2d906bae20667834a212ead64054388a7a0a52732048269e589d4a4d71bd38c6",
+    "src/workbench/intakeRequests.ts": "263f3d32e2d0c3c6bb600db830c0db096357b2e61776ede1f6cecc7324de981f",
+    "src/workbench/workspaceTheme.ts": "bda3b1e8bb5132e948e3703f95ffa5f387337c35eb96267fe4da6d2bb58dc48a",
+    "src/workbench/assets/careeros-mark.svg": "02d4ccd1a39c65771ee4580bdbeef66ebe86abc820871655ed80eebf94b37597"
+  }
+}

@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { resumeCategorySchema } from "../classification.js";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, rename, mkdir, rm } from "node:fs/promises";
@@ -5,7 +6,7 @@ import { dirname, join } from "node:path";
 import { z } from "zod";
 import { acquireFileLock } from "../recordLock.js";
 import { writePrivateFile } from "../storage/privateFiles.js";
-import { matchingContext, saveMatchingPreferences, withPreferences } from "../matching/matching.js";
+import { matchingContext, replaceSearchNotes, searchNotesEditor, saveMatchingPreferences, withPreferences } from "../matching/matching.js";
 import { workspaceMatchingPaths } from "../matching/intake.js";
 
 const line = z.string().trim().max(2000);
@@ -34,7 +35,12 @@ export async function readProfileEditor(root: string) {
   const paths = workspaceMatchingPaths(root);
   const raw = await readFile(paths.profile, "utf8");
   const context = await matchingContext(paths);
-  return { ...context, profileRevision: digest(raw), editable: JSON.parse(raw).schemaVersion === 2 };
+  const files = userFiles(root);
+  const documents = files.grouped ? await Promise.all([files.application, files.interview].map(async file => {
+    const content = await readFile(file, "utf8");
+    return { content, revision: digest(content) };
+  })) : undefined;
+  return { ...context, searchNotes: searchNotesEditor(context.preferences), documents, profileRevision: digest(raw), editable: JSON.parse(raw).schemaVersion === 2 };
 }
 export async function saveProfileEditor(root: string, input: unknown) {
   const command = z.object({ revision: z.string(), confirmed: z.literal(true), fields: profileFields }).strict().parse(input);
@@ -57,6 +63,23 @@ export async function saveProfileEditor(root: string, input: unknown) {
   }));
 }
 export async function saveWebsitePreferences(root: string, input: unknown) {
+  if (typeof input === "object" && input && "document" in input) {
+    if (input.document === "job-selection") {
+      const edit = z.object({ document: z.literal("job-selection"), revision: z.string(), content: z.string().max(20000) }).strict().parse(input);
+      await replaceSearchNotes(userFiles(root), edit.revision, edit.content);
+      return readProfileEditor(root);
+    }
+    const edit = z.object({ document: z.enum(["application", "interview"]), revision: z.string(),
+      content: z.string().max(20000) }).strict().parse(input);
+    const files = userFiles(root);
+    if (!files.grouped) throw new Error("invalid_request");
+    await withPreferences(files.preferences, async () => {
+      const path = files[edit.document];
+      if (digest(await readFile(path, "utf8")) !== edit.revision) throw new Error("profile_changed");
+      await replace(path, edit.content);
+    });
+    return readProfileEditor(root);
+  }
   const command = z.object({ token: z.string(), directions: z.array(line.min(1)), locations: z.array(line.min(1)),
     flexibleDirection: z.boolean().optional(), flexibleLocation: z.boolean().optional(),
     workModes: z.array(z.enum(["remote", "hybrid", "onsite"])), feedback: z.string().trim().default("") }).strict().parse(input);
@@ -92,7 +115,13 @@ export async function saveWebsiteResume(root: string, input: unknown) {
     await mkdir(join(dirname(paths.manifest), "resumes"), { recursive: true, mode: 0o700 });
     const file = join(dirname(paths.manifest), relative);
     await writePrivateFile(file, bytes, { flag: "wx" });
-    try { await replace(paths.manifest, JSON.stringify([...context.manifest, { category: command.category, path: relative, sha256: createHash("sha256").update(bytes).digest("hex") }], null, 2) + "\n"); }
+    try {
+      const resumes = [...context.manifest, { category: command.category, path: relative, sha256: createHash("sha256").update(bytes).digest("hex") }];
+      const document = paths.manifest === paths.profile
+        ? { ...JSON.parse(await readFile(paths.profile, "utf8")), resumes }
+        : resumes;
+      await replace(paths.manifest, JSON.stringify(document, null, 2) + "\n");
+    }
     catch (error) { await rm(file, { force: true }); throw error; }
     return readProfileEditor(root);
   });

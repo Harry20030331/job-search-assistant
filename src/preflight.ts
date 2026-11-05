@@ -109,8 +109,12 @@ async function loadCanonicalInputs(
   manifestPath: string,
   dependencies: PreflightDependencies
 ): Promise<{ candidateName: string; manifest: Manifest }> {
-  const profile = profileSchema.parse(await loadCandidateProfile(profilePath, dependencies.readText));
-  const manifest = manifestSchema.parse(JSON.parse(await dependencies.readText(manifestPath)));
+  const candidate = await loadCandidateProfile(profilePath, dependencies.readText);
+  const profile = profileSchema.parse(candidate);
+  const source = resolve(manifestPath) === resolve(profilePath)
+    ? candidate.resumes
+    : JSON.parse(await dependencies.readText(manifestPath));
+  const manifest = manifestSchema.parse(source);
   const manifestCategories = manifest.map((entry) => entry.category);
   if (manifest.length === 0 || new Set(manifestCategories).size !== manifest.length) {
     throw new Error("approved_cv_manifest_invalid");

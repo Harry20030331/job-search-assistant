@@ -20,7 +20,7 @@ test("confirmed search intake preserves unknowns, needs no resume and remains bl
   expect(result.context.candidate.availability).toEqual({ relocation: null });
   expect(result.context.availableResumeCategories).toEqual([]);
   expect(result.context.candidate).not.toHaveProperty("contact");
-  expect(await readFile(result.paths.manifest, "utf8")).toBe("[]\n");
+  expect(JSON.parse(await readFile(result.paths.profile, "utf8")).resumes).toEqual([]);
   const context = await runMatchingCli(["context", "--workspace", result.root]);
   expect(context).toHaveProperty("token", result.context.token);
   await expect(runPreflight({ category: "llm", jobUrl: "https://jobs.example.com/one", profilePath: result.paths.profile, manifestPath: result.paths.manifest })).rejects.toThrow("approved_cv_manifest_invalid");
@@ -38,8 +38,9 @@ test("creates a registered fictional workspace before research without running s
   const result = await createExampleSearchWorkspace(root, registry);
   expect(JSON.parse(await readFile(result.paths.profile, "utf8")).fictional).toBe(true);
   const saved = JSON.parse(await readFile(result.paths.opportunities, "utf8")).opportunities;
-  expect(saved.map((job: { company: string }) => job.company)).toEqual(["Nooks", "Adobe", "Western Digital", "Scale AI", "Palantir"]);
-  expect(saved.every((job: { stage: string; application?: unknown }) => job.stage === "ready" && !job.application)).toBe(true);
+  const seed = new URL("../../evaluation/cases/alex/data/opportunities/opportunities.json", import.meta.url);
+  expect(saved).toEqual(JSON.parse(await readFile(seed, "utf8")).opportunities);
+  expect(saved.every((job: { stage: string; application?: unknown }) => job.stage === "new" && !job.application)).toBe(true);
   expect(JSON.parse(await readFile(registry, "utf8")).paths).toHaveLength(1);
   await expect(createExampleSearchWorkspace(root, registry)).rejects.toThrow();
 });

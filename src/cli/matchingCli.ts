@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { publishJevMatchingRound, jevReadiness } from "../matching/jev.js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -65,11 +66,12 @@ export async function runMatchingCli(args: string[]) {
     return createMatchingWorkspace(options.get("--workspace")!, await readIntakeFile(options.get("--input")!));
   }
   if (options.has("--workspace") && ["--profile", "--preferences", "--manifest", "--opportunities"].some(k => options.has(k))) throw new Error("invalid_arguments");
+  const defaults = userFiles(process.cwd());
   const paths: MatchingPaths = options.has("--workspace") ? workspaceMatchingPaths(options.get("--workspace")!) : {
-    profile: resolve(options.get("--profile") ?? "data/candidate.json"),
-    preferences: resolve(options.get("--preferences") ?? "data/preferences.md"),
-    manifest: resolve(options.get("--manifest") ?? "data/resumes.json"),
-    opportunities: resolve(options.get("--opportunities") ?? "data/opportunities.json")
+    profile: resolve(options.get("--profile") ?? defaults.profile),
+    preferences: resolve(options.get("--preferences") ?? defaults.preferences),
+    manifest: resolve(options.get("--manifest") ?? defaults.manifest),
+    opportunities: resolve(options.get("--opportunities") ?? defaults.opportunities)
   };
   if (operation === "context") {
     if (options.has("--input")) throw new Error("invalid_arguments");

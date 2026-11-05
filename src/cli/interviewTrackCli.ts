@@ -1,3 +1,4 @@
+import { filesForRuntime } from "../storage/userWorkspace.js";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,7 +15,7 @@ export async function runInterviewTrackCli(args: string[]) {
   }
   if (!flags.has("--runtime-dir")) throw new Error("invalid_arguments");
   const root = resolve(flags.get("--runtime-dir")!);
-  const paths = { trackerPath: resolve(root, "opportunities.json"), profilePath: resolve(flags.get("--profile") ?? resolve(root, "candidate.json")) };
+  const paths = { trackerPath: filesForRuntime(root).opportunities, profilePath: resolve(flags.get("--profile") ?? filesForRuntime(root).profile) };
   if (phase === "link" && flags.has("--input") && !["--workspace", "--interview-id", "--expected-revision"].some(k => flags.has(k))) {
     return linkInterview(paths, JSON.parse(await readFile(resolve(flags.get("--input")!), "utf8")));
   }

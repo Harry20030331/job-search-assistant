@@ -3,6 +3,7 @@ node_modules/
 .env.*
 !.env.example
 .DS_Store
+/.intake-*/
 data/
 local/
 private/
@@ -22,3 +23,6 @@ __pycache__/
 *.sqlite3-wal
 *.sqlite3-shm
 src/interview/python/deliverables/
+
+# Share only the authored fictional Alex case inputs.
+!/evaluation/cases/alex/data/

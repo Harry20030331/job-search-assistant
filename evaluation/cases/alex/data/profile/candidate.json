@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 2,
+  "fictional": true,
+  "identity": {
+    "fullName": "Alex Liu",
+    "firstName": "Alex",
+    "lastName": "Liu"
+  },
+  "contact": {
+    "email": "alex.liu@example.com",
+    "phone": "+1 202 555 0142",
+    "currentLocation": "Seattle, WA, United States"
+  },
+  "education": [
+    {
+      "institution": "Cascadia Institute of Technology (fictional)",
+      "degree": "Master of Science",
+      "field": "Computer Science",
+      "startDate": "2025-09",
+      "endDate": "2027-06",
+      "status": "In progress",
+      "graduationDateType": "Expected",
+      "coursework": [
+        "Information Retrieval",
+        "Machine Learning",
+        "Distributed Systems",
+        "AI Agents"
+      ],
+      "gpa": {
+        "value": null,
+        "scale": null,
+        "asOf": null
+      }
+    },
+    {
+      "institution": "Pacific Coast University (fictional)",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "startDate": "2021-09",
+      "endDate": "2025-06",
+      "status": "Completed",
+      "gpa": {
+        "value": null,
+        "scale": null,
+        "asOf": null
+      }
+    }
+  ],
+  "experiences": [
+    {
+      "id": "example-labs",
+      "employer": "Example Labs (fictional)",
+      "title": "Software Engineering Intern",
+      "employmentType": "Full-time internship",
+      "location": "Seattle, WA",
+      "startDate": "2026-06",
+      "endDate": "2026-08",
+      "description": "Built a Python document-search prototype for a synthetic support corpus with a team mentor. Implemented ingestion, hybrid retrieval and citation checks; owned evaluation scripts and error analysis, not production deployment.",
+      "achievements": [
+        "Curated 180 synthetic retrieval questions with reference documents.",
+        "Improved Recall@5 from 0.64 to 0.79 on a fixed 60-question development split; no held-out performance claim."
+      ],
+      "limitations": [
+        "No production traffic or customer-impact claim.",
+        "Metrics are invented fixture facts, not measured course results."
+      ]
+    },
+    {
+      "id": "campus-research",
+      "employer": "Cascadia Institute of Technology (fictional)",
+      "title": "Graduate Research Assistant",
+      "employmentType": "Part-time, 10 hours per week",
+      "location": "Seattle, WA",
+      "startDate": "2026-01",
+      "endDate": "2026-05",
+      "description": "Compared sparse and dense retrieval on a synthetic document collection. Maintained reproducible experiment configurations and categorized citation failures.",
+      "achievements": [
+        "Presented an internal lab report; no peer-reviewed publication."
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "TypeScript",
+    "SQL",
+    "Git",
+    "pytest",
+    "FastAPI",
+    "Information retrieval",
+    "Retrieval evaluation",
+    "Basic PyTorch",
+    "Basic Docker"
+  ],
+  "projects": [
+    {
+      "name": "Study Search",
+      "startDate": "2026-09",
+      "endDate": null,
+      "status": "In progress",
+      "description": "Built a retrieval assistant with source citations and deterministic regression checks for synthetic course notes.",
+      "technologies": [
+        "Python",
+        "TypeScript",
+        "SQLite"
+      ],
+      "ownership": "Owns ingestion, evaluation and the local review interface.",
+      "limitations": [
+        "Local prototype; no real users or commercial deployment."
+      ]
+    },
+    {
+      "name": "Agent Task Bench",
+      "startDate": "2026-02",
+      "endDate": "2026-05",
+      "status": "Completed course project",
+      "description": "Built a small tool-using assistant with explicit approval gates and replayable synthetic tasks.",
+      "technologies": [
+        "Python",
+        "pytest"
+      ],
+      "ownership": "Worked in a three-person team; owns tool validation and failure analysis.",
+      "limitations": [
+        "Do not claim ownership of teammates' scheduling or frontend work."
+      ]
+    }
+  ],
+  "workAuthorization": {
+    "authorizedUs": true,
+    "sponsorshipNow": false,
+    "sponsorshipFuture": false,
+    "scope": "Fictional US work-authorization scenario; no visa history is copied from a real person.",
+    "immigrationSupport": {
+      "requiredNowOrFuture": null,
+      "includes": [
+        "Employer visa sponsorship",
+        "OPT",
+        "CPT",
+        "STEM OPT",
+        "Other employer-supported immigration benefits"
+      ]
+    }
+  },
+  "availability": {
+    "startDate": "2027-07-01",
+    "employmentType": "Full-time",
+    "relocation": null,
+    "interviewTimeZone": "America/Los_Angeles",
+    "interviewWindows": [
+      "Tuesday 13:00-17:00",
+      "Thursday 13:00-17:00"
+    ],
+    "scheduleScope": "Preferred interview windows; availability for a specific invitation must be confirmed."
+  },
+  "_meta": {
+    "provenance": "Synthetic course candidate revised 2026-10-15. Only broad technical themes and career stage are inspired by the project owner. Identity, institutions, employers, dates, authorization, achievements and schedules are invented and are not a de-identified copy of any real person.",
+    "usage": "Local fixtures and offline evaluation only; never submit to a real employer.",
+    "unknowns": [
+      "availability.relocation",
+      "applicationFacts.desiredCompensation",
+      "links.github",
+      "links.linkedin",
+      "citizenship.countryCodes",
+      "citizenship.usPermanentResident",
+      "citizenship.usAsyleeOrRefugee",
+      "citizenship.subsequentStatusHistory",
+      "militaryService.hasServed",
+      "militaryService.serviceCountryCodes",
+      "militaryService.isVeteran",
+      "education[].gpa",
+      "workAuthorization.immigrationSupport.requiredNowOrFuture",
+      "applicationFacts.employmentRestrictions",
+      "applicationFacts.outsideActivities"
+    ],
+    "evidenceRule": "All claims and metrics are fictional input facts. They are not evaluation results for this repository. Unknown values must not be guessed."
+  },
+  "summary": "Early-career software engineer completing an MS in Computer Science, focused on retrieval, applied language models and reliable agent workflows. Strongest in Python, backend prototyping and evaluation; seeking an entry-level industry role rather than a research scientist position.",
+  "skillDepth": {
+    "strong": [
+      "Python data processing",
+      "Test design",
+      "Retrieval evaluation"
+    ],
+    "working": [
+      "TypeScript",
+      "SQL",
+      "REST APIs",
+      "Git"
+    ],
+    "basic": [
+      "PyTorch model training",
+      "Docker",
+      "Cloud deployment"
+    ],
+    "notClaimed": [
+      "Large-scale distributed training",
+      "Production Kubernetes operations",
+      "Expert C++",
+      "Senior engineering leadership"
+    ]
+  },
+  "languages": [
+    {
+      "language": "English",
+      "proficiency": "Professional working proficiency"
+    },
+    {
+      "language": "Mandarin Chinese",
+      "proficiency": "Native or bilingual proficiency"
+    }
+  ],
+  "links": {
+    "portfolio": "https://portfolio.example.com/alex-liu",
+    "github": null,
+    "linkedin": null
+  },
+  "publications": [],
+  "applicationFacts": {
+    "currentlyEnrolled": true,
+    "requiresInternshipForDegree": false,
+    "previousFullTimeEmploymentExcludingInternships": false,
+    "desiredCompensation": null,
+    "demographicSelfIdentification": "Ask the candidate; do not infer from name, language or education.",
+    "personalConnections": {
+      "entries": [],
+      "unlistedCompanyAnswer": "No",
+      "scope": "Family members (including parents and relatives) and close friends; current or former employment.",
+      "source": "Fictional example default."
+    },
+    "employmentHistoryCoverage": {
+      "complete": true,
+      "scope": "All employment in this fictional candidate scenario, including internships and part-time roles.",
+      "source": "The supplied fictional scenario defines the full employment history; not a claim about the real project owner."
+    },
+    "employmentRestrictions": {
+      "hasRestrictions": null,
+      "details": null,
+      "asOf": null
+    },
+    "outsideActivities": {
+      "entries": null,
+      "asOf": null
+    }
+  },
+  "citizenship": {
+    "countryCodes": null,
+    "usPermanentResident": null,
+    "usAsyleeOrRefugee": null,
+    "subsequentStatusHistory": null
+  },
+  "militaryService": {
+    "hasServed": null,
+    "serviceCountryCodes": null,
+    "isVeteran": null
+  },
+  "resumes": [
+    {
+      "category": "llm",
+      "path": "resumes/alex-liu-resume.pdf",
+      "sha256": "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a"
+    }
+  ]
+}

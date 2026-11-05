@@ -31,8 +31,8 @@ Run these commands from the repository root. For directory ownership see [struct
 - `npm run profile -- --profile <path> --check`: validate an explicit candidate source without printing personal facts.
 - `npm run preflight -- --batch <local-json-path>`: validate one bounded US Application Batch while parking item-local URL or category errors.
 - `npm run jobs -- validate --path data/opportunities.json`: validate the canonical job view; `upsert`, `status` and `close` use the same path.
-- `npm run discovery -- show --path data/discovery-state.json`: inspect source checkpoints.
-- `npm run discovery -- complete --path data/discovery-state.json --source <source-id> --at <ISO>`: record a fully completed scan only.
+- `npm run discovery -- show --path data/runtime/discovery-state.json`: inspect source checkpoints (older flat workspaces use `data/discovery-state.json`).
+- `npm run discovery -- complete --path data/runtime/discovery-state.json --source <source-id> --at <ISO>`: record a fully completed scan only.
 - `npm run drafts -- prune --path data/drafts`: remove working drafts only after durable verified success.
 - `npm run lifecycle -- confirm-batch --tracker <path> --input <path>`: atomically reconcile one local Gmail confirmation batch.
 - `npm run lifecycle -- transition --tracker <path> --application-id <id> --status <closed|interviewing|offer> --at <ISO>`: record one unambiguous protected recruiting update.
@@ -67,7 +67,7 @@ Run these commands from the repository root. For directory ownership see [struct
 
 Add `--method source-id-catalog-v1` in a new run directory to test exact source-reference guidance and schema constraints separately from the unchanged default baseline. See [source-reference repair](interview-source-reference-fix.md); method and implementation changes cannot resume an older run.
 
-See [Interview](interview.md) for Python setup, complete flags, the source-version token and an offline example. Run `npm run interview -- context --workspace <candidate-workspace> --job-id <stable-id> --settings <settings.json> --invitation <invitation.txt>` to inspect the read-only handoff. `stage` additionally requires `--expected-token <token> --output <new-absolute-directory>` and creates an isolated local workspace, without Google/model calls or shared-ledger writes.
+See [Interview](interview.md) for Python setup, complete flags, the source-version token and an offline example. Run `npm run interview -- context --workspace <candidate-workspace> --job-id <stable-id> --settings <settings.json> --invitation <invitation.txt>` to inspect the read-only handoff. `stage` additionally requires `--expected-token <token>`. With a grouped workspace the default destination is the role’s interview directory. Pass `--output <new-absolute-directory>` for another run and creates an isolated local workspace, without Google/model calls or shared-ledger writes.
 
 `npm run interview:tools -- call <operation> --workspace <absolute-work> --input <absolute-json>` invokes the business tool API. `npm run interview:local -- inspect --workspace <absolute-work>` reads local state. See [Interview storage](interview-storage.md) for business versus experiment output paths.
 
@@ -152,3 +152,7 @@ The agent runs these from the repository with its available Node runtime (`node 
 The connection does not switch execution mode: the course workspace still defaults to demo, with no employer submissions. Live browser work remains unverified. Never manufacture button requests to test the connection against current application data; use isolated fixtures or an actual user click.
 
 Stage transitions are projected from saved drafts and tasks. A partial application with no draft remains Shortlisted and is eligible for Apply. A blocked/interrupted preparation shows a small retry hint; details remain in task history. Reuse its identity. Active requests show Preparing or Submitting; completed exact-snapshot rehearsals leave active Review and appear under Submitted in Status. The website refreshes changed stages when no edits, saves or shortlist selections are pending.
+
+## Opt-in research memory
+
+See [session memory](session-memory.md) for the explicit-root session open/close, Core lookup, local Codex Dreaming and isolated task adapter CLI. It does not modify production preferences or connect a virtual website.

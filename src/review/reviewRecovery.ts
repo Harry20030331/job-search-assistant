@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { normalizeOfficialUrl, readJobLibrary } from "../jobs/jobLibrary.js";
@@ -29,16 +30,25 @@ async function requirePrivateFile(path: string): Promise<void> {
 }
 
 export async function resolveRecoveryInputs(projectRoot: string): Promise<RecoveryInputs> {
-  const canonical = join(projectRoot, "data/opportunities.json");
+  const files = userFiles(projectRoot);
+  const canonical = files.opportunities;
   let canonicalExists = false;
   try { await stat(canonical); canonicalExists = true; } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
   if (canonicalExists) {
     await requirePrivateFile(canonical);
-    const reviewPath = join(projectRoot, "data/drafts");
+    const reviewPath = files.drafts;
     const metadata = await stat(reviewPath);
     if (!metadata.isDirectory()) throw new Error("unsafe_recovery_file_permissions");
     await assertPrivate(reviewPath, true);
-    for (const name of await readdir(reviewPath)) if (name.endsWith(".json")) await requirePrivateFile(join(reviewPath, name));
+    for (const entry of await readdir(reviewPath, { withFileTypes: true })) {
+      if (entry.name.endsWith(".json")) await requirePrivateFile(join(reviewPath, entry.name));
+      if (files.grouped && entry.name.startsWith("job-")) {
+        if (!entry.isDirectory()) throw new Error("invalid_job_directory");
+        const role = join(reviewPath, entry.name);
+        await assertPrivate(role, true);
+        if ((await readdir(role)).includes("draft.json")) await requirePrivateFile(join(role, "draft.json"));
+      }
+    }
     const [review, tracker, jobs] = await Promise.all([readReviewBatch(reviewPath), readApplicationTracker(canonical), readJobLibrary(canonical)]);
     validateRecoveryCandidate(review, tracker, jobs, true);
     return { reviewPath, trackerPath: canonical, jobsPath: canonical, chinaJobsPath: "", chinaOutreachPath: "", port: 64441,

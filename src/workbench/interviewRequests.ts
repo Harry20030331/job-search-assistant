@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { randomUUID } from "node:crypto";
@@ -16,7 +17,7 @@ const requestSchema=z.object({requestId:z.string().uuid(),action:z.enum(["invita
 const entrySchema=requestSchema.extend({threadId:z.string().uuid(),mode:z.enum(["demo","codex"]).optional(),state:z.enum(["pending_delivery","delivered","running","completed","blocked"]),createdAt:z.string().datetime(),reply:z.string(),messageId:z.string().optional()});
 type Entry=z.infer<typeof entrySchema>;
 const queues=new Map<string,Promise<unknown>>();
-const pathFor=(root:string)=>join(root,"data/interview-requests.json");
+const pathFor=(root:string)=>join(userFiles(root).runtime,"interview-requests.json");
 async function read(root:string):Promise<Entry[]>{try{return z.array(entrySchema).parse(JSON.parse(await readFile(pathFor(root),"utf8")))}catch(e){if((e as NodeJS.ErrnoException).code==="ENOENT")return [];throw e}}
 async function change<T>(root:string,fn:(entries:Entry[])=>T|Promise<T>){const path=pathFor(root);const operation=(queues.get(path)??Promise.resolve()).catch(()=>{}).then(async()=>{await mkdir(dirname(path),{recursive:true,mode:0o700});const unlock=await acquireFileLock(path);try{const entries=await read(root),result=await fn(entries),temporary=join(dirname(path),`.${randomUUID()}.tmp`);try{await writePrivateFile(temporary,JSON.stringify(z.array(entrySchema).parse(entries)),{flag:"wx"});await rename(temporary,path)}finally{await rm(temporary,{force:true})}return result}finally{await unlock()}});queues.set(path,operation);try{return await operation}finally{if(queues.get(path)===operation)queues.delete(path)}}
 export async function interviewRequestHistory(root:string){return (await read(root)).map(({threadId:_thread,messageId:_receipt,...entry})=>entry)}
@@ -25,8 +26,8 @@ export async function requestInterviewWork(root:string,repository:string,input:u
  const selected=await change(root,async entries=>{
   const duplicate=entries.find(e=>e.requestId===command.requestId);if(duplicate){if(JSON.stringify(requestSchema.strip().parse(duplicate))!==JSON.stringify(command))throw Error("invalid_request");return {entry:duplicate,fresh:false}}
   if(entries.some(e=>["pending_delivery","delivered","running"].includes(e.state)))throw Error("task_already_active");
-  if(command.applicationId && !(await readApplicationTracker(join(root,"data/opportunities.json"))).applications.some(a=>a.applicationId===command.applicationId))throw Error("invalid_request");
-  if(command.interviewId){const board=await readInterviewBoard({trackerPath:join(root,"data/opportunities.json"),profilePath:join(root,"data/candidate.json")});if(!board.some(i=>i.entry.interviewId===command.interviewId&&(!command.applicationId||i.entry.applicationId===command.applicationId)))throw Error("invalid_request")}
+  if(command.applicationId && !(await readApplicationTracker(userFiles(root).opportunities)).applications.some(a=>a.applicationId===command.applicationId))throw Error("invalid_request");
+  if(command.interviewId){const board=await readInterviewBoard({trackerPath:userFiles(root).opportunities,profilePath:userFiles(root).profile});if(!board.some(i=>i.entry.interviewId===command.interviewId&&(!command.applicationId||i.entry.applicationId===command.applicationId)))throw Error("invalid_request")}
   const entry:Entry={...command,threadId:chat.threadId,mode,state:"pending_delivery",createdAt:new Date().toISOString(),reply:"Request saved; checking Codex delivery."};entries.push(entry);return {entry,fresh:true};
  });
  if(!selected.fresh)return interviewRequestHistory(root);

@@ -13,7 +13,7 @@ try {
   const workspace = resolve(values.get("--dir") ?? project);
   const snapshot = values.get("--snapshot");
   if (snapshot !== undefined && snapshot !== "shortlist" && snapshot !== "review") throw new Error("invalid_example_snapshot");
-  const result = await loadExample(workspace, resolve(values.get("--from") ?? resolve(project, "examples")), snapshot);
+  const result = await loadExample(workspace, values.get("--from") ?? (snapshot ? resolve(project, "examples") : undefined), snapshot);
   console.log(JSON.stringify({ ok: true, workspace, candidate: result.candidateName, snapshot: result.snapshot, entryPath: result.entryPath, applications: result.applicationCount, backupPath: result.backupPath, next: "Start Review to use the loaded state." }, null, 2));
 } catch (error) {
   console.error(error instanceof Error ? error.message : "example_load_failed");

@@ -1,6 +1,8 @@
 # Candidate inputs
 
-Use one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping approved resume-profile keys to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Open the default case with `npm run review`, or select a saved case with `npm run example:load -- --from <example-directory>`, then use the working copy:
+New real-user workspaces use [the grouped local layout](structure.md#single-user-workspace). `data/profile/candidate.json` stores candidate facts and a `resumes` array of approved category, PDF path and SHA-256 entries. Paths resolve relative to the profile file; screening, application and interview preferences have independent files under `data/profile/preferences/`. Onboarding and Profile edit those same sources.
+
+The flat fictional example uses one standalone `candidate.json`, one `preferences.md`, and one `resumes.json` mapping approved resume-profile keys to PDFs. Files and PDFs may live outside this repository. The supplied example uses a fictional identity; it contains an intentionally unknown relocation answer. Open the default case with `npm run review`, or select a saved case with `npm run example:load -- --from <example-directory>`, then use the working copy:
 
 ```sh
 npm run profile -- --profile data/candidate.json --check

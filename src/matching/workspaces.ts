@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { writePrivateFile as writeFile } from "../storage/privateFiles.js";
 import { randomUUID } from "node:crypto";
 import { lstat, mkdir, readFile, readdir, realpath, rename } from "node:fs/promises";
@@ -17,7 +18,7 @@ const queues = new Map<string, Promise<unknown>>();
 /** Local path index only; candidate facts and jobs remain in their canonical workspace. */
 export async function rememberWorkspace(workspace: string, registryPath = defaultRegistryPath) {
   const root = await realpath(workspace);
-  await readOpportunities(join(root, "data/opportunities.json"));
+  await readOpportunities(userFiles(root).opportunities);
   const path = resolve(registryPath);
   await mkdir(dirname(path), { recursive: true, mode: 0o700 });
   const result = (queues.get(path) ?? Promise.resolve()).catch(() => undefined).then(async () => {
@@ -71,7 +72,7 @@ export async function listMatchingWorkspaces(options: DiscoveryOptions = {}) {
   const workspaces: { path: string; candidate: string | null; totalJobs: number; activeJobs: number; lastActivity: string | null; hasResults: boolean }[] = [];
   const seen = new Set<string>();
   for (const directory of candidates) {
-    const store = join(directory, "data/opportunities.json");
+    const store = userFiles(directory).opportunities;
     try {
       if ((await lstat(join(directory, "data"))).isSymbolicLink() || (await lstat(store)).isSymbolicLink()) continue;
       const canonical = await realpath(directory);
@@ -80,7 +81,7 @@ export async function listMatchingWorkspaces(options: DiscoveryOptions = {}) {
       const document = await readOpportunities(store);
       let candidate: string | null = null;
       try {
-        const file = join(canonical, "data/candidate.json");
+        const file = userFiles(canonical).profile;
         if (!(await lstat(file)).isSymbolicLink()) candidate = z.object({ fullName: z.string().min(1) }).parse((await loadCandidateProfile(file)).identity).fullName;
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== "ENOENT") diagnostics.push({ path: canonical, error: "candidate_summary_unavailable" });

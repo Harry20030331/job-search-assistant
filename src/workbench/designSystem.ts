@@ -149,4 +149,25 @@ body>header>.workspace-brand{flex-direction:row;align-items:center;gap:9px;max-w
 body .workspace-brand .brand-mark{flex:0 0 28px;width:28px;height:28px;border-radius:0;background:transparent;color:#f89344}
 body,button,input,textarea,select,code,pre,kbd,samp{font-family:var(--font)}
 ${workspaceTheme}
+body>header>.workspace-return {
+  position: fixed;
+  left: 16px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  color: #202020;
+  background: #eff1f3;
+  border-radius: 8px;
+  font: 550 14px/1.4 var(--font);
+  text-decoration: none;
+}
+body>header>.workspace-return:hover { background: #e3e7eb; }
+body>header>.workspace-return:focus-visible { outline: 2px solid #202020; outline-offset: 3px; }
+@media(max-width:900px) {
+  body:has(.workspace-return) { padding-bottom: 92px; }
+  body>header>.workspace-return { left: 20px; bottom: max(16px, env(safe-area-inset-bottom)); }
+}
 `;

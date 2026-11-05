@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { link, mkdir, readFile, rm } from "node:fs/promises";
@@ -13,7 +14,7 @@ export type ChatTaskConfig = z.infer<typeof configSchema>;
 
 /** Private runtime configuration, never supplied by website input or committed with examples. */
 export async function readChatTaskConfig(root: string): Promise<ChatTaskConfig | undefined> {
-  try { return configSchema.parse(JSON.parse(await readFile(join(root, "data/chat-runner.json"), "utf8"))); }
+  try { return configSchema.parse(JSON.parse(await readFile(userFiles(root).chat, "utf8"))); }
   catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined; throw error; }
 }
 
@@ -24,11 +25,12 @@ export async function connectCurrentChat(root: string, environment: NodeJS.Proce
   const thread = z.string().uuid().safeParse(environment.CODEX_THREAD_ID);
   if (!thread.success) return undefined;
   const config = configSchema.parse({ version: 1, threadId: thread.data, executable: environment.CODEX_CLI_PATH || "codex" });
-  await mkdir(join(root, "data"), { recursive: true, mode: 0o700 });
-  const temporary = join(root, "data", `.chat-runner-${randomUUID()}.tmp`);
+  const { runtime } = userFiles(root);
+  await mkdir(runtime, { recursive: true, mode: 0o700 });
+  const temporary = join(runtime, `.chat-runner-${randomUUID()}.tmp`);
   try {
     await writePrivateFile(temporary, JSON.stringify(config), { flag: "wx" });
-    try { await link(temporary, join(root, "data/chat-runner.json")); }
+    try { await link(temporary, userFiles(root).chat); }
     catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error; }
   } finally { await rm(temporary, { force: true }); }
   return readChatTaskConfig(root);

@@ -519,7 +519,7 @@ describe("review console views", () => {
     expect(html).not.toMatch(/\.lifecycle[^}]*var\(--warn\)/);
   });
 
-  test("renders compact rows with exact links, company and city, role, category, status, and date", () => {
+  test("renders compact rows with exact links, company and city, role, resume, status, and date", () => {
     const html = renderStatusPage(buildStatusView(tracker, []));
 
     expect(html).toContain('href="https://jobs.ashbyhq.com/notion/1/application?from=status&amp;step=final"');
@@ -597,9 +597,9 @@ describe("review console views", () => {
     expect(applications[2]?.status).toBe("confirmed");
     expect(html).not.toContain("Confirmed");
     expect(rows.filter(row => row.includes('data-status="submitted"'))).toHaveLength(2);
-    expect(html).not.toContain('<th scope="col">Status</th>');
+    expect(html).toContain('<th scope="col">Status</th>');
     rows.forEach((row, index) => {
-      expect(row).not.toContain('class="row-status"');
+      expect(row).toContain(`<span class="row-stage">${["In Review", "Submitted", "Submitted", "Interviewing", "Offer"][index]}</span>`);
       expect(row).toContain(`data-status="${statuses[index] === "confirmed" ? "submitted" : statuses[index]}"`);
     });
   });

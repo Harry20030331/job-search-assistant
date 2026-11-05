@@ -1,3 +1,4 @@
+import { userFiles } from "../storage/userWorkspace.js";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { loadCandidateProfile } from "../profile.js";
@@ -14,7 +15,7 @@ export function parseProfileArgs(args: readonly string[]): { check: boolean; pro
       profilePath = resolve(value);
     } else throw new Error("invalid_arguments");
   }
-  return { check, profilePath: profilePath ?? resolve(dirname(fileURLToPath(import.meta.url)), "../../data/candidate.json") };
+  return { check, profilePath: profilePath ?? userFiles(resolve(dirname(fileURLToPath(import.meta.url)), "../..")).profile };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
