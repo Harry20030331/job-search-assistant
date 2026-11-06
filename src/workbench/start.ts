@@ -1,14 +1,15 @@
+import { seedExampleResumeBindings } from "./exampleResumeBindings.js";
 import { userFiles } from "../storage/userWorkspace.js";
 import { serveWorkspaceFont } from "./assets.js";
 import { renderNewCandidate } from "./intakeView.js";
 import { beginIntakeRequest, readIntakeRequest, reviseIntakeRequest, confirmIntakeRequest } from "./intakeRequests.js";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { renderExampleSnapshot } from "./exampleSnapshot.js";
-import { lstat, realpath, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { lstat, realpath, readFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
-import { workspaceMatchingPaths, createPersonalWorkspace } from "../matching/intake.js";
+import { workspaceMatchingPaths, createPersonalWorkspace, createExampleSearchWorkspace } from "../matching/intake.js";
 import { resolveRecoveryInputs } from "../review/reviewRecovery.js";
 import { startReviewServer, type RunningReviewServer } from "../review/reviewServer.js";
 import { ApplicationTaskService, demoTaskExecutor } from "../review/applicationTasks.js";
@@ -28,6 +29,21 @@ export async function startWorkbench(repository: string, options: { port?: numbe
   const running = new Map<string, { server: RunningReviewServer; tasks?: ApplicationTaskService }>();
   const opening = new Map<string, Promise<string>>();
   const creations = new Map<string, Promise<string>>();
+  let exampleRoot: string | undefined;
+  let exampleOpening: Promise<string> | undefined;
+  function openExample() {
+    return exampleOpening ??= (async () => {
+      exampleRoot = await mkdtemp(join(tmpdir(), "careeros-example-"));
+      const workspace = join(exampleRoot, "workspace");
+      await createExampleSearchWorkspace(workspace, null);
+      await seedExampleResumeBindings(workspace);
+      return new URL("/status/us", await open(workspace)).href;
+    })().catch(async error => {
+      if (exampleRoot) await rm(exampleRoot, { recursive: true, force: true });
+      exampleOpening = undefined;
+      throw error;
+    });
+  }
   async function open(workspace: string) {
     const root = await realpath(workspace);
     if (running.has(root)) return running.get(root)!.server.address + "/profile";
@@ -99,8 +115,13 @@ export async function startWorkbench(repository: string, options: { port?: numbe
         send(404, "Not found"); return;
       }
       if (request.method === "GET" && (url.pathname === "/example" || url.pathname.startsWith("/example/"))) {
-        const snapshot = await renderExampleSnapshot(url);
-        send(snapshot ? 200 : 404, snapshot ?? "Not found"); return;
+        const routes: Record<string, string> = { "/example": "/status/us", "/example/profile": "/profile", "/example/review": "/review", "/example/interview": "/interviews" };
+        const route = routes[url.pathname];
+        if (!route) { send(404, "Not found"); return; }
+        // URL filters never create applications or grant approval/submission.
+        const target = new URL(route, await openExample());
+        if (route === "/status/us" && url.searchParams.has("stage")) target.searchParams.set("stage", url.searchParams.get("stage")!);
+        response.writeHead(302, { location: target.href, "cache-control": "no-store" }); response.end(); return;
       }
       if(request.method==="POST" && ["/api/start/new","/api/start/existing","/api/start/example"].includes(url.pathname)){
         let payload="";for await(const chunk of request){payload+=chunk.toString();if(Buffer.byteLength(payload)>65536){send(413,"Request too large");return;}}
@@ -109,7 +130,7 @@ export async function startWorkbench(repository: string, options: { port?: numbe
           location = new URL("/status", await open(repository)).href;
         }else{
           if(url.pathname==="/api/start/example"){
-            location = "/example";
+            location = await openExample();
           }else{
             const f=z.object({requestId:z.string().uuid(),fullName:z.string().trim().min(1),email:z.union([z.literal(""),z.string().email()]),summary:z.string().trim().min(1),skills:z.string().trim().min(1),institution:z.string(),degree:z.string(),company:z.string(),title:z.string(),directions:z.string().trim().min(1),locations:z.string(),preferences:z.string().trim().min(1),confirmed:z.literal(true)}).strict().parse(JSON.parse(payload));
             if(!creations.has(f.requestId)){
@@ -133,5 +154,5 @@ export async function startWorkbench(repository: string, options: { port?: numbe
     }
   });
   await new Promise<void>((resolve,reject)=>{server.once("error",reject);server.listen(options.port??0,"127.0.0.1",resolve)});
-  return { address:`http://127.0.0.1:${(server.address() as AddressInfo).port}/`, async close(){await Promise.all([...running.values()].map(async r=>{await r.tasks?.close();await r.server.close()}));await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()))} };
+  return { address:`http://127.0.0.1:${(server.address() as AddressInfo).port}/`, async close(){await exampleOpening?.catch(() => undefined);await Promise.all([...running.values()].map(async r=>{await r.tasks?.close();await r.server.close()}));await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));if(exampleRoot)await rm(exampleRoot,{recursive:true,force:true})} };
 }

@@ -66,7 +66,7 @@ The source workflow's private archive and runtime are excluded. Inert regional a
 
 See [commands](commands.md), [candidate inputs](candidate-inputs.md), [UI contract](ui-contract.md), and [workflow contract](workflow-contract.md).
 
-The website loads the repository’s `data/` on startup. Older installations can resume their previously selected profile through their saved pointer. The website example reads the authored Alex case directly.
+The website loads the repository’s `data/` on startup. Older installations can resume their previously selected profile through their saved pointer. The website example copies the authored Alex case into a temporary isolated workspace and runs the same Status, Review and Profile interfaces. Closing its launch service removes that temporary copy.
 
 ## Example and local workspace
 

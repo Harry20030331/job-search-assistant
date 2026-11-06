@@ -31,6 +31,17 @@ class PracticeCodeTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_code(code, "double")
 
+    def test_json_nested_pairs_are_lists_and_tuple_only_answers_fail(self):
+        item = CodingSolution(language="python", function_name="first_id",
+            code="def first_id(hits):\n    if not isinstance(hits[0], list):\n        raise TypeError('pair must be a list')\n    return hits[0][0]",
+            complexity="O(1) time and space.", tests=[
+                {"arguments_json": "[[[7,0.4],[3,0.9]]]", "expected_json": "7", "expected_error": None},
+                {"arguments_json": "[[[2,0.9]]]", "expected_json": "2", "expected_error": None},
+                {"arguments_json": "[[7]]", "expected_json": "null", "expected_error": "TypeError"}])
+        self.assertTrue(check_solution(item)["passed"])
+        with self.assertRaisesRegex(ValueError, "failed its declared"):
+            check_solution(item.model_copy(update={"code": item.code.replace("isinstance(hits[0], list)", "isinstance(hits[0], tuple)")}))
+
     def test_actor_contract_lists_the_same_bounded_execution_operations(self):
         from interview.practice import DIRECT_GUIDANCE
         from interview.practice_code import BUILTINS, METHODS

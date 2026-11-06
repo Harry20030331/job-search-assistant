@@ -22,7 +22,7 @@ test("welcome starts without selecting or writing candidate data; new setup is i
  expect(await(await fetch(s.address)).text()).toContain("Create profile");expect(await readdir(root)).toEqual([]);
  const legacy=await fetch(base+"/welcome",{redirect:"manual"});expect(legacy.status).toBe(302);expect(legacy.headers.get("location")).toBe("/");
  const setup=await(await fetch(base+"/")).text();expect(setup).not.toContain("Explore a fictional example");expect(setup.match(/href="\/example"/g)).toHaveLength(1);expect(setup).not.toContain("Continue a search");
- const example=await(await fetch(base+"/example")).text();expect(example).toContain("My workspace");expect(example).not.toContain('href="/welcome"');expect(example).toContain('class="brand-mark"');
+ const example=await(await fetch(base+"/example")).text();expect(example).toContain("Refresh jobs");expect(example).not.toContain('href="/welcome"');expect(example).toContain('class="brand-mark"');
  expect(await(await fetch(base+"/existing")).text()).toContain("Create profile");
  const input={requestId:randomUUID(),fullName:fields.fullName,email:fields.email,summary:fields.summary,skills:"Research",institution:"Example School",degree:"BS",company:"",title:"",directions:"Research",locations:"",preferences:"Remote roles",confirmed:true};
  expect((await post(base+"/api/start/new",input,"https://attacker.invalid")).status).toBe(403);
@@ -87,37 +87,60 @@ test("profile endpoints enforce origin, strict JSON, consent, body limits and di
 
 test("profile scripts remain valid and escape untrusted candidate content",async()=>{const root=await candidate();const state=await readProfileEditor(root);state.candidate.summary="</script><script>untrusted()</script>";const html=renderProfilePage(state);for(const match of html.matchAll(/<script>([\s\S]*?)<\/script>/g))expect(()=>new Script(match[1]!)).not.toThrow();expect(html).not.toContain("<script>untrusted()</script>")});
 
-test("Try example serves navigable snapshots and returns to personal setup without creating data", async () => {
+test("Try example restores editable Review and refresh controls in an isolated workspace", async () => {
   const root = await temporary();
   const server = await startWorkbench(root);
   servers.push(server);
   const base = new URL(server.address).origin;
-  const status = await fetch(base + "/example", { redirect: "error" });
+  const status = await fetch(base + "/example");
   expect(status.status).toBe(200);
+  const selected = new URL(status.url).origin;
   const html = await status.text();
   for (const company of ["Cedar Search", "Raincloud Systems", "Hudson AI", "Summit Platform", "Harbor Index"]) expect(html).toContain(company);
-  expect(html).toContain('href="/example/jobs/A1"');
-  expect(html).not.toContain('id="run-selected"');
-  expect(html).not.toContain('Not matched yet');
-  expect(html).not.toContain('>Direction</th>');
+  expect(html).toContain('id="run-selected"');
+  expect(html).not.toContain("Not matched yet");
+  expect(html).not.toMatch(/href="https:\/\/example\.invalid/);
+  const detailLinks = [...html.matchAll(/href="(\/demo\/jobs\/[^"?#]+)"/g)].map(match => match[1]!);
+  expect(new Set(detailLinks).size).toBe(5);
+  for (const link of new Set(detailLinks)) {
+    const detail = await fetch(selected + link);
+    expect(detail.status).toBe(200);
+    expect(await detail.text()).toContain("Role overview");
+  }
+  expect((await fetch(selected + "/demo/jobs/unknown")).status).toBe(404);
   expect(html.match(/class="resume-tag"/g)).toHaveLength(5);
-  expect(html).toContain('</nav><a class="workspace-return"');
-  const batch = "job=A1&job=A2";
-  const review = await (await fetch(base + "/example/review?stage=in_review&" + batch)).text();
-  expect(review).toContain("Recall@5");
-  expect(review).toContain("Agent Task Bench");
-  expect(review).toContain("Approve (2)");
-  const submitted = await (await fetch(base + "/example?stage=submitted&" + batch)).text();
-  expect(submitted.match(/data-status="submitted"/g)).toHaveLength(2);
-  const interview = await (await fetch(base + "/example/interview?stage=interviewing&focus=A1&" + batch)).text();
-  expect(interview).toContain("Retrieval evaluation");
-  expect((await fetch(base + "/example/review?job=unknown")).status).toBe(404);
-  const job = await (await fetch(base + "/example/jobs/A1")).text();
-  expect(job).toContain("Seattle hybrid");
-  const profile = await (await fetch(base + "/example/profile")).text();
-  expect(profile).toContain("Alex Liu");
-  for (const view of [html, job, profile]) expect(view).toContain('href="/"><span aria-hidden="true">←</span> My workspace');
-  expect((await post(base + "/api/tasks", { action: "prepare" })).status).toBe(404);
+  expect(html).toContain('id="refresh-jobs"');
+  expect(html).toContain('class="workspace-return"');
+  expect(await (await fetch(selected + "/api/search/refresh")).json()).toMatchObject({ automaticEnabled: false, connected: false, manualEnabled: false });
+  expect(new URL((await fetch(base + "/example")).url).origin).toBe(selected);
+  const prepare = await post(selected + "/api/tasks", { action: "prepare", mode: "demo", requestId: randomUUID(), jobIds: ["A1"] });
+  expect(prepare.status).toBe(202);
+  expect((await prepare.json()).tasks[0].target).toMatchObject({ resumeCategory: "llm", resumeSha256: "bc0411efd98cf994a84c6cbc4b4664d3349bed60d714e8f5d84496d2f55c262a" });
+  await expect.poll(async () => (await (await fetch(selected + "/api/tasks")).json()).tasks[0]?.state).toBe("needs_review");
+  const review = await (await fetch(base + "/example/review")).text();
+  expect(review).toContain('class="long-answer question-answer"');
+  expect(review).toContain('class="short-answer"');
+  expect(review).toContain("Approve content");
+  expect(review).toContain('href="/demo/jobs/A1"');
+  expect(review).not.toMatch(/href="https:\/\/example\.invalid/);
+  expect(review).toContain("Submit applications");
+  const item = JSON.parse(/const items=(.*?);const desiredStates=/.exec(review)![1]!)[0];
+  const identity = { applicationId: item.applicationId, snapshotId: item.snapshotId };
+  expect((await post(selected + "/api/review/content-approval", identity)).ok).toBe(false);
+  for (const [questionId, value, expectedRevision] of [["demo-motivation", "Fictional review answer", 0], ["demo-start", "June 2027", 1]]) {
+    expect((await post(selected + "/api/review/text", { ...identity, questionId, value, expectedRevision })).status).toBe(200);
+  }
+  expect(await (await fetch(selected + "/review")).text()).toContain("Fictional review answer");
+  expect((await post(selected + "/api/review/content-approval", { ...identity, expectedDesiredRevision: 2 })).status).toBe(200);
+  const approved = await (await fetch(selected + "/api/tasks")).json();
+  expect(approved.approvals).toHaveLength(1);
+  expect(approved.tasks).toHaveLength(1);
+  // Navigating to a forged submitted URL cannot submit the approved draft.
+  await fetch(base + "/example?stage=submitted&job=A1");
+  expect((await (await fetch(selected + "/api/tasks")).json()).tasks).toHaveLength(1);
+  expect((await post(selected + "/api/tasks", { action: "submit", mode: "demo", requestId: randomUUID(), selections: approved.approvals })).status).toBe(202);
+  await expect.poll(async () => (await (await fetch(selected + "/api/tasks")).json()).tasks.find((t: {action:string}) => t.action === "submit")?.state).toBe("demo_complete");
+  expect(await (await fetch(base + "/")).text()).toContain("Create profile");
   expect(await readdir(root)).toEqual([]);
 });
 
@@ -197,4 +220,17 @@ test("a real-layout session keeps exact turns, writes only the cited preference 
   expect(editor.profileRevision).toBe(initial.profileRevision);
   await expect(saveWebsitePreferences(root, { document: "interview", revision: initial.documents![1]!.revision,
     content: "A stale manual edit" })).rejects.toThrow("profile_changed");
+});
+
+
+test("connected example exposes manual refresh without starting automatic research", async () => {
+  const root = await temporary();
+  const server = await startWorkbench(root, { chat: { version: 1, threadId: randomUUID(), executable: "never-execute-fictional-test" } });
+  servers.push(server);
+  const status = await fetch(new URL("/example", server.address));
+  const selected = new URL(status.url).origin;
+  const refresh = await (await fetch(selected + "/api/search/refresh")).json();
+  expect(refresh).toMatchObject({ manualEnabled: true, connected: true, automaticEnabled: false, inProgress: false, lastUpdatedAt: null, latest: null });
+  expect((await (await fetch(selected + "/api/tasks")).json()).tasks).toEqual([]);
+  expect(await readdir(root)).toEqual([]);
 });

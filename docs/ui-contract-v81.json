@@ -1,0 +1,32 @@
+{
+  "version": 81,
+  "establishedAt": "2026-11-05",
+  "authorization": "User reported dead example.invalid links while recording and requested a verified runnable demo.",
+  "validation": "TypeScript and 13 workbench tests passed, including every local fictional posting link and the full Apply, edit, approval and separate submission path.",
+  "files": {
+    "src/review/reviewViews.ts": "d8c2417c894fc415a1f9574cfe5edb2d1358f7ddb5e4b7dd0e4ca677b24e8aef",
+    "src/review/statusView.ts": "abdb5380ca9906d2b97833cb318157d46423aa7099ee1a51b624c2dbfd96b6c3",
+    "src/review/workflowViews.ts": "0486280d4a944c43f709e046631da58aa682d1c73e2ab58e4aaebc0a9bb7178d",
+    "src/review/applicationStyles.ts": "1f44f248b69f14229956d9d06d72935aa65b090518b8ec3ed697d0bddca0468b",
+    "src/workbench/views.ts": "f52e0e7bf13c1ff720da4bd5633364aa73dae8bf7aff51e25d82fbaec472d00e",
+    "src/interview/interviewView.ts": "7d7157a7bc6ace5087a7294602b1e7b1490f850554fa3229e66036abe512a33c",
+    "src/interview/practiceText.ts": "4f0eb8b44740be89d087e6e31fdb528853adbfd436bfb22f6bbecb1827da7f8d",
+    "src/interview/browserActions.ts": "2001f1525868184d68eb536b5cdc3b04be55119639c9d0b983c3b0c5be12dcaa",
+    "src/workbench/profileView.ts": "2ca626d4b96233b7fffd9304030f34c9b5127f49b2d192320fe7597c1db0da81",
+    "src/workbench/start.ts": "6b96d60b55dd87a6a36ae43397a4e70082c7ef7628cdd0c0a3016fd6725735a5",
+    "src/workbench/interviewRequests.ts": "56fba31af7805ead3d7716a2a20cdf10b6ab7291832dad9f2f6968fd47894293",
+    "src/workbench/intakeView.ts": "690c2d7c3f00e7e53b292b249fc0478e97d04d0927fc2cb44ca401514c0b2fd2",
+    "src/workbench/searchRefreshView.ts": "f35f05e765b573b15ab4806e9678dde8e52e07f4987d3a9ceb5d840a5338764f",
+    "src/workbench/designSystem.ts": "e2968b1d535b07e7618d95c818558a913a3eb55d67743d00a4f9643f780f74bd",
+    "src/workbench/assets.ts": "b14341424c6cf07ae4ad3d7573e07d21effc640154f87e7dcf0f968df7156bb1",
+    "src/workbench/assets/InterVariable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/review/statusLayout.ts": "2a7cd6a1f4537ae36b2e19bf847d64419f1b6e5e63bece063894c5e42e402c8c",
+    "src/workbench/profileStore.ts": "918a4766a3af32fa02be8646ff754d0ef89720f42f74c5b0a5f363784a9d9ef2",
+    "src/workbench/intakeRequests.ts": "60a9ae8058539ce552627c74dfcd6b09d458d6deeab08e5459fd8e1b0c421ef9",
+    "src/workbench/workspaceTheme.ts": "e4b73cb665962b58f03acdc178282bcd6260e2cdeb3348704e1a1577402127fb",
+    "src/workbench/assets/careeros-mark.svg": "02d4ccd1a39c65771ee4580bdbeef66ebe86abc820871655ed80eebf94b37597",
+    "src/workbench/exampleSnapshot.ts": "dc0b0d060f37855e78354eb1a40515a3d96c8d62bec24f064bd29624ae6f8256",
+    "src/workbench/exampleWorkflow.ts": "bf0a7e2d95aec51c96303fa5aecee4f9073abe0550712ca4518f4013a8f659d6",
+    "src/workbench/exampleResumeBindings.ts": "40e030eab81b610f843555292cb457c273504755664d1afaf8fc65b8de869b48"
+  }
+}

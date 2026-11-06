@@ -30,7 +30,7 @@ import { buildStatusView } from "./statusView.js";
 import { basename, dirname, join } from "node:path";
 import { readInterviewBoard } from "../interview/workbench.js";
 import { renderInterviewPage } from "../interview/interviewView.js";
-import { renderAccountPage } from "../workbench/views.js";
+import { page, escapeText, renderAccountPage } from "../workbench/views.js";
 import { GoogleBridge, googleRoutes } from "../interview/googleBridge.js";
 import { randomBytes } from "node:crypto";
 import { approveWebsitePlan } from "../interview/webActions.js";
@@ -251,7 +251,13 @@ function publicError(error: unknown): { status: number; code: string } {
 
 export async function startReviewServer(options: ReviewServerOptions): Promise<RunningReviewServer> {
   const send = (response: ServerResponse, status: number, body: string, contentType = "text/plain; charset=utf-8") => {
+    if (options.welcomeUrl && options.tasks?.mode === "demo" && contentType.startsWith("text/html")) {
+      body = body.replace('</nav></header>', '</nav><a class="workspace-return" href="/"><span aria-hidden="true">←</span> My workspace</a></header>');
+    }
     if (options.welcomeUrl && contentType.startsWith("text/html")) body = body.replaceAll('href="/"', `href="${options.welcomeUrl}"`);
+    if (options.tasks?.mode === "demo" && contentType.startsWith("text/html")) {
+      body = body.replace(/href="https:\/\/example\.invalid\/jobs\/([^"?#]+)"/g, 'href="/demo/jobs/$1"');
+    }
     sendResponse(response, status, body, contentType);
   };
   const workspaceRoot = options.workspaceRoot ?? dirname(dataForTracker(options.trackerPath));
@@ -299,6 +305,13 @@ export async function startReviewServer(options: ReviewServerOptions): Promise<R
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? "/", "http://127.0.0.1");
     try {
+      if (request.method === "GET" && url.pathname.startsWith("/demo/jobs/")) {
+        const jobId = decodeURIComponent(url.pathname.slice("/demo/jobs/".length));
+        const job = options.tasks?.mode === "demo" ? (await readJobLibrary(options.jobsPath)).find(item => item.jobId === jobId && item.officialUrl === `https://example.invalid/jobs/${jobId}`) : undefined;
+        if (!job) { send(response, 404, "Not found"); return; }
+        const body = `<main id="workspace-main" tabindex="-1"><nav class="task-context"><a href="/status/us">← Back to Status</a></nav><h1>${escapeText(job.title)}</h1><p>${escapeText(job.company)} · ${escapeText(job.location)}</p><section class="editor"><h2>Role overview</h2><p>${escapeText(job.note)}</p></section><p class="meta">Fictional role for the local demo.</p><a href="/status/us">View application progress →</a></main>`;
+        send(response, 200, page(job.title, "status", body), "text/html; charset=utf-8"); return;
+      }
       if (request.method === "GET" && url.pathname === "/assets/InterVariable.woff2") { await serveWorkspaceFont(response); return; }
       if (request.method === "GET" && ["/", "/profile", "/status", "/status/us", "/review", "/interviews"].includes(url.pathname)) void refresh?.check("opened");
       if (request.method === "GET" && url.pathname === "/assets/interview-actions.js") {

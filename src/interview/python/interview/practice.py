@@ -170,7 +170,12 @@ For EVERY coding exercise, solution MUST contain a complete runnable Python func
 No imports, I/O, filesystem, environment, network, reflection or external dependencies. Use only the explicitly allowed built-ins/methods below.
 Include at least 3 executable tests with arguments_json (JSON positional-argument array), expected_json (JSON expected result),
 and expected_error (null for success, ValueError/TypeError for an expected error; use expected_json 'null' then).
-Use list/tuple/int type annotations if helpful. Match the exact question's signature and invalid-input contract.
+Tests are decoded with json.loads: JSON arrays become Python lists, including nested pairs; JSON objects have string keys.
+There is NO tuple conversion or input coercion. Design input contracts using JSON-native types and use list annotations for input pairs.
+Never require tuple-only inputs or integer dictionary keys in executable test inputs. Internal tuples are allowed.
+For example, arguments_json='[[[7,0.4],[3,0.9]],2]' calls the function with a list of lists and integer 2.
+Match every displayed signature, example, validator and expected exception to these exact decoded types.
+Mentally trace every success and failure test through the complete function before returning the pack.
 Include complexity and boundary tests. Non-coding questions use solution=null.
 If the contract requires validating every input item, validate the entire input before returning an early match.
 Test malformed items after an otherwise valid matching item as well as malformed first items.
